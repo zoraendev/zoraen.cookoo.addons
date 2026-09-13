@@ -1,0 +1,77 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabCanal"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'canal'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <div class="zrn_analitics_commercial_channel">
+                    <t t-if="state.channelLoading">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_text">Cargando resumen por canal...</div>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.channelLoading">
+                        <div class="zrn_analitics_commercial_channel_cards">
+                            <t t-foreach="channelPayload.summary_cards" t-as="card" t-key="card.label">
+                                <div class="zrn_analitics_commercial_coverage_card">
+                                    <span><t t-esc="card.label"/></span>
+                                    <strong><t t-esc="formatChannelCardValue(card)"/></strong>
+                                </div>
+                            </t>
+                        </div>
+
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Canales comerciales</span>
+                                <span>Click en la fila para abrir detalle</span>
+                            </div>
+
+                            <t t-if="hasChannelRows">
+                                <div class="zrn_analitics_commercial_table_wrap zrn_analitics_commercial_channel_table_wrap">
+                                    <div class="o_list_renderer o_list_view">
+                                        <table class="o_list_table table table-sm table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Canal</th>
+                                                    <th>Clientes</th>
+                                                    <th>PDVs</th>
+                                                    <th>Pedidos</th>
+                                                    <th>Unidades</th>
+                                                    <th>Revenue</th>
+                                                    <th>% Mix</th>
+                                                    <th>Ticket</th>
+                                                    <th>Marcas</th>
+                                                    <th>Ultima venta</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="channelPayload.rows" t-as="row" t-key="row.key">
+                                                    <tr class="zrn_analitics_commercial_channel_row" t-on-click="() =&gt; this.openChannelModal(row)">
+                                                        <td><strong><t t-esc="row.channel"/></strong></td>
+                                                        <td><t t-esc="formatCount(row.customer_count)"/></td>
+                                                        <td><t t-esc="formatCount(row.point_count)"/></td>
+                                                        <td><t t-esc="formatCount(row.order_count)"/></td>
+                                                        <td><t t-esc="formatCount(row.units)"/></td>
+                                                        <td><t t-esc="channelPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                        <td><t t-esc="formatPercent(row.mix_pct)"/></td>
+                                                        <td><t t-esc="channelPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.average_ticket)"/></td>
+                                                        <td><t t-esc="formatCount(row.brand_count)"/></td>
+                                                        <td><t t-esc="row.last_order_label"/></td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <div class="zrn_analitics_commercial_empty_note">
+                                    <t t-esc="channelPayload.empty_message"/>
+                                </div>
+                            </t>
+                        </section>
+                    </t>
+                </div>
+            </t>
+
+            </t>
+</templates>

@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabAlertas"><t t-if="state.financialTab === 'alertas'">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_financial_panel_head">
+                                    <span>Alertas financieras</span>
+                                    <span>Reglas simples sobre cobertura, margen y concentración</span>
+                                </div>
+                                <div class="zrn_analitics_financial_coverage_notes">
+                                    <t t-if="financialPayload.alerts.length">
+                                        <t t-foreach="financialPayload.alerts" t-as="alert" t-key="alert.title">
+                                            <div class="zrn_analitics_financial_coverage_note_row">
+                                                <strong><t t-esc="alert.title"/></strong>
+                                                <span><t t-esc="alert.detail"/></span>
+                                            </div>
+                                            <div t-if="alert.items &amp;&amp; alert.items.length" class="zrn_analitics_financial_table_sub">
+                                                <t t-esc="alert.items.join(', ')"/>
+                                            </div>
+                                        </t>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_financial_coverage_note_row">
+                                            <strong>Sin alertas activas</strong>
+                                            <span>Ninguna regla financiera superó los umbrales del periodo filtrado.</span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

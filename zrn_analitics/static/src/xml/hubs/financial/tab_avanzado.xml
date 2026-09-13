@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabAvanzado"><t t-if="state.financialTab === 'avanzado'">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_financial_panel_head">
+                                    <span>
+                                        <t t-if="state.financialTab === 'avanzado'">Analisis Avanzado</t>
+                                        </span>
+                                    <span>Pendiente de backend y datos específicos</span>
+                                </div>
+                                <div class="zrn_analitics_financial_empty_note">
+                                    <t t-if="state.financialTab === 'avanzado'">
+                                        Esta tab queda reservada para analisis como sensibilidad de precios, waterfall de margen y cruces financieros que necesitan fuentes adicionales o reglas mas maduras.
+                                    </t>
+                                    </div>
+                            </section>
+                        </t>
+                    </t>
+</templates>

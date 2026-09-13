@@ -1,0 +1,43 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubOperationsTabDemanda"><t t-if="state.operationsTab === 'demanda'">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_operations_panel_head">
+                                    <span>Plan de produccion sugerido</span>
+                                    <span>Lotes base desde demanda promedio</span>
+                                </div>
+                                <div class="zrn_analitics_operations_table_wrap">
+                                    <div class="o_list_renderer o_list_view table-responsive">
+                                        <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_demanda', 'name')" class="o_column_sortable" style="cursor: pointer;">Producto</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_demanda', 'brand_name')" class="o_column_sortable" style="cursor: pointer;">Marca</th>
+                                                    <th class="text-center">ABC</th>
+                                                    <th class="text-center">Rotacion</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_demanda', 'units_per_month')" class="o_column_sortable text-end" style="cursor: pointer;">Unid/mes</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_demanda', 'units_per_day')" class="o_column_sortable text-end" style="cursor: pointer;">Unid/dia</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_demanda', 'weekly_suggestion')" class="o_column_sortable text-end" style="cursor: pointer;">Semanal</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_demanda', 'biweekly_suggestion')" class="o_column_sortable text-end" style="cursor: pointer;">Quincenal</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="sortedOperationsDemanda" t-as="row" t-key="row.id" t-on-click="() =&gt; this.openOperationsProduct(row)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="row.name"/></strong></td>
+                                                    <td><t t-esc="row.brand_name"/></td>
+                                                    <td class="text-center"><t t-esc="row.abc_class"/></td>
+                                                    <td class="text-center"><t t-esc="row.rotation_key"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.units_per_month)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.units_per_day)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.weekly_suggestion)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.biweekly_suggestion)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

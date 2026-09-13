@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubOperationsFilters">
+        <section class="zrn_analitics_hub_panel">
+            <div class="zrn_analitics_operations_panel_head">
+                <span>Filtros operativos</span>
+                <span>Demanda inferida desde ventas con corte por marca y canal</span>
+            </div>
+            <div class="zrn_analitics_operations_channel_filters">
+                <div class="zrn_analitics_operations_field">
+                    <label>Desde</label>
+                    <input type="date" class="form-control" t-att-value="state.operationsFilters.date_from" t-on-input="(ev) =&gt; this.onOperationsDateFromInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_operations_field">
+                    <label>Hasta</label>
+                    <input type="date" class="form-control" t-att-value="state.operationsFilters.date_to" t-on-input="(ev) =&gt; this.onOperationsDateToInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_operations_field">
+                    <label>Marca</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(operationsPayload.filter_options.brands, state.operationsFilters.brand_ids)" domain="getOptionDomain(operationsPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onOperationsBrandsChange"/>
+                </div>
+                <div class="zrn_analitics_operations_field">
+                    <label>Canal</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(operationsPayload.filter_options.channels, state.operationsFilters.channel_ids)" domain="getOptionDomain(operationsPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onOperationsChannelsChange"/>
+                </div>
+                <div class="zrn_analitics_operations_field">
+                    <label>Canal de producto</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(operationsPayload.filter_options.product_channels, state.operationsFilters.product_channel_ids)" domain="getOptionDomain(operationsPayload.filter_options.product_channels)" resModel="'zrn_commercial.product.channel'" fieldString="'Canal de producto'" placeholder="'Todos los canales de producto'" onChange.bind="this.onOperationsProductChannelsChange"/>
+                </div>
+                <div class="zrn_analitics_operations_field">
+                    <label>Clase ABC</label>
+                    <SelectMenu choices="getSelectChoices(operationsPayload.filter_options.abc_choices, 'Todas las clases')" value="state.operationsFilters.abc_class" onSelect.bind="this.onOperationsAbcSelect"/>
+                </div>
+                <div class="zrn_analitics_operations_field">
+                    <label>Rotacion</label>
+                    <SelectMenu choices="getSelectChoices(operationsPayload.filter_options.rotation_choices, 'Toda la rotacion')" value="state.operationsFilters.rotation_key" onSelect.bind="this.onOperationsRotationSelect"/>
+                </div>
+                <div class="zrn_analitics_operations_field zrn_analitics_operations_field_search">
+                    <label>Buscar</label>
+                    <input type="text" class="form-control" placeholder="Producto, marca, canal o codigo" t-att-value="state.operationsFilters.search" t-on-input="(ev) =&gt; this.updateOperationsFilter('search', ev.target.value)" t-on-keydown="this.onOperationsSearchKeydown"/>
+                </div>
+            </div>
+            <div class="zrn_analitics_operations_channel_actions">
+                <button type="button" class="btn btn-primary" t-on-click="this.applyOperationsFilters">Aplicar</button>
+                <button type="button" class="btn btn-secondary" t-on-click="this.clearOperationsFilters">Limpiar</button>
+            </div>
+        </section>
+    </t>
+
+    </templates>

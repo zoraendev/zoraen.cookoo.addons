@@ -1,0 +1,67 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabProducto"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'producto'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                
+                <!-- Product Revenue Chart and Selectors -->
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Top 10 Productos por Venta YTD</span>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-sm btn-outline-dark" t-att-class="state.productChartType === 'bar' ? 'active' : ''" t-on-click="() =&gt; this.setProductChartType('bar')">Barra</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark" t-att-class="state.productChartType === 'line' ? 'active' : ''" t-on-click="() =&gt; this.setProductChartType('line')">Línea</button>
+                            <button type="button" class="btn btn-sm btn-outline-dark" t-att-class="state.productChartType === 'pie' ? 'active' : ''" t-on-click="() =&gt; this.setProductChartType('pie')">Rosca (Pie)</button>
+                        </div>
+                    </div>
+                    <div class="zrn_analitics_commercial_chart_container" style="height: 320px;">
+                        <t t-if="hasEchartsLibrary">
+                            <div class="w-100 h-100" data-zrn-chart="product-chart"/>
+                        </t>
+                        <t t-else="">
+                            <div class="zrn_analitics_commercial_chart_empty">Librería ECharts no disponible.</div>
+                        </t>
+                    </div>
+                </section>
+
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Catálogo completo de productos y marcas</span>
+                        <span>Total: <t t-esc="formatCount(commercialPayload.all_products.length)"/> SKUs</span>
+                    </div>
+                    <div class="zrn_analitics_commercial_table_wrap" style="max-height: 600px; overflow-y: auto;">
+                        <table class="zrn_analitics_commercial_table">
+                            <thead>
+                                <tr>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_products', 'name')" style="cursor:pointer">Producto <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_products', 'brand')" style="cursor:pointer">Marca <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th>Categoría</th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_products', 'rev')" style="cursor:pointer; text-align:right">Revenue YTD <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_products', 'units')" style="cursor:pointer; text-align:right">Unidades <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th style="text-align:right">% Venta</th>
+                                    <th style="text-align:right">Líneas (Pedidos)</th>
+                                    <th style="text-align:right">Canales</th>
+                                    <th style="text-align:right">Precio real prom.</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="sortedAllProducts" t-as="item" t-key="item.product_id">
+                                    <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(item.detail)" style="cursor: pointer;">
+                                        <td><strong><t t-esc="item.name"/></strong></td>
+                                        <td><t t-esc="item.brand"/></td>
+                                        <td><t t-esc="item.category"/></td>
+                                        <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.rev)"/></td>
+                                        <td style="text-align:right"><t t-esc="formatCount(item.units)"/></td>
+                                        <td style="text-align:right"><t t-esc="Math.round(item.rev / commercialPayload.summary.total_amount * 1000) / 10"/>%</td>
+                                        <td style="text-align:right"><t t-esc="formatCount(item.n_lines)"/></td>
+                                        <td style="text-align:right"><t t-esc="formatCount(item.channels)"/></td>
+                                        <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.avg_unit_price_real)"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </t>
+
+            </t>
+</templates>

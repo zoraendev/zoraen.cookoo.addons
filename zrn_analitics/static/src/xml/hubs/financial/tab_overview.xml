@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabOverview"><t t-if="state.financialTab === 'overview'">
+                            <div class="zrn_analitics_financial_top_row">
+                                <section class="zrn_analitics_hub_panel zrn_analitics_financial_panel_main">
+                                    <div class="zrn_analitics_financial_panel_head">
+                                        <span>Evolución financiera</span>
+                                        <span>Revenue, costo y margen</span>
+                                    </div>
+                                    <div class="zrn_analitics_financial_line_chart">
+                                        <t t-if="hasFinancialRevenueSeries &amp;&amp; hasEchartsLibrary">
+                                            <div class="zrn_analitics_financial_echart" data-zrn-chart="financial-overview"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_financial_chart_empty">Sin serie financiera para graficar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel zrn_analitics_financial_panel_side">
+                                    <div class="zrn_analitics_financial_panel_head">
+                                        <span>Margen por marca</span>
+                                        <span>Top del periodo</span>
+                                    </div>
+                                    <div class="zrn_analitics_financial_donut_wrap">
+                                        <t t-if="hasFinancialBrandMix &amp;&amp; hasEchartsLibrary">
+                                            <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_donut" data-zrn-chart="financial-brand-overview"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_financial_chart_empty">Sin margen por marca para mostrar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="zrn_analitics_financial_bottom_grid">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_financial_panel_head">
+                                        <span>Margen % por canal</span>
+                                        <span>Lectura rápida por segmento</span>
+                                    </div>
+                                    <div class="zrn_analitics_financial_bar_list">
+                                        <t t-if="hasFinancialChannels &amp;&amp; hasEchartsLibrary">
+                                            <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="financial-channel-overview"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_financial_chart_empty">Sin canales con margen calculable.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_financial_panel_head">
+                                        <span>Notas y fuentes</span>
+                                        <span>Trazabilidad del dato</span>
+                                    </div>
+                                    <div class="zrn_analitics_financial_coverage_notes">
+                                        <t t-foreach="financialPayload.notes_sources" t-as="note" t-key="note.label">
+                                            <div class="zrn_analitics_financial_coverage_note_row">
+                                                <strong><t t-esc="note.label"/></strong>
+                                                <span><t t-esc="note.detail"/></span>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+                        </t>
+
+                        </t>
+</templates>

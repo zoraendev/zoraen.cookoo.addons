@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabMarca"><t t-if="state.financialTab === 'marca'">
+                            <div class="zrn_analitics_financial_top_row">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_financial_panel_head">
+                                        <span>Margen por marca</span>
+                                        <span>Comparativo del periodo</span>
+                                    </div>
+                                    <div class="zrn_analitics_financial_bar_list">
+                                        <t t-if="sortedFinancialBrands.length &amp;&amp; hasEchartsLibrary">
+                                            <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="financial-brand-detail"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_financial_chart_empty">Sin marcas para mostrar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_financial_panel_head">
+                                    <span>Comparativo por marca</span>
+                                    <span>Click en la fila para abrir detalle</span>
+                                </div>
+                                <div class="zrn_analitics_financial_table_wrap">
+                                    <div class="o_list_renderer o_list_view table-responsive">
+                                        <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'name')" class="o_column_sortable">Marca</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'product_count')" class="o_column_sortable text-end">Productos</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'revenue')" class="o_column_sortable text-end">Revenue</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'matched_revenue')" class="o_column_sortable text-end">Rev. matcheado</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'cost')" class="o_column_sortable text-end">Costo</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'margin')" class="o_column_sortable text-end">Margen</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('financial_brands', 'margin_pct')" class="o_column_sortable text-end">Margen %</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <t t-foreach="sortedFinancialBrands" t-as="row" t-key="row.name">
+                                                    <tr t-on-click="() =&gt; this.openFinancialBrand(row)" style="cursor: pointer;">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.product_count)"/></td>
+                                                        <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                        <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.matched_revenue)"/></td>
+                                                        <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.cost)"/></td>
+                                                        <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.margin)"/></td>
+                                                        <td class="text-end"><t t-esc="formatPercent(row.margin_pct)"/></td>
+                                                    </tr>
+                                                </t>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

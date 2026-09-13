@@ -1,0 +1,204 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabRfm"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'rfm'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Matriz RFM + Pareto ABC</span>
+                        <span>Periodo comercial YTD</span>
+                    </div>
+
+                    <!-- KPIs -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">Clientes totales</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.clients_rfm.meta.n_clients)"/></h4>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">Clase A (Pareto)</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.clients_rfm.abc.a_count)"/></h4>
+                                <span class="small text-success"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.clients_rfm.abc.a_rev)"/></span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">Champions + Leales</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.clients_rfm.exec.champions_loyal_count)"/></h4>
+                                <span class="small text-muted"><t t-esc="commercialPayload.clients_rfm.exec.champions_loyal_pct"/>% del total</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-2">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">En riesgo</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold text-danger"><t t-esc="formatCount(commercialPayload.clients_rfm.exec.at_risk_count)"/></h4>
+                                <span class="small text-danger"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.clients_rfm.exec.at_risk_rev)"/></span>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 bg-light">
+                                <div class="text-muted small text-center uppercase">Concentración de Ventas</div>
+                                <div class="d-flex justify-content-around mt-2 text-center">
+                                    <div>
+                                        <strong>Top 5</strong>
+                                        <div class="text-dark font-weight-bold"><t t-esc="commercialPayload.clients_rfm.concentration.top5_pct"/>%</div>
+                                    </div>
+                                    <div>
+                                        <strong>Top 10</strong>
+                                        <div class="text-dark font-weight-bold"><t t-esc="commercialPayload.clients_rfm.concentration.top10_pct"/>%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-4">
+                        <!-- Heatmap R x F -->
+                        <div class="col-12 col-md-7">
+                            <div class="border rounded p-3 bg-white h-100">
+                                <h6 class="font-weight-bold mb-2">Matriz Recencia × Frecuencia · 4 × 4</h6>
+                                <div class="zrn_analitics_rfm_heatmap">
+                                    <t t-foreach="[4,3,2,1]" t-as="r" t-key="r">
+                                        <t t-foreach="[1,2,3,4]" t-as="f" t-key="f">
+                                            <t t-set="cell_key" t-value="r + '-' + f"/>
+                                            <t t-set="cell_data" t-value="commercialPayload.clients_rfm.rf_matrix[cell_key] || {'count':0, 'rev':0.0}"/>
+                                            <div class="zrn_analitics_rfm_cell" t-att-style="cell_data.count &gt; 10 ? 'background: #dcfce7; border-color: #86efac;' : (cell_data.count &gt; 0 ? 'background: #f0fdf4; border-color: #bbf7d0;' : 'background: #fafafa; border-color: #f1f5f9;')">
+                                                <div class="zrn_analitics_rfm_cell_title">R<t t-esc="r"/>-F<t t-esc="f"/></div>
+                                                <div class="zrn_analitics_rfm_cell_count"><t t-esc="formatCount(cell_data.count)"/></div>
+                                                <div class="zrn_analitics_rfm_cell_rev"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(cell_data.rev)"/></div>
+                                            </div>
+                                        </t>
+                                    </t>
+                                </div>
+                                <div class="text-muted small mt-2">
+                                    <strong>Recencia:</strong> 4 = compró este mes, 1 = hace &gt;= 3 meses. <strong>Frecuencia:</strong> 4 = 4+ meses activo, 1 = un solo mes con compra.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pareto Curve -->
+                        <div class="col-12 col-md-5">
+                            <div class="border rounded p-3 bg-white h-100">
+                                <h6 class="font-weight-bold mb-2">Curva de Concentración de Pareto ABC</h6>
+                                <div class="zrn_analitics_commercial_chart_container" style="height: 200px;">
+                                    <div class="w-100 h-100" data-zrn-chart="rfm-pareto"/>
+                                </div>
+                                <div class="row g-2 mt-2">
+                                    <div class="col-4">
+                                        <div class="border rounded p-2 text-center" style="background: #f0fdf4; border-left: 3px solid #16a34a;">
+                                            <div class="text-muted small">Clase A (80%)</div>
+                                            <strong class="font-weight-bold"><t t-esc="commercialPayload.clients_rfm.abc.a_count"/> pdvs</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-2 text-center" style="background: #fffbeb; border-left: 3px solid #d97706;">
+                                            <div class="text-muted small">Clase B (15%)</div>
+                                            <strong class="font-weight-bold"><t t-esc="commercialPayload.clients_rfm.abc.b_count"/> pdvs</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="border rounded p-2 text-center" style="background: #f8fafc; border-left: 3px solid #64748b;">
+                                            <div class="text-muted small">Clase C (5%)</div>
+                                            <strong class="font-weight-bold"><t t-esc="commercialPayload.clients_rfm.abc.c_count"/> pdvs</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RFM Segments Cards -->
+                    <div class="border rounded p-3 bg-white mb-4">
+                        <h6 class="font-weight-bold mb-3">Segmentación Estratégica RFM (Top 3 clientes por segmento)</h6>
+                        <div class="zrn_analitics_rfm_segments_grid">
+                            <t t-foreach="commercialPayload.clients_rfm.segments_order" t-as="seg" t-key="seg.key">
+                                <t t-set="seg_data" t-value="commercialPayload.clients_rfm.segments[seg.key]"/>
+                                <div class="zrn_analitics_rfm_segment_card">
+                                    <div class="zrn_analitics_rfm_segment_head">
+                                        <span class="zrn_analitics_rfm_segment_title"><t t-esc="seg.name"/></span>
+                                        <span class="zrn_analitics_rfm_segment_count"><t t-esc="formatCount(seg_data.count)"/> pdvs (Q<t t-esc="formatMoney(seg_data.rev)"/>)</span>
+                                    </div>
+                                    <div class="zrn_analitics_rfm_segment_body">
+                                        <t t-foreach="seg_data.top_clients" t-as="tc" t-key="tc.name">
+                                            <div class="zrn_analitics_rfm_segment_item">
+                                                <span class="text-truncate" style="max-width:180px;"><t t-esc="tc.name"/></span>
+                                                <span class="font-weight-bold"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(tc.rev)"/></span>
+                                            </div>
+                                        </t>
+                                        <t t-if="!seg_data.top_clients.length">
+                                            <div class="text-muted small text-center py-2">Sin clientes en este segmento</div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+
+                    <!-- Client List Table -->
+                    <div class="border rounded p-3 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="font-weight-bold mb-0">Listado Completo de Segmentación y Pareto</h6>
+                            <div class="d-flex gap-2">
+                                <select class="form-select form-select-sm" style="width: auto;" t-on-change="onRfmFilterSegmentSelect">
+                                    <option value="">Todos los segmentos</option>
+                                    <t t-foreach="commercialPayload.clients_rfm.segments_order" t-as="seg" t-key="seg.key">
+                                        <option t-att-value="seg.key"><t t-esc="seg.name"/></option>
+                                    </t>
+                                </select>
+                                <select class="form-select form-select-sm" style="width: auto;" t-on-change="onRfmFilterAbcSelect">
+                                    <option value="">Todas las clases (ABC)</option>
+                                    <option value="A">Clase A (Venta 80%)</option>
+                                    <option value="B">Clase B (Venta 15%)</option>
+                                    <option value="C">Clase C (Venta 5%)</option>
+                                </select>
+                                <input type="text" class="form-control form-control-sm" placeholder="Buscar cliente..." style="width: 200px;" t-on-input="onRfmFilterSearchInput"/>
+                            </div>
+                        </div>
+                        <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">
+                            <table class="zrn_analitics_commercial_table">
+                                <thead>
+                                    <tr>
+                                        <th t-on-click="() =&gt; this.toggleSort('rfm_clients', 'name')" style="cursor:pointer">Cliente / PDV <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('rfm_clients', 'primary_channel')" style="cursor:pointer">Canal <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('rfm_clients', 'rev')" style="cursor:pointer; text-align:right">Venta YTD <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th style="text-align:right">% Participación</th>
+                                        <th t-on-click="() =&gt; this.toggleSort('rfm_clients', 'abc')" style="cursor:pointer; text-align:center">Clase ABC <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th style="text-align:center">R</th>
+                                        <th style="text-align:center">F</th>
+                                        <th style="text-align:center">M</th>
+                                        <th>Segmento RFM</th>
+                                        <th>Última Compra</th>
+                                        <th style="text-align:right">Ticket Promedio</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="sortedRfmClients" t-as="item" t-key="item.id">
+                                        <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(item.detail)" style="cursor: pointer;">
+                                            <td><strong><t t-esc="item.name"/></strong></td>
+                                            <td><span class="badge bg-light text-dark"><t t-esc="item.primary_channel"/></span></td>
+                                            <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.rev)"/></td>
+                                            <td style="text-align:right"><t t-esc="item.share_pct"/>%</td>
+                                            <td style="text-align:center">
+                                                <span t-att-class="item.abc === 'A' ? 'badge bg-success' : (item.abc === 'B' ? 'badge bg-warning' : 'badge bg-secondary')">
+                                                    Clase <t t-esc="item.abc"/>
+                                                </span>
+                                            </td>
+                                            <td style="text-align:center"><t t-esc="item.r_score"/></td>
+                                            <td style="text-align:center"><t t-esc="item.f_score"/></td>
+                                            <td style="text-align:center"><t t-esc="item.m_score"/></td>
+                                            <td><t t-esc="item.segment"/></td>
+                                            <td><t t-esc="item.last_month_label"/></td>
+                                            <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.ticket_avg)"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </t>
+
+            </t>
+</templates>

@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabGap"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'gap'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Sell-in Facturado vs Sell-out Consumidor</span>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm" t-att-class="state.sellinChain === 'walmart' ? 'btn-primary' : 'btn-light'" t-on-click="() =&gt; this.setSellinChain('walmart')">Walmart / Paiz</button>
+                            <button type="button" class="btn btn-sm" t-att-class="state.sellinChain === 'puma' ? 'btn-primary' : 'btn-light'" t-on-click="() =&gt; this.setSellinChain('puma')">PUMA Super 7</button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <t t-set="chain_payload" t-value="(commercialPayload.sellin_vs_sellout || {})[state.sellinChain] || {summary: {}}"/>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">Sell-in Facturado (Venta)</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(chain_payload.summary.sellin_q)"/></h4>
+                                <span class="small text-muted"><t t-esc="formatCount(chain_payload.summary.sellin_u)"/> unidades</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">Sell-out Consumidor (Venta)</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(chain_payload.summary.sellout_q)"/></h4>
+                                <span class="small text-muted"><t t-esc="formatCount(chain_payload.summary.sellout_u)"/> unidades</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">Sell-through (Desplazamiento)</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold text-success"><t t-esc="chain_payload.summary.sellthrough_q_pct"/>%</h4>
+                                <span class="small text-muted">Venta consumida</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light">
+                                <div class="text-muted small uppercase">PDVs Activos</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(chain_payload.summary.pdvs_with_data)"/></h4>
+                                <span class="small text-muted">En canal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chart -->
+                    <div class="border rounded p-3 bg-white mb-4">
+                        <h6 class="font-weight-bold mb-2">Comparativa Mensual de Ventas</h6>
+                        <div class="zrn_analitics_commercial_chart_container" style="height: 220px;">
+                            <div class="w-100 h-100" data-zrn-chart="sellin-sellout"/>
+                        </div>
+                    </div>
+
+                    <!-- Alerts & Accumulators -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6">
+                            <div class="border rounded p-3 bg-white">
+                                <h6 class="font-weight-bold mb-3 text-danger">⚠️ PDVs con Mayor Acumulación de Stock (Bajo Sell-through)</h6>
+                                <div class="zrn_analitics_commercial_table_wrap" style="max-height: 320px; overflow-y: auto;">
+                                    <table class="zrn_analitics_commercial_table">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('sellin_pdv', 'pdv_name')" style="cursor:pointer">PDV / Sucursal <i class="fa fa-sort ms-1 text-muted"/></th>
+                                                <th t-on-click="() =&gt; this.toggleSort('sellin_pdv', 'sellin_q')" style="cursor:pointer; text-align:right">Sell-in Q <i class="fa fa-sort ms-1 text-muted"/></th>
+                                                <th style="text-align:right">Sell-through</th>
+                                                <th style="text-align:right">Excedente (Gap Q)</th>
+                                                <th style="text-align:right">Días Cobertura</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedSellinPdv" t-as="p" t-key="p.store">
+                                                <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(p.detail)" t-att-class="p.sellthrough_pct &lt; 50 ? 'table-warning' : ''" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="p.pdv_name"/></strong></td>
+                                                    <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(p.sellin_q)"/></td>
+                                                    <td style="text-align:right; font-weight:700;"><t t-esc="p.sellthrough_pct"/>%</td>
+                                                    <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(p.gap_q)"/></td>
+                                                    <td style="text-align:right; font-weight:700;">
+                                                        <t t-if="p.days_of_cover">
+                                                            <t t-esc="p.days_of_cover"/> días
+                                                        </t>
+                                                        <t t-else="">
+                                                            —
+                                                        </t>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="border rounded p-3 bg-white">
+                                <h6 class="font-weight-bold mb-3">Ranking de Productos por Acumulación</h6>
+                                <div class="zrn_analitics_commercial_table_wrap" style="max-height: 320px; overflow-y: auto;">
+                                    <table class="zrn_analitics_commercial_table">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('sellin_sku', 'sku')" style="cursor:pointer">SKU / Producto <i class="fa fa-sort ms-1 text-muted"/></th>
+                                                <th t-on-click="() =&gt; this.toggleSort('sellin_sku', 'sellin_q')" style="cursor:pointer; text-align:right">Sell-in Q <i class="fa fa-sort ms-1 text-muted"/></th>
+                                                <th style="text-align:right">Sell-through</th>
+                                                <th style="text-align:right">Excedente (Gap Q)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedSellinSku" t-as="sku" t-key="sku.sku">
+                                                <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(sku.detail)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="sku.sku"/></strong></td>
+                                                    <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(sku.sellin_q)"/></td>
+                                                    <td style="text-align:right; font-weight:700;"><t t-esc="sku.sellthrough_pct"/>%</td>
+                                                    <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(sku.gap_q)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </t>
+
+            </t>
+</templates>

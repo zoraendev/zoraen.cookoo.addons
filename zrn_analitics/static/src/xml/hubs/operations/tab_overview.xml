@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubOperationsTabOverview"><t t-if="state.operationsTab === 'overview'">
+                            <div class="zrn_analitics_operations_top_row">
+                                <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_main">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Demanda mensual</span>
+                                        <span>Unidades proyectadas por mes</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_line_chart">
+                                        <t t-if="hasOperationsMonthlySeries and hasEchartsLibrary">
+                                            <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-overview-monthly"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_operations_chart_empty">Sin demanda mensual para graficar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_side">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Mix por marca</span>
+                                        <span>Participacion de unidades</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_donut_wrap">
+                                        <t t-if="hasOperationsBrandMix and hasEchartsLibrary">
+                                            <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_donut" data-zrn-chart="operations-overview-brand-mix"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_operations_chart_empty">Sin mix por marca para mostrar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="zrn_analitics_operations_bottom_grid">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Distribucion ABC</span>
+                                        <span>SKUs por clase</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <t t-if="hasEchartsLibrary">
+                                            <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-overview-abc"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_operations_chart_empty">Libreria ECharts no disponible.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Distribucion de rotacion</span>
+                                        <span>Frecuencia de venta</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <t t-if="hasEchartsLibrary">
+                                            <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-overview-rotation"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_operations_chart_empty">Libreria ECharts no disponible.</div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_operations_panel_head">
+                                    <span>Top SKUs</span>
+                                    <span>Ordenado por unidades vendidas</span>
+                                </div>
+                                <div class="zrn_analitics_operations_table_wrap">
+                                    <div class="o_list_renderer o_list_view table-responsive">
+                                        <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_top_skus', 'name')" class="o_column_sortable" style="cursor: pointer;">Producto</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_top_skus', 'brand_name')" class="o_column_sortable" style="cursor: pointer;">Marca</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_top_skus', 'abc_class')" class="o_column_sortable text-center" style="cursor: pointer;">ABC</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_top_skus', 'rotation_key')" class="o_column_sortable text-center" style="cursor: pointer;">Rotacion</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_top_skus', 'units')" class="o_column_sortable text-end" style="cursor: pointer;">Unidades</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_top_skus', 'revenue')" class="o_column_sortable text-end" style="cursor: pointer;">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="sortedOperationsTopSkus" t-as="row" t-key="row.id" t-on-click="() =&gt; this.openOperationsProduct(row)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="row.name"/></strong></td>
+                                                    <td><t t-esc="row.brand_name"/></td>
+                                                    <td class="text-center"><t t-esc="row.abc_class"/></td>
+                                                    <td class="text-center"><t t-esc="row.rotation_key"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.units)"/></td>
+                                                    <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

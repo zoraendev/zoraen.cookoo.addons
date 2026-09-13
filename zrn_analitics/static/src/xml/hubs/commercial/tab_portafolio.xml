@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabPortafolio"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'portafolio'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <div class="zrn_analitics_commercial_portfolio">
+                    <div class="zrn_analitics_commercial_portfolio_note">
+                        <strong>Portafolio oficial</strong>
+                        <span>UN → Marca Comercial → Línea → SKU.</span>
+                    </div>
+
+                    <t t-if="!commercialPortfolio.hasBrands">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_title">Portafolio</div>
+                            <div class="zrn_analitics_hub_panel_text">
+                                No hay marcas comerciales creadas en (ZRN) Manejo Comercial para construir esta vista.
+                            </div>
+                        </div>
+                    </t>
+
+                    <t t-if="commercialPortfolio.hasBrands">
+                        <div class="zrn_analitics_commercial_portfolio_cards">
+                            <t t-foreach="commercialPortfolio.units" t-as="unit" t-key="unit.key">
+                                <button type="button" class="zrn_analitics_commercial_portfolio_card" t-att-class="activePortfolioUnit and activePortfolioUnit.key === unit.key ? 'is-active' : ''" t-att-style="'--zrn-unit-color: ' + unit.color" t-on-click="() =&gt; this.selectPortfolioUnit(unit.key)">
+                                    <div class="zrn_analitics_commercial_portfolio_card_name"><t t-esc="unit.name"/></div>
+                                    <div class="zrn_analitics_commercial_portfolio_card_value">
+                                        <t t-esc="commercialPortfolio.currencySymbol"/> <t t-esc="formatMoney(unit.revenue)"/>
+                                    </div>
+                                    <div class="zrn_analitics_commercial_portfolio_card_meta">
+                                        <t t-esc="formatPercent(unit.mix_percentage)"/> del mix · <t t-esc="formatCount(unit.sku_count)"/> SKU · <t t-esc="formatCount(unit.brand_count)"/> marcas
+                                    </div>
+                                    <div class="zrn_analitics_commercial_portfolio_card_footer">
+                                        <span>Margen real</span>
+                                        <strong>
+                                            <t t-esc="commercialPortfolio.currencySymbol"/> <t t-esc="formatMoney(unit.margin_amount)"/> (<t t-esc="formatPercent(unit.margin_pct)"/>)
+                                        </strong>
+                                    </div>
+                                </button>
+                            </t>
+                        </div>
+
+                        <div class="zrn_analitics_commercial_portfolio_top">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Revenue y margen por unidad</span>
+                                    <span>Vista inicial</span>
+                                </div>
+                                <div class="zrn_analitics_commercial_portfolio_chart">
+                                    <t t-if="commercialPortfolio.hasRevenue and hasEchartsLibrary">
+                                        <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="portfolio-units"/>
+                                    </t>
+                                    <t t-elif="commercialPortfolio.hasRevenue">
+                                        <div class="zrn_analitics_commercial_chart_empty">Hay datos de portafolio, pero la libreria ECharts aun no esta cargada en assets.</div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_commercial_chart_empty">Sin ventas ligadas a marcas en el periodo.</div>
+                                    </t>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Marca comercial dentro de UN</span>
+                                    <span><t t-esc="activePortfolioUnit ? activePortfolioUnit.name : ''"/></span>
+                                </div>
+                                <div class="zrn_analitics_commercial_portfolio_brand_mix">
+                                    <t t-if="activePortfolioUnit and activePortfolioUnit.brands.length and commercialPortfolio.hasRevenue and hasEchartsLibrary">
+                                        <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="portfolio-brands"/>
+                                    </t>
+                                    <t t-elif="activePortfolioUnit and activePortfolioUnit.brands.length and commercialPortfolio.hasRevenue">
+                                        <div class="zrn_analitics_commercial_chart_empty">Hay marcas con revenue, pero la libreria ECharts aun no esta cargada en assets.</div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_commercial_chart_empty">Sin marcas con revenue asignado para esta unidad.</div>
+                                    </t>
+                                </div>
+                            </section>
+                        </div>
+
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Drill UN → Marca → Línea → SKU</span>
+                                <span>Base preparada para jerarquía real</span>
+                            </div>
+                            <div class="zrn_analitics_commercial_portfolio_table_wrap">
+                                <div class="o_list_renderer o_list_view table-responsive">
+                                <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Nivel</th>
+                                            <th>Revenue</th>
+                                            <th>% Mix</th>
+                                            <th>Unidades</th>
+                                            <th>Líneas fact.</th>
+                                            <th>SKUs</th>
+                                            <th>Margen Q</th>
+                                            <th>Margen %</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="commercialPortfolio.drillRows" t-as="row" t-key="row.key">
+                                            <tr t-if="isPortfolioRowVisible(row)" class="zrn_analitics_commercial_portfolio_row" t-att-class="'is-' + row.level" t-on-click="() =&gt; this.onPortfolioRowClick(row)" t-att-style="row.level === 'brand' || row.level === 'line' || row.level === 'sku' ? 'cursor: pointer;' : ''">
+                                                <td>
+                                                    <div class="zrn_analitics_commercial_portfolio_cell d-flex align-items-center" t-att-class="'is-' + row.level">
+                                                        <button t-if="row.level !== 'sku'" type="button" class="btn btn-link p-0 me-1 zrn_analitics_commercial_portfolio_toggle text-decoration-none text-reset" t-on-click.stop="() =&gt; this.togglePortfolioRow(row.key)" style="width: 1.5rem; height: 1.5rem;">
+                                                            <t t-esc="isPortfolioRowExpanded(row.key) ? '▾' : '▸'"/>
+                                                        </button>
+                                                        <span t-if="row.level === 'unit'" class="zrn_analitics_commercial_portfolio_dot rounded-circle me-1" t-att-style="'background:' + row.color + '; width: 8px; height: 8px; display: inline-block;'"/>
+                                                        <span><t t-esc="row.label"/></span>
+                                                    </div>
+                                                </td>
+                                                <td><t t-esc="commercialPortfolio.currencySymbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                <td><t t-esc="formatPercent(row.mix_percentage)"/></td>
+                                                <td><t t-esc="row.units_sold ? formatCount(row.units_sold) : '—'"/></td>
+                                                <td><t t-esc="row.billed_lines ? formatCount(row.billed_lines) : '—'"/></td>
+                                                <td><t t-esc="row.sku_count ? formatCount(row.sku_count) : '—'"/></td>
+                                                <td><t t-esc="row.margin_amount ? commercialPortfolio.currencySymbol + ' ' + formatMoney(row.margin_amount) : '—'"/></td>
+                                                <td><t t-esc="row.margin_amount ? formatPercent(row.margin_pct) : '—'"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                                </div>
+                            </div>
+                        </section>
+
+                    </t>
+                </div>
+            </t>
+
+            </t>
+</templates>

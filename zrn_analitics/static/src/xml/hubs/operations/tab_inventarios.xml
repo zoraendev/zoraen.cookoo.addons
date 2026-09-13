@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubOperationsTabInventarios"><t t-if="state.operationsTab === 'inventarios'">
+                            <div class="zrn_analitics_operations_stats">
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>On hand</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.on_hand_units)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Disponible</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.available_units)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Reservado</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.reserved_units)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Valor inventario</span>
+                                    <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.inventory.summary.inventory_value)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Riesgo</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.risk_count)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Cobertura promedio</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.avg_coverage_days)"/> d</strong>
+                                </div>
+                            </div>
+                            <div class="zrn_analitics_operations_top_row">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Cobertura</span>
+                                        <span>Distribucion de SKUs</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-inventory-coverage"/>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Mix por marca</span>
+                                        <span>On hand por marca</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_donut_wrap">
+                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_donut" data-zrn-chart="operations-inventory-brand-mix"/>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="zrn_analitics_operations_bottom_grid">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Riesgo de quiebre</span>
+                                        <span>Click para abrir producto</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_inventory_risk', 'name')" class="o_column_sortable" style="cursor: pointer;">Producto</th>
+                                                        <th>Marca</th>
+                                                        <th>Canal producto</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_inventory_risk', 'available')" class="o_column_sortable text-end" style="cursor: pointer;">Disponible</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_inventory_risk', 'coverage_days')" class="o_column_sortable text-end" style="cursor: pointer;">Cobertura</th>
+                                                        <th class="text-end">Min</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedOperationsInventoryRisk" t-as="row" t-key="'ops_inv_risk_' + row.id" t-on-click="() =&gt; this.openOperationsProduct(row)" style="cursor: pointer;">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td><t t-esc="row.brand_name"/></td>
+                                                        <td><t t-esc="row.product_channel_name"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.available)"/></td>
+                                                        <td class="text-end"><t t-esc="row.coverage_days !== null ? formatCount(row.coverage_days) : '-'"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.min_days)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Sobrestock</span>
+                                        <span>Por encima del maximo</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_inventory_overstock', 'name')" class="o_column_sortable" style="cursor: pointer;">Producto</th>
+                                                        <th>Canal producto</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_inventory_overstock', 'on_hand')" class="o_column_sortable text-end" style="cursor: pointer;">On hand</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_inventory_overstock', 'coverage_days')" class="o_column_sortable text-end" style="cursor: pointer;">Cobertura</th>
+                                                        <th class="text-end">Max</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedOperationsInventoryOverstock" t-as="row" t-key="'ops_inv_over_' + row.id" t-on-click="() =&gt; this.openOperationsProduct(row)" style="cursor: pointer;">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td><t t-esc="row.product_channel_name"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.on_hand)"/></td>
+                                                        <td class="text-end"><t t-esc="row.coverage_days !== null ? formatCount(row.coverage_days) : '-'"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.max_days)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_operations_panel_head">
+                                    <span>Baja rotacion con stock</span>
+                                    <span>Inventario inmovilizado</span>
+                                </div>
+                                <div class="zrn_analitics_operations_table_wrap">
+                                    <div class="o_list_renderer o_list_view table-responsive">
+                                        <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_inventory_rotation', 'name')" class="o_column_sortable" style="cursor: pointer;">Producto</th>
+                                                    <th>Rotacion</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_inventory_rotation', 'days_since_last')" class="o_column_sortable text-end" style="cursor: pointer;">Dias sin venta</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_inventory_rotation', 'inventory_value')" class="o_column_sortable text-end" style="cursor: pointer;">Valor</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="sortedOperationsInventoryRotation" t-as="row" t-key="'ops_inv_rot_' + row.id" t-on-click="() =&gt; this.openOperationsProduct(row)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="row.name"/></strong></td>
+                                                    <td><t t-esc="row.rotation_key"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.days_since_last)"/></td>
+                                                    <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.inventory_value)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

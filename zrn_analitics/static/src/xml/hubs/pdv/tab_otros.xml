@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubPdvTabOtros"><t t-if="state.pdvTab === 'otros'">
+                            <div class="zrn_analitics_pdv_grid_top">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_pdv_panel_head">
+                                        <span>Cadenas adicionales</span>
+                                        <span>Revenue por canal</span>
+                                    </div>
+                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                        <t t-if="pdvPayload.otros.channels.length and hasEchartsLibrary">
+                                            <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-otros-channels"/>
+                                        </t>
+                                        <t t-elif="pdvPayload.otros.channels.length">
+                                            <div class="zrn_analitics_pdv_chart_empty">Hay canales adicionales, pero ECharts no esta disponible.</div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_pdv_chart_empty">Sin cadenas adicionales para mostrar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_pdv_panel_head">
+                                        <span>Canales incluidos</span>
+                                        <span><t t-esc="formatCount(pdvPayload.otros.channels.length)"/> canales</span>
+                                    </div>
+                                    <div class="zrn_analitics_pdv_channel_list">
+                                        <t t-if="pdvPayload.otros.channels.length">
+                                            <t t-foreach="pdvPayload.otros.channels" t-as="row" t-key="'other_channel_' + row.channel">
+                                                <div class="zrn_analitics_pdv_channel_item">
+                                                    <strong><t t-esc="row.channel"/></strong>
+                                                    <span><t t-esc="formatCount(row.active)"/> PDVs</span>
+                                                    <span><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></span>
+                                                </div>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_pdv_list_empty">Sin canales adicionales.</div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_pdv_panel_head">
+                                    <span>Detalle de PDVs</span>
+                                    <span>Click para drill-down</span>
+                                </div>
+                                <div class="zrn_analitics_pdv_table_wrap">
+                                    <table class="zrn_analitics_pdv_table">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'name_short')">PDV</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'channel')">Canal</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'rev')" class="text-end">Revenue</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'invoices')" class="text-end">Pedidos</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'days_since_last')" class="text-end">Recencia</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedPdvOtrosRows" t-as="row" t-key="'otros_' + row.partner_id">
+                                                <tr class="zrn_analitics_pdv_row_clickable" t-on-click="() =&gt; this.openPdvRow(row)">
+                                                    <td><strong><t t-esc="row.name_short"/></strong></td>
+                                                    <td><t t-esc="row.channel"/></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.rev)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.invoices)"/></td>
+                                                    <td class="text-end"><t t-esc="row.days_since_last"/> d</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

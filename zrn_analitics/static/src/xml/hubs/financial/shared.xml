@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubFinancialFilters">
+        <section class="zrn_analitics_hub_panel">
+            <div class="zrn_analitics_financial_panel_head">
+                <span>Filtros financieros</span>
+                <span>Revenue, costo teórico y margen por corte comercial</span>
+            </div>
+            <div class="zrn_analitics_financial_channel_filters">
+                <div class="zrn_analitics_financial_field">
+                    <label>Desde</label>
+                    <input type="date" class="form-control" t-att-value="state.financialFilters.date_from" t-on-input="(ev) =&gt; this.onFinancialDateFromInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_financial_field">
+                    <label>Hasta</label>
+                    <input type="date" class="form-control" t-att-value="state.financialFilters.date_to" t-on-input="(ev) =&gt; this.onFinancialDateToInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_financial_field">
+                    <label>Marca</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.brands, state.financialFilters.brand_ids)" domain="getOptionDomain(financialPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onFinancialBrandsChange"/>
+                </div>
+                <div class="zrn_analitics_financial_field">
+                    <label>Categoria</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.categories, state.financialFilters.category_ids)" domain="getOptionDomain(financialPayload.filter_options.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onFinancialCategoriesChange"/>
+                </div>
+                <div class="zrn_analitics_financial_field">
+                    <label>Canal</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.channels, state.financialFilters.channel_ids)" domain="getOptionDomain(financialPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onFinancialChannelsChange"/>
+                </div>
+                <div class="zrn_analitics_financial_field zrn_analitics_financial_field_search">
+                    <label>Buscar</label>
+                    <input type="text" class="form-control" placeholder="Producto, canal, marca o codigo" t-att-value="state.financialFilters.search" t-on-input="(ev) =&gt; this.updateFinancialFilter('search', ev.target.value)" t-on-keydown="onFinancialSearchKeydown"/>
+                </div>
+            </div>
+            <div class="zrn_analitics_financial_channel_actions">
+                <button type="button" class="btn btn-primary" t-on-click="applyFinancialFilters">Aplicar</button>
+                <button type="button" class="btn btn-secondary" t-on-click="clearFinancialFilters">Limpiar</button>
+                <div class="zrn_analitics_financial_channel_period">
+                    <strong>Periodo:</strong>
+                    <span><t t-esc="financialPayload.summary.period_label"/></span>
+                </div>
+            </div>
+        </section>
+    </t>
+
+    </templates>

@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubPdvFilters">
+        <section class="zrn_analitics_hub_panel">
+            <div class="zrn_analitics_pdv_panel_head">
+                <span>Filtros PDV</span>
+                <span>Segmenta el centro PDV por periodo, canal, marca y categoria</span>
+            </div>
+            <div class="zrn_analitics_pdv_filters">
+                <div class="zrn_analitics_pdv_field">
+                    <label>Desde</label>
+                    <input type="date" class="form-control" t-att-value="state.pdvFilters.date_from" t-on-input="(ev) =&gt; this.onPdvDateFromInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_pdv_field">
+                    <label>Hasta</label>
+                    <input type="date" class="form-control" t-att-value="state.pdvFilters.date_to" t-on-input="(ev) =&gt; this.onPdvDateToInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_pdv_field">
+                    <label>Marca</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.brands, state.pdvFilters.brand_ids)" domain="getOptionDomain(pdvPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onPdvBrandsChange"/>
+                </div>
+                <div class="zrn_analitics_pdv_field">
+                    <label>Categoria</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.categories, state.pdvFilters.category_ids)" domain="getOptionDomain(pdvPayload.filter_options.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onPdvCategoriesChange"/>
+                </div>
+                <div class="zrn_analitics_pdv_field">
+                    <label>Canal</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.channels, state.pdvFilters.channel_ids)" domain="getOptionDomain(pdvPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onPdvChannelsChange"/>
+                </div>
+                <div class="zrn_analitics_pdv_field zrn_analitics_pdv_field_search">
+                    <label>Buscar</label>
+                    <input type="text" class="form-control" placeholder="PDV, cliente, producto o codigo" t-att-value="state.pdvFilters.search" t-on-input="(ev) =&gt; this.updatePdvFilter('search', ev.target.value)" t-on-keydown="this.onPdvSearchKeydown"/>
+                </div>
+            </div>
+            <div class="zrn_analitics_pdv_actions">
+                <button type="button" class="btn btn-primary" t-on-click="this.applyPdvFilters">Aplicar</button>
+                <button type="button" class="btn btn-secondary" t-on-click="this.clearPdvFilters">Limpiar</button>
+            </div>
+        </section>
+    </t>
+
+    </templates>

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubRrhhTabHistorico"><t t-if="!state.rrhhLoading &amp;&amp; !rrhhPayload.empty_message &amp;&amp; rrhhPayload.current_applicant &amp;&amp; state.rrhhTab === 'historico'">
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Historico de solicitudes</span>
+                                <span><t t-esc="formatCount(sortedRrhhHistorical.length)"/> registros</span>
+                            </div>
+                            <div class="zrn_analitics_rrhh_history_filters">
+                                <div class="zrn_analitics_rrhh_field">
+                                    <label>Riesgo</label>
+                                    <SelectMenu choices="getRrhhRiskChoices(rrhhPayload.predictor_config.thresholds)" value="state.rrhhHistoryRisk" onSelect.bind="this.onRrhhHistoryRiskSelect"/>
+                                </div>
+                                <div class="zrn_analitics_rrhh_field zrn_analitics_rrhh_field_wide">
+                                    <label>Buscar</label>
+                                    <input type="text" class="form-control" placeholder="Solicitud, puesto, etapa o patron" t-att-value="state.rrhhHistorySearch" t-on-input="(ev) =&gt; this.state.rrhhHistorySearch = ev.target.value"/>
+                                </div>
+                            </div>
+                            <div class="o_list_renderer o_list_view table-responsive">
+                                <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Accion</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Solicitud</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'job_name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Puesto</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'stage_name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Etapa</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'predictor_score')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Score</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'predictor_risk_label')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Riesgo</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'checklist_alert_count')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Checklist</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'matched_pattern_count')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Patrones</th>
+                                            <th t-on-click="() =&gt; this.toggleSort('rrhh_historical', 'created_at')" class="o_column_sortable" style="cursor: pointer; user-select: none;">Creada</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="sortedRrhhHistorical" t-as="row" t-key="row.applicant_id">
+                                            <tr t-on-click="() =&gt; this.openRrhhApplicant(row.applicant_id)" style="cursor: pointer;">
+                                                <td>
+                                                    <button type="button" class="btn btn-link p-0 text-decoration-none" t-on-click.stop="() =&gt; this.useRrhhHistoricalApplicant(row.applicant_id)">
+                                                        Cargar
+                                                    </button>
+                                                </td>
+                                                <td><strong><t t-esc="row.name"/></strong></td>
+                                                <td><t t-esc="row.job_name || 'Sin puesto'"/></td>
+                                                <td><t t-esc="row.stage_name || 'Sin etapa'"/></td>
+                                                <td><t t-esc="row.predictor_score"/></td>
+                                                <td><t t-esc="row.predictor_risk_label"/></td>
+                                                <td><t t-esc="formatCount(row.checklist_alert_count)"/></td>
+                                                <td><t t-esc="formatCount(row.matched_pattern_count)"/></td>
+                                                <td><t t-esc="row.created_at"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    </t>
+                </t>
+</templates>

@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubRrhhTabPredictor"><t t-if="!state.rrhhLoading &amp;&amp; !rrhhPayload.empty_message &amp;&amp; rrhhPayload.current_applicant &amp;&amp; state.rrhhTab === 'predictor'">
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Predictor</span>
+                                <span>Scorecard predictivo</span>
+                            </div>
+                            <div class="zrn_analitics_rrhh_form_intro">
+                                <span>Complete la evaluacion sobre la solicitud activa y guarde para recalcular el nivel de riesgo.</span>
+                            </div>
+                            <section class="zrn_analitics_rrhh_form_shell">
+                                <div class="zrn_analitics_rrhh_form_head">
+                                    <div class="zrn_analitics_rrhh_field">
+                                        <label>Fecha de evaluacion</label>
+                                        <input type="date" class="form-control" t-att-value="state.rrhhPredictorForm.evaluation_date" t-on-input="(ev) =&gt; this.updateRrhhPredictorValue('evaluation_date', ev.target.value)"/>
+                                    </div>
+                                    <div class="zrn_analitics_rrhh_field zrn_analitics_rrhh_field_wide">
+                                        <label>Observaciones</label>
+                                        <textarea class="form-control" rows="2" t-on-input="(ev) =&gt; this.updateRrhhPredictorValue('notes', ev.target.value)"><t t-esc="state.rrhhPredictorForm.notes"/></textarea>
+                                    </div>
+                                </div>
+
+                                <t t-foreach="rrhhPredictorFactors" t-as="factor" t-key="factor.key">
+                                    <div class="zrn_analitics_rrhh_factor_block">
+                                        <div class="zrn_analitics_rrhh_factor_head">
+                                            <span class="zrn_analitics_rrhh_factor_badge"><t t-esc="factor.badge"/></span>
+                                            <strong><t t-esc="factor.label"/></strong>
+                                        </div>
+                                        <t t-foreach="factor.questions" t-as="question" t-key="question.key">
+                                            <div class="zrn_analitics_rrhh_question">
+                                                <div class="zrn_analitics_rrhh_question_label"><t t-esc="question.label"/></div>
+                                                <div class="zrn_analitics_rrhh_option_list">
+                                                    <t t-foreach="question.options" t-as="option" t-key="option.value">
+                                                        <label class="zrn_analitics_rrhh_option">
+                                                            <input type="radio" t-att-name="question.key" t-att-value="option.value" t-att-checked="state.rrhhPredictorForm[question.key] === option.value ? true : undefined" t-on-change="() =&gt; this.updateRrhhPredictorValue(question.key, option.value)"/>
+                                                            <span><t t-esc="option.label"/></span>
+                                                            <small><t t-esc="option.points"/> pts</small>
+                                                        </label>
+                                                    </t>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </t>
+
+                                <div class="zrn_analitics_rrhh_result_box">
+                                    <strong><t t-esc="rrhhPayload.current_predictor ? rrhhPayload.current_predictor.risk_label : 'Sin evaluar'"/></strong>
+                                    <span><t t-esc="rrhhPayload.current_predictor ? rrhhPayload.current_predictor.summary_text : 'Guarde el predictor para calcular el riesgo.'"/></span>
+                                </div>
+
+                                <div class="zrn_analitics_rrhh_actions">
+                                    <button type="button" class="btn btn-primary" t-on-click="saveRrhhPredictor">Guardar predictor</button>
+                                </div>
+                            </section>
+                        </section>
+                    </t>
+
+                    </t>
+</templates>

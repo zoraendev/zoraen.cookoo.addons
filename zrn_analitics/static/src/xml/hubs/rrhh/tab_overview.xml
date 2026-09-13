@@ -1,0 +1,130 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubRrhhTabOverview"><t t-if="!state.rrhhLoading &amp;&amp; !rrhhPayload.empty_message &amp;&amp; state.rrhhTab === 'overview'">
+                        <div class="zrn_analitics_commercial_stats">
+                            <div class="zrn_analitics_commercial_stat_box">
+                                <span>Solicitudes</span>
+                                <strong><t t-esc="formatCount(rrhhPayload.summary.applicant_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_commercial_stat_box">
+                                <span>Con predictor</span>
+                                <strong><t t-esc="formatCount(rrhhPayload.summary.predictor_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_commercial_stat_box">
+                                <span>Con checklist</span>
+                                <strong><t t-esc="formatCount(rrhhPayload.summary.checklist_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_commercial_stat_box">
+                                <span>Riesgo alto</span>
+                                <strong><t t-esc="formatCount(rrhhPayload.summary.high_risk_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_commercial_stat_box">
+                                <span>Pendientes</span>
+                                <strong><t t-esc="formatCount(rrhhPayload.summary.pending_count)"/></strong>
+                            </div>
+                        </div>
+
+                        <div class="zrn_analitics_commercial_top_row">
+                            <section class="zrn_analitics_hub_panel zrn_analitics_commercial_panel_main">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Distribucion de riesgo</span>
+                                    <span>Predictor por solicitud</span>
+                                </div>
+                                <div class="zrn_analitics_rrhh_chart_wrap">
+                                    <t t-if="rrhhPayload.overview.risk_distribution.length &amp;&amp; hasEchartsLibrary">
+                                        <div class="zrn_analitics_commercial_echart" data-zrn-chart="rrhh-risk-distribution"/>
+                                    </t>
+                                    <t t-elif="rrhhPayload.overview.risk_distribution.length">
+                                        <div class="zrn_analitics_commercial_chart_empty">Hay datos de riesgo, pero ECharts aun no esta cargado.</div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_commercial_chart_empty">Sin evaluaciones para graficar.</div>
+                                    </t>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel zrn_analitics_commercial_panel_side">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Solicitudes por etapa</span>
+                                    <span>Pipeline actual</span>
+                                </div>
+                                <div class="zrn_analitics_rrhh_chart_wrap">
+                                    <t t-if="rrhhPayload.overview.stage_distribution.length &amp;&amp; hasEchartsLibrary">
+                                        <div class="zrn_analitics_commercial_echart" data-zrn-chart="rrhh-stage-distribution"/>
+                                    </t>
+                                    <t t-elif="rrhhPayload.overview.stage_distribution.length">
+                                        <div class="zrn_analitics_commercial_chart_empty">Hay etapas para graficar, pero ECharts aun no esta cargado.</div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_commercial_chart_empty">Sin etapas para mostrar.</div>
+                                    </t>
+                                </div>
+                            </section>
+                        </div>
+
+                        <div class="zrn_analitics_commercial_bottom_grid">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Ultimas solicitudes</span>
+                                    <span>Seleccion o apertura rapida</span>
+                                </div>
+                                <div class="o_list_renderer o_list_view table-responsive">
+                                    <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Solicitud</th>
+                                                <th>Puesto</th>
+                                                <th>Etapa</th>
+                                                <th>Predictor</th>
+                                                <th>Checklist</th>
+                                                <th>Patrones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="rrhhPayload.overview.latest_rows" t-as="row" t-key="row.applicant_id">
+                                                <tr t-on-click="() =&gt; this.openRrhhApplicant(row.applicant_id)" style="cursor: pointer;">
+                                                    <td>
+                                                        <button type="button" class="btn btn-link p-0 text-decoration-none me-2" t-on-click.stop="() =&gt; this.useRrhhHistoricalApplicant(row.applicant_id)">
+                                                            Usar
+                                                        </button>
+                                                        <strong><t t-esc="row.name"/></strong>
+                                                    </td>
+                                                    <td><t t-esc="row.job_name || 'Sin puesto'"/></td>
+                                                    <td><t t-esc="row.stage_name || 'Sin etapa'"/></td>
+                                                    <td><t t-esc="row.predictor_risk_label"/></td>
+                                                    <td><t t-esc="formatCount(row.checklist_alert_count)"/> alertas</td>
+                                                    <td><t t-esc="formatCount(row.matched_pattern_count)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Puestos con mas solicitudes</span>
+                                    <span>Distribucion actual</span>
+                                </div>
+                                <div class="zrn_analitics_rrhh_list">
+                                    <t t-foreach="rrhhPayload.overview.job_distribution" t-as="row" t-key="row.label">
+                                        <div class="zrn_analitics_rrhh_list_row">
+                                            <span><t t-esc="row.label"/>:</span>
+                                            <strong><t t-esc="formatCount(row.value)"/></strong>
+                                        </div>
+                                    </t>
+                                </div>
+                                <div class="zrn_analitics_rrhh_sources">
+                                    <t t-foreach="rrhhPayload.notes_sources" t-as="source" t-key="source.label">
+                                        <div class="zrn_analitics_rrhh_source_item">
+                                            <strong><t t-esc="source.label"/>:</strong>
+                                            <span><t t-esc="source.detail"/></span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </section>
+                        </div>
+                    </t>
+
+                    </t>
+</templates>

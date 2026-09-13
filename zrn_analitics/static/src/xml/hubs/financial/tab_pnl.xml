@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabPnl"><t t-if="state.financialTab === 'pnl'">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_financial_panel_head">
+                                    <span>
+                                        <t t-if="state.financialTab === 'pnl'">P&amp;L</t>
+                                    </span>
+                                    <span>Pendiente de backend y datos específicos</span>
+                                </div>
+                                <div class="zrn_analitics_financial_empty_note">
+                                    <t t-if="state.financialTab === 'pnl'">
+                                        Esta tab queda reservada para estado de resultados y lecturas P&amp;L. Se habilitara cuando el hub tenga acceso a datos contables y a la estructura final del analisis financiero.
+                                    </t>
+                                </div>
+                            </section>
+                        </t>
+                    </t>
+</templates>

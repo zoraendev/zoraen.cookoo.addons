@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubRrhhTabPatrones"><t t-if="!state.rrhhLoading &amp;&amp; !rrhhPayload.empty_message &amp;&amp; rrhhPayload.current_applicant &amp;&amp; state.rrhhTab === 'patrones'">
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Patrones validados</span>
+                                <span><t t-esc="rrhhPayload.current_applicant ? rrhhPayload.current_applicant.name : 'Seleccione una solicitud'"/></span>
+                            </div>
+
+                            <div class="zrn_analitics_rrhh_non_predictive">
+                                <t t-foreach="rrhhPayload.validated_patterns.non_predictive_factors" t-as="factor" t-key="factor">
+                                    <span class="zrn_analitics_rrhh_chip"><t t-esc="factor"/></span>
+                                </t>
+                            </div>
+
+                            <div class="zrn_analitics_rrhh_result_box">
+                                <strong><t t-esc="rrhhPayload.current_patterns.summary_text"/></strong>
+                                <span>
+                                    <t t-esc="formatCount(rrhhPayload.current_patterns.matched_pattern_count)"/> patrones activos para la solicitud seleccionada.
+                                </span>
+                            </div>
+
+                            <div class="zrn_analitics_rrhh_pattern_grid">
+                                <t t-foreach="rrhhPayload.current_patterns.patterns" t-as="pattern" t-key="pattern.key">
+                                    <div class="zrn_analitics_rrhh_pattern_card" t-att-class="pattern.matched ? 'is-matched' : ''">
+                                        <div class="zrn_analitics_rrhh_pattern_head">
+                                            <strong><t t-esc="pattern.label"/></strong>
+                                            <span><t t-esc="pattern.strength"/></span>
+                                        </div>
+                                        <div class="zrn_analitics_rrhh_pattern_stats">
+                                            <span>Aprobados: <t t-esc="pattern.approved_pct"/>%</span>
+                                            <span>No aprobados: <t t-esc="pattern.rejected_pct"/>%</span>
+                                        </div>
+                                        <div class="zrn_analitics_rrhh_pattern_desc"><t t-esc="pattern.description"/></div>
+                                    </div>
+                                </t>
+                            </div>
+                        </section>
+                    </t>
+
+                    </t>
+</templates>

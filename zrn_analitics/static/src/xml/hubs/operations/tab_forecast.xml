@@ -1,0 +1,100 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubOperationsTabForecast"><t t-if="state.operationsTab === 'forecast'">
+                            <div class="zrn_analitics_operations_top_row">
+                                <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_main">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Forecast mensual</span>
+                                        <span>Actual vs proyectado</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_line_chart">
+                                        <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-forecast"/>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_side">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Proximo mes</span>
+                                        <span>Blend de revenue</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_coverage_universe">
+                                        <div class="zrn_analitics_operations_coverage_universe_group">
+                                            <strong>Forecast blend</strong>
+                                            <div class="zrn_analitics_operations_coverage_universe_row">
+                                                <span><t t-esc="operationsPayload.forecast.next_month_label"/></span>
+                                                <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.forecast.next_month_blend)"/></strong>
+                                            </div>
+                                        </div>
+                                        <div class="zrn_analitics_operations_coverage_universe_group">
+                                            <strong>Run-rate anual</strong>
+                                            <div class="zrn_analitics_operations_coverage_universe_row">
+                                                <span>Proyeccion simple</span>
+                                                <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.forecast.runrate_annual)"/></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="zrn_analitics_operations_bottom_grid">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Serie mensual</span>
+                                        <span>Pace y proyeccion</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mes</th>
+                                                        <th class="text-end">Actual Q</th>
+                                                        <th class="text-end">Proyectado Q</th>
+                                                        <th class="text-end">Unidades</th>
+                                                        <th class="text-end">MoM</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="operationsPayload.forecast.monthly" t-as="row" t-key="row.month_key">
+                                                        <td><strong><t t-esc="row.label"/></strong></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.projected_revenue)"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.projected_units)"/></td>
+                                                        <td class="text-end"><t t-esc="formatPercent(row.mom_pct)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Pace por canal</span>
+                                        <span>Comparativo rapido</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_forecast_channels', 'channel')" class="o_column_sortable" style="cursor: pointer;">Canal</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_forecast_channels', 'total_ytd')" class="o_column_sortable text-end" style="cursor: pointer;">YTD</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_forecast_channels', 'current_projected')" class="o_column_sortable text-end" style="cursor: pointer;">Actual proyectado</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_forecast_channels', 'projected_vs_last_pct')" class="o_column_sortable text-end" style="cursor: pointer;">Δ vs ultimo</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedOperationsForecastChannels" t-as="row" t-key="row.channel">
+                                                        <td><strong><t t-esc="row.channel"/></strong></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.total_ytd)"/></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.current_projected)"/></td>
+                                                        <td class="text-end"><t t-esc="formatPercent(row.projected_vs_last_pct)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </t>
+
+                        </t>
+</templates>

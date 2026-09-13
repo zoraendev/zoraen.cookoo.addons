@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabPortafolio"><t t-if="state.financialTab === 'portafolio'">
+                            <div class="zrn_analitics_financial_portfolio">
+                                <div class="zrn_analitics_financial_portfolio_note">
+                                    <strong>Portafolio financiero por unidad</strong>
+                                    <span>Lectura jerárquica UN → Marca → Línea → SKU usando el catálogo actual de Odoo y (ZRN) Manejo Comercial.</span>
+                                </div>
+
+                                <div class="zrn_analitics_financial_portfolio_cards">
+                                    <t t-foreach="financialPortfolio.units || []" t-as="unit" t-key="unit.key">
+                                        <button type="button" class="btn zrn_analitics_financial_portfolio_card" t-att-class="state.selectedFinancialUnit === unit.key ? 'is-active' : ''" t-on-click="() =&gt; this.selectFinancialUnit(unit.key)">
+                                            <span class="zrn_analitics_financial_portfolio_card_name"><t t-esc="unit.name"/></span>
+                                            <strong class="zrn_analitics_financial_portfolio_card_value"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(unit.margin)"/></strong>
+                                            <span class="zrn_analitics_financial_portfolio_card_meta"><t t-esc="formatPercent(unit.margin_pct)"/> margen</span>
+                                        </button>
+                                    </t>
+                                </div>
+
+                                <div class="zrn_analitics_financial_portfolio_top">
+                                    <section class="zrn_analitics_hub_panel zrn_analitics_financial_portfolio_chart">
+                                        <div class="zrn_analitics_financial_panel_head">
+                                            <span>Margen por unidad</span>
+                                            <span>Vista consolidada</span>
+                                        </div>
+                                        <div class="zrn_analitics_financial_echart" data-zrn-chart="financial-portfolio-units"/>
+                                    </section>
+
+                                    <section class="zrn_analitics_hub_panel zrn_analitics_financial_portfolio_brand_mix">
+                                        <div class="zrn_analitics_financial_panel_head">
+                                            <span>Margen % por marca</span>
+                                            <span>Unidad activa</span>
+                                        </div>
+                                        <div class="zrn_analitics_financial_echart" data-zrn-chart="financial-portfolio-brands"/>
+                                    </section>
+                                </div>
+
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_financial_panel_head">
+                                        <span>Drill financiero</span>
+                                        <span>Expande para ver marcas, líneas y productos</span>
+                                    </div>
+                                    <div class="zrn_analitics_financial_portfolio_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Portafolio</th>
+                                                        <th class="text-end">Revenue</th>
+                                                        <th class="text-end">Rev. matcheado</th>
+                                                        <th class="text-end">Costo</th>
+                                                        <th class="text-end">Margen</th>
+                                                        <th class="text-end">Margen %</th>
+                                                        <th class="text-end">SKUs</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-foreach="financialPortfolio.rows || []" t-as="row" t-key="row.key">
+                                                        <tr t-if="row.level === 'unit' || isFinancialPortfolioRowVisible(row)" class="zrn_analitics_financial_portfolio_row" t-att-class="'is-' + row.level">
+                                                            <td class="zrn_analitics_financial_portfolio_cell" t-att-class="'is-' + row.level">
+                                                                <button t-if="row.level !== 'sku'" type="button" class="btn zrn_analitics_financial_portfolio_toggle" t-on-click="() =&gt; this.toggleFinancialPortfolioRow(row.key)">
+                                                                    <i class="fa" t-att-class="isFinancialPortfolioRowExpanded(row.key) ? 'fa-caret-down' : 'fa-caret-right'"/>
+                                                                </button>
+                                                                <span t-on-click="() =&gt; this.openFinancialPortfolioRow(row)" t-att-style="row.detail || row.resId ? 'cursor: pointer;' : ''">
+                                                                    <t t-esc="row.label"/>
+                                                                </span>
+                                                            </td>
+                                                            <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                            <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.matched_revenue)"/></td>
+                                                            <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.cost)"/></td>
+                                                            <td class="text-end"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.margin)"/></td>
+                                                            <td class="text-end"><t t-esc="formatPercent(row.margin_pct)"/></td>
+                                                            <td class="text-end"><t t-esc="formatCount(row.sku_count)"/></td>
+                                                        </tr>
+                                                    </t>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </t>
+
+                        </t>
+</templates>

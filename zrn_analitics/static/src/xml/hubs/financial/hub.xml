@@ -1,0 +1,203 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubFinancial">
+        <div class="zrn_analitics_financial_hub" t-ref="hubRoot">
+            <div class="zrn_analitics_financial_hero">
+                <div class="zrn_analitics_financial_title_row">
+                    <div class="zrn_analitics_hub_panel_title">Hub Financiero</div>
+                </div>
+            </div>
+
+            <div class="zrn_analitics_financial_shell">
+                <button type="button" class="btn zrn_analitics_financial_sidebar_toggle" t-on-click="toggleCommercialSidebar">
+                    <i class="fa fa-bars"/>
+                    <span>Secciones</span>
+                </button>
+
+                <div class="zrn_analitics_financial_sidebar_overlay" t-att-class="state.commercialSidebarOpen ? 'is-open' : ''" t-on-click="closeCommercialSidebar"/>
+
+                <aside class="zrn_analitics_financial_sidebar" t-att-class="state.commercialSidebarOpen ? 'is-open' : ''">
+                    <div class="zrn_analitics_financial_sidebar_head">
+                        <div class="zrn_analitics_financial_sidebar_title">Secciones</div>
+                        <button type="button" class="btn zrn_analitics_financial_sidebar_close" t-on-click="closeCommercialSidebar">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+
+                    <div class="zrn_analitics_financial_badges zrn_analitics_financial_badges_sidebar">
+                        <span class="zrn_analitics_financial_badge zrn_analitics_financial_badge_sync">
+                            Sync con Odoo: <t t-esc="activeHubSummary.sync_label"/>
+                        </span>
+                        <span class="zrn_analitics_financial_badge">
+                            <t t-esc="activeHubSummary.period_label"/>
+                        </span>
+                        <span class="zrn_analitics_financial_badge">
+                            <t t-esc="formatCount(financialPayload.summary.brand_count)"/> marcas / <t t-esc="formatCount(financialPayload.summary.product_count)"/> productos
+                        </span>
+                    </div>
+
+                    <div class="zrn_analitics_financial_section_tabs">
+                        <t t-foreach="financialTabs" t-as="tab" t-key="tab.key">
+                            <button type="button" class="btn zrn_analitics_financial_section_tab" t-att-class="state.financialTab === tab.key ? 'is-active' : ''" t-on-click="() =&gt; this.setFinancialTab(tab.key)">
+                                <i class="fa zrn_analitics_financial_section_tab_icon" t-att-class="tab.icon"/>
+                                <span><t t-esc="tab.label"/></span>
+                            </button>
+                        </t>
+                    </div>
+                </aside>
+
+                <div class="zrn_analitics_financial_content">
+                    <t t-if="state.financialLoading">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_text">Cargando resumen financiero...</div>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.financialLoading">
+                        <t t-call="zrn_analitics.HubFinancialFilters"/>
+
+                        <div class="zrn_analitics_financial_stats">
+                            <div class="zrn_analitics_financial_stat_box">
+                                <span>Revenue</span>
+                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.revenue)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_financial_stat_box">
+                                <span>Revenue matcheado</span>
+                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.matched_revenue)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_financial_stat_box">
+                                <span>Cobertura</span>
+                                <strong><t t-esc="formatPercent(financialPayload.summary.coverage_pct)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_financial_stat_box">
+                                <span>Costo teórico</span>
+                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.cost)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_financial_stat_box">
+                                <span>Margen</span>
+                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.margin)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_financial_stat_box">
+                                <span>Margen %</span>
+                                <strong><t t-esc="formatPercent(financialPayload.summary.margin_pct)"/></strong>
+                            </div>
+                        </div>
+
+                        <t t-if="financialPayload.empty_message">
+                            <div class="zrn_analitics_financial_empty_note">
+                                <t t-esc="financialPayload.empty_message"/>
+                            </div>
+                        </t>
+
+                        <t t-call="zrn_analitics.HubFinancialTabOverview"/>
+
+                        <t t-call="zrn_analitics.HubFinancialTabProducto"/>
+
+                        <t t-call="zrn_analitics.HubFinancialTabCanal"/>
+
+                        <t t-call="zrn_analitics.HubFinancialTabMarca"/>
+
+                        <t t-call="zrn_analitics.HubFinancialTabPortafolio"/>
+
+                        <t t-call="zrn_analitics.HubFinancialTabAlertas"/>
+
+                        <t t-call="zrn_analitics.HubFinancialTabPrecios"/>
+                        <t t-call="zrn_analitics.HubFinancialTabCartera"/>
+                        <t t-call="zrn_analitics.HubFinancialTabAvanzado"/>
+                        <t t-call="zrn_analitics.HubFinancialTabPnl"/>
+                    </t>
+
+                    <t t-if="state.analyticsDetailModal">
+                        <div class="modal-backdrop fade show zrn_analitics_financial_modal_backdrop" t-on-click="closeAnalyticsDetailModal"/>
+                        <div class="modal fade show d-block zrn_analitics_financial_modal_shell" tabindex="-1" role="dialog">
+                            <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+                                <div class="modal-content zrn_analitics_financial_modal">
+                                    <div class="modal-header">
+                                        <div>
+                                            <h4 class="modal-title"><t t-esc="state.analyticsDetailModal.title"/></h4>
+                                            <div class="zrn_analitics_financial_table_sub">
+                                                <t t-esc="state.analyticsDetailModal.subtitle"/>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-close" aria-label="Close" t-on-click="closeAnalyticsDetailModal"/>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="zrn_analitics_financial_channel_modal_cards">
+                                            <t t-foreach="state.analyticsDetailModal.summary_cards || []" t-as="card" t-key="card.label">
+                                                <div class="zrn_analitics_financial_coverage_card">
+                                                    <span><t t-esc="card.label"/></span>
+                                                    <strong><t t-esc="formatDetailCard(state.analyticsDetailModal, card)"/></strong>
+                                                </div>
+                                            </t>
+                                        </div>
+
+                                        <div class="zrn_analitics_financial_channel_modal_grid">
+                                            <section class="zrn_analitics_hub_panel">
+                                                <div class="zrn_analitics_financial_panel_head">
+                                                    <span>Por canal</span>
+                                                    <span>Base analítica</span>
+                                                </div>
+                                                <div class="zrn_analitics_financial_table_wrap">
+                                                    <table class="zrn_analitics_financial_table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Canal</th>
+                                                                <th>PDVs</th>
+                                                                <th>Pedidos</th>
+                                                                <th>Unidades</th>
+                                                                <th>Revenue</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <t t-foreach="state.analyticsDetailModal.channel_rows || []" t-as="row" t-key="row.name">
+                                                                <tr class="zrn_analitics_financial_table_row">
+                                                                    <td><strong><t t-esc="row.name"/></strong></td>
+                                                                    <td><t t-esc="formatCount(row.pdv_count)"/></td>
+                                                                    <td><t t-esc="formatCount(row.order_count)"/></td>
+                                                                    <td><t t-esc="formatCount(row.units)"/></td>
+                                                                    <td><t t-esc="state.analyticsDetailModal.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                                </tr>
+                                                            </t>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </section>
+
+                                            <section class="zrn_analitics_hub_panel">
+                                                <div class="zrn_analitics_financial_panel_head">
+                                                    <span><t t-esc="state.analyticsDetailModal.secondary_title || 'Top PDVs'"/></span>
+                                                    <span>Detalle del cálculo</span>
+                                                </div>
+                                                <div class="zrn_analitics_financial_table_wrap">
+                                                    <table class="zrn_analitics_financial_table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th>Nombre</th>
+                                                                <th>Unidades</th>
+                                                                <th>Pedidos</th>
+                                                                <th>Revenue</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <t t-foreach="(state.analyticsDetailModal.secondary_rows || state.analyticsDetailModal.customer_rows || [])" t-as="row" t-key="row.name">
+                                                                <tr t-att-class="row.id ? 'zrn_analitics_financial_table_row zrn_analitics_financial_table_row_clickable' : 'zrn_analitics_financial_table_row'" t-on-click="() =&gt; row.id ? this.openRecordModal('res.partner', row.id) : null">
+                                                                    <td><strong><t t-esc="row.name"/></strong></td>
+                                                                    <td><t t-esc="formatCount(row.units)"/></td>
+                                                                    <td><t t-esc="formatCount(row.order_count)"/></td>
+                                                                    <td><t t-esc="state.analyticsDetailModal.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                                </tr>
+                                                            </t>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

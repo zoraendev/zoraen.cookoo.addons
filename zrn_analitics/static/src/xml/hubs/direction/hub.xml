@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<templates xml:space="preserve">
-    <t t-name="zrn_analitics.HubDirection">
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubDirection">
         <div class="zrn_analitics_hub_panel">
             <div class="zrn_analitics_hub_panel_title">Hub Direccion</div>
             <div class="zrn_analitics_hub_panel_text">Vista de prueba activa para el hub de Direccion.</div>

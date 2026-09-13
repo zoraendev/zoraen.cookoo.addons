@@ -1,0 +1,414 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabCobertura"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'cobertura'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <div class="zrn_analitics_commercial_coverage">
+                    <div class="zrn_analitics_commercial_coverage_note">
+                        <strong>Cobertura y distribución</strong>
+                        <span>Universo PDV, cobertura por canal, white space, marcas por canal, holes de portafolio y clientes A/B en riesgo.</span>
+                    </div>
+
+                    <t t-if="state.coverageLoading">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_text">Cargando tablero de cobertura...</div>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.coverageLoading">
+                        <t t-if="coveragePayload.empty_message">
+                            <div class="zrn_analitics_commercial_empty_note">
+                                <t t-esc="coveragePayload.empty_message"/>
+                            </div>
+                        </t>
+
+                        <div class="zrn_analitics_commercial_coverage_cards">
+                            <t t-foreach="coveragePayload.summary_cards" t-as="card" t-key="card.label">
+                                <div class="zrn_analitics_commercial_coverage_card">
+                                    <span><t t-esc="card.label"/></span>
+                                    <strong><t t-esc="formatCount(card.value)"/></strong>
+                                    <small><t t-esc="card.note"/></small>
+                                </div>
+                            </t>
+                        </div>
+
+                        <div class="zrn_analitics_commercial_coverage_top">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Cobertura por canal</span>
+                                    <span>Activos vs red total</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'channel')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Canal
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'channel'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'active')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Activos
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'active'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'network_total')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Red total
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'network_total'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'coverage_pct')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    % Cobertura
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'coverage_pct'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'white_space')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    White space
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'white_space'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'revenue')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Revenue
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'revenue'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'mix_pct')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    % Mix
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'mix_pct'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('coverage_by_channel', 'avg_ticket')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Ticket / PDV
+                                                    <t t-if="state.sorts.coverage_by_channel.column === 'avg_ticket'">
+                                                        <i class="fa" t-att-class="state.sorts.coverage_by_channel.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedCoverageByChannel" t-as="row" t-key="row.channel">
+                                                <tr>
+                                                    <td><strong><t t-esc="row.channel"/></strong></td>
+                                                    <td><t t-esc="formatCount(row.active)"/></td>
+                                                    <td><t t-esc="row.network_total ? formatCount(row.network_total) : '—'"/></td>
+                                                    <td><t t-esc="row.network_total ? formatPercent(row.coverage_pct) : '—'"/></td>
+                                                    <td><t t-esc="row.network_total ? formatCount(row.white_space) : '—'"/></td>
+                                                    <td><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                    <td><t t-esc="formatPercent(row.mix_pct)"/></td>
+                                                    <td><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.avg_ticket)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="zrn_analitics_commercial_coverage_chart">
+                                    <t t-if="coveragePayload.coverage_by_channel.length and hasEchartsLibrary">
+                                        <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="coverage-channel"/>
+                                    </t>
+                                    <t t-elif="coveragePayload.coverage_by_channel.length">
+                                        <div class="zrn_analitics_commercial_chart_empty">Hay cobertura por canal, pero la libreria ECharts aun no esta cargada en assets.</div>
+                                    </t>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Universo PDV</span>
+                                    <span><t t-esc="formatCount(coveragePayload.pdv_universe.total)"/> PDVs</span>
+                                </div>
+                                <div class="zrn_analitics_commercial_coverage_universe">
+                                    <div class="zrn_analitics_commercial_coverage_universe_group">
+                                        <strong>Por canal</strong>
+                                        <t t-foreach="coveragePayload.pdv_universe.channel_rows || []" t-as="item" t-key="item.name">
+                                            <div class="zrn_analitics_commercial_coverage_universe_row">
+                                                <span><t t-esc="item.name"/></span>
+                                                <strong><t t-esc="formatCount(item.value)"/></strong>
+                                            </div>
+                                        </t>
+                                    </div>
+                                    <div class="zrn_analitics_commercial_coverage_universe_group">
+                                        <strong>Top municipios</strong>
+                                        <t t-foreach="coveragePayload.pdv_universe.municipio_rows || []" t-as="item" t-key="item.name">
+                                            <div class="zrn_analitics_commercial_coverage_universe_row">
+                                                <span><t t-esc="item.name"/></span>
+                                                <strong><t t-esc="formatCount(item.value)"/></strong>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Matriz canal × sub-marca</span>
+                                <span>Revenue por presencia</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped zrn_analitics_commercial_coverage_matrix">
+                                    <thead>
+                                        <tr>
+                                            <th>Canal</th>
+                                            <t t-foreach="coveragePayload.channel_brand_matrix.brands" t-as="brand" t-key="brand">
+                                                <th><t t-esc="brand"/></th>
+                                            </t>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="coveragePayload.channel_brand_matrix.rows" t-as="row" t-key="row.channel">
+                                            <tr>
+                                                <td><strong><t t-esc="row.channel"/></strong></td>
+                                                <t t-foreach="row.cells" t-as="cell" t-key="cell.brand">
+                                                    <td t-att-style="cell.revenue ? getCoverageMatrixCellStyle(cell.revenue) : ''">
+                                                        <t t-esc="cell.revenue ? commercialPayload.summary.currency_symbol + ' ' + formatMoney(cell.revenue) : '·'"/>
+                                                    </td>
+                                                </t>
+                                                <td><strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.total_revenue)"/></strong></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Distribución por SKU</span>
+                                <span>Penetración sobre PDVs activos</span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th t-on-click="() =&gt; this.toggleSort('sku_distribution', 'sku')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                SKU
+                                                <t t-if="state.sorts.sku_distribution.column === 'sku'">
+                                                    <i class="fa" t-att-class="state.sorts.sku_distribution.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('sku_distribution', 'brand')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Sub-marca
+                                                <t t-if="state.sorts.sku_distribution.column === 'brand'">
+                                                    <i class="fa" t-att-class="state.sorts.sku_distribution.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('sku_distribution', 'revenue')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Revenue
+                                                <t t-if="state.sorts.sku_distribution.column === 'revenue'">
+                                                    <i class="fa" t-att-class="state.sorts.sku_distribution.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('sku_distribution', 'pdv_count')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                # PDVs
+                                                <t t-if="state.sorts.sku_distribution.column === 'pdv_count'">
+                                                    <i class="fa" t-att-class="state.sorts.sku_distribution.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('sku_distribution', 'pdv_pct')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                % PDVs
+                                                <t t-if="state.sorts.sku_distribution.column === 'pdv_pct'">
+                                                    <i class="fa" t-att-class="state.sorts.sku_distribution.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('sku_distribution', 'channels')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Canales
+                                                <t t-if="state.sorts.sku_distribution.column === 'channels'">
+                                                    <i class="fa" t-att-class="state.sorts.sku_distribution.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="sortedSkuDistribution" t-as="row" t-key="row.product_id">
+                                            <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(row.detail)" style="cursor: pointer;">
+                                                <td><strong><t t-esc="row.sku"/></strong></td>
+                                                <td><t t-esc="row.brand"/></td>
+                                                <td><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                <td><t t-esc="formatCount(row.pdv_count)"/></td>
+                                                <td><t t-esc="formatPercent(row.pdv_pct)"/></td>
+                                                <td><t t-esc="formatCount(row.channels)"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="zrn_analitics_commercial_coverage_chart">
+                                <t t-if="coveragePayload.sku_distribution.length and hasEchartsLibrary">
+                                    <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="coverage-sku"/>
+                                </t>
+                                <t t-elif="coveragePayload.sku_distribution.length">
+                                    <div class="zrn_analitics_commercial_chart_empty">Hay distribucion por SKU, pero la libreria ECharts aun no esta cargada en assets.</div>
+                                </t>
+                            </div>
+                        </section>
+
+                        <div class="zrn_analitics_commercial_coverage_bottom">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Holes de portafolio</span>
+                                    <span><t t-esc="coveragePayload.portfolio_holes.core_skus.length"/> SKUs core</span>
+                                </div>
+                                <div class="zrn_analitics_commercial_coverage_tags">
+                                    <t t-foreach="coveragePayload.portfolio_holes.core_skus" t-as="sku" t-key="sku">
+                                        <span class="zrn_analitics_commercial_coverage_tag"><t t-esc="sku"/></span>
+                                    </t>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('portfolio_holes', 'name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Cliente / PDV
+                                                    <t t-if="state.sorts.portfolio_holes.column === 'name'">
+                                                        <i class="fa" t-att-class="state.sorts.portfolio_holes.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('portfolio_holes', 'channel')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Canal
+                                                    <t t-if="state.sorts.portfolio_holes.column === 'channel'">
+                                                        <i class="fa" t-att-class="state.sorts.portfolio_holes.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('portfolio_holes', 'abc')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    ABC
+                                                    <t t-if="state.sorts.portfolio_holes.column === 'abc'">
+                                                        <i class="fa" t-att-class="state.sorts.portfolio_holes.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('portfolio_holes', 'revenue')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Revenue
+                                                    <t t-if="state.sorts.portfolio_holes.column === 'revenue'">
+                                                        <i class="fa" t-att-class="state.sorts.portfolio_holes.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('portfolio_holes', 'gap_count')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Gaps
+                                                    <t t-if="state.sorts.portfolio_holes.column === 'gap_count'">
+                                                        <i class="fa" t-att-class="state.sorts.portfolio_holes.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedPortfolioHoles" t-as="row" t-key="row.partner_id">
+                                                <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(row.detail)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="row.name"/></strong></td>
+                                                    <td><t t-esc="row.channel"/></td>
+                                                    <td><t t-esc="row.abc"/></td>
+                                                    <td><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                    <td><t t-esc="formatCount(row.gap_count)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Clientes A/B en riesgo</span>
+                                    <span>Recencia y cobertura</span>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Cliente / PDV
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'name'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'channel')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Canal
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'channel'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'abc')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    ABC
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'abc'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'segment')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Segmento
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'segment'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'revenue')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Revenue YTD
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'revenue'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'days_since_last')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Recencia
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'days_since_last'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'months_active')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Meses activo
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'months_active'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                                <th t-on-click="() =&gt; this.toggleSort('clients_at_risk', 'top_product')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                    Producto principal
+                                                    <t t-if="state.sorts.clients_at_risk.column === 'top_product'">
+                                                        <i class="fa" t-att-class="state.sorts.clients_at_risk.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                    </t>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedClientsAtRisk" t-as="row" t-key="row.partner_id">
+                                                <tr t-on-click="() =&gt; this.openRecordModal('res.partner', row.partner_id)" style="cursor: pointer;">
+                                                    <td>
+                                                        <strong><t t-esc="row.name"/></strong>
+                                                        <div class="text-muted small"><t t-esc="row.action"/></div>
+                                                    </td>
+                                                    <td><t t-esc="row.channel"/></td>
+                                                    <td><t t-esc="row.abc"/></td>
+                                                    <td><t t-esc="row.segment"/></td>
+                                                    <td><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                    <td><t t-esc="formatCount(row.days_since_last)"/> días</td>
+                                                    <td><t t-esc="formatCount(row.months_active)"/></td>
+                                                    <td><t t-esc="row.top_product"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </div>
+
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Notas y fuentes</span>
+                                <span>Trazabilidad del dato</span>
+                            </div>
+                            <div class="zrn_analitics_commercial_coverage_notes">
+                                <t t-foreach="coveragePayload.notes_sources" t-as="note" t-key="note.label">
+                                    <div class="zrn_analitics_commercial_coverage_note_row">
+                                        <strong><t t-esc="note.label"/></strong>
+                                        <span><t t-esc="note.detail"/></span>
+                                    </div>
+                                </t>
+                            </div>
+                        </section>
+                    </t>
+                </div>
+            </t>
+
+            </t>
+</templates>

@@ -1,0 +1,127 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubRrhh">
+        <div class="zrn_analitics_rrhh_hub" t-ref="hubRoot">
+            <div class="zrn_analitics_commercial_hero">
+                <div class="zrn_analitics_commercial_title_row">
+                    <div class="zrn_analitics_hub_panel_title">Hub RRHH</div>
+                </div>
+            </div>
+
+            <div class="zrn_analitics_commercial_shell">
+                <button type="button" class="btn zrn_analitics_commercial_sidebar_toggle" t-on-click="toggleCommercialSidebar">
+                    <i class="fa fa-bars"/>
+                    <span>Secciones</span>
+                </button>
+
+                <div class="zrn_analitics_commercial_sidebar_overlay" t-att-class="state.commercialSidebarOpen ? 'is-open' : ''" t-on-click="closeCommercialSidebar"/>
+
+                <aside class="zrn_analitics_commercial_sidebar" t-att-class="state.commercialSidebarOpen ? 'is-open' : ''">
+                    <div class="zrn_analitics_commercial_sidebar_head">
+                        <div class="zrn_analitics_commercial_sidebar_title">Secciones</div>
+                        <button type="button" class="btn zrn_analitics_commercial_sidebar_close" t-on-click="closeCommercialSidebar">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+
+                    <div class="zrn_analitics_commercial_badges zrn_analitics_commercial_badges_sidebar">
+                        <span class="zrn_analitics_commercial_badge zrn_analitics_commercial_badge_sync">
+                            Sync con Odoo: <t t-esc="rrhhPayload.summary.sync_label"/>
+                        </span>
+                        <span class="zrn_analitics_commercial_badge">
+                            <t t-esc="formatCount(rrhhPayload.summary.applicant_count)"/> solicitudes
+                        </span>
+                        <span class="zrn_analitics_commercial_badge">
+                            <t t-esc="formatCount(rrhhPayload.summary.high_risk_count)"/> en riesgo alto
+                        </span>
+                    </div>
+
+                    <div class="zrn_analitics_commercial_section_tabs">
+                        <t t-foreach="visibleRrhhTabs" t-as="tab" t-key="tab.key">
+                            <button type="button" class="btn zrn_analitics_commercial_section_tab" t-att-class="state.rrhhTab === tab.key ? 'is-active' : ''" t-on-click="() =&gt; this.setRrhhTab(tab.key)">
+                                <i class="fa zrn_analitics_commercial_section_tab_icon" t-att-class="tab.icon"/>
+                                <span><t t-esc="tab.label"/></span>
+                            </button>
+                        </t>
+                    </div>
+                </aside>
+
+                <div class="zrn_analitics_commercial_content zrn_analitics_rrhh_content">
+                    <t t-if="state.rrhhLoading">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_text">Cargando resumen de RRHH...</div>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.rrhhLoading &amp;&amp; rrhhPayload.empty_message">
+                        <div class="zrn_analitics_commercial_empty_note">
+                            <t t-esc="rrhhPayload.empty_message"/>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.rrhhLoading &amp;&amp; !rrhhPayload.empty_message">
+                        <section class="zrn_analitics_hub_panel zrn_analitics_rrhh_workspace_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Solicitud activa</span>
+                                <span>Flujo de evaluacion RRHH</span>
+                            </div>
+                            <div class="zrn_analitics_rrhh_workspace_top">
+                                <div class="zrn_analitics_rrhh_selector zrn_analitics_rrhh_selector_primary">
+                                    <label>Solicitud de trabajo</label>
+                                    <ZrnRelationalSingleSelect record="rrhhCurrentApplicantRecord" domain="getRrhhApplicantDomain(rrhhPayload.applicant_options)" resModel="'hr.applicant'" fieldString="'Solicitud de trabajo'" placeholder="'Seleccione una solicitud activa'" onChange.bind="this.selectRrhhApplicant"/>
+                                    <div class="zrn_analitics_rrhh_selector_hint">
+                                        <t t-if="hasPendingRrhhChanges">
+                                            Guarde o descarte los cambios pendientes antes de continuar con otra solicitud.
+                                        </t>
+                                        <t t-else="">
+                                            Use la X para limpiar la solicitud actual y seleccionar otra activa.
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <t t-if="rrhhPayload.current_applicant">
+                                <div class="zrn_analitics_rrhh_summary_grid">
+                                    <div class="zrn_analitics_rrhh_summary_item">
+                                        <span>Solicitud</span>
+                                        <strong><t t-esc="rrhhPayload.current_applicant.name"/></strong>
+                                    </div>
+                                    <div class="zrn_analitics_rrhh_summary_item">
+                                        <span>Puesto</span>
+                                        <strong><t t-esc="rrhhPayload.current_applicant.job_name || 'Sin puesto'"/></strong>
+                                    </div>
+                                    <div class="zrn_analitics_rrhh_summary_item">
+                                        <span>Etapa</span>
+                                        <strong><t t-esc="rrhhPayload.current_applicant.stage_name || 'Sin etapa'"/></strong>
+                                    </div>
+                                    <div class="zrn_analitics_rrhh_summary_item">
+                                        <span>Score total</span>
+                                        <strong><t t-esc="rrhhPayload.current_predictor ? rrhhPayload.current_predictor.score_total : '0.0'"/></strong>
+                                    </div>
+                                    <div class="zrn_analitics_rrhh_summary_item">
+                                        <span>Riesgo</span>
+                                        <strong><t t-esc="rrhhPayload.current_predictor ? rrhhPayload.current_predictor.risk_label : 'Sin evaluar'"/></strong>
+                                    </div>
+                                </div>
+                            </t>
+
+                            <div class="zrn_analitics_rrhh_empty_state" t-if="!rrhhPayload.current_applicant">
+                                <strong>Seleccione una solicitud para continuar.</strong>
+                                <span>El flujo operativo de RRHH se activa por solicitud y puede retomarse mientras la solicitud siga activa.</span>
+                            </div>
+                        </section>
+                    </t>
+
+                    <t t-call="zrn_analitics.HubRrhhTabOverview"/>
+
+                    <t t-call="zrn_analitics.HubRrhhTabPredictor"/>
+
+                    <t t-call="zrn_analitics.HubRrhhTabPatrones"/>
+
+                    <t t-call="zrn_analitics.HubRrhhTabChecklist"/>
+
+                    <t t-call="zrn_analitics.HubRrhhTabHistorico"/>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

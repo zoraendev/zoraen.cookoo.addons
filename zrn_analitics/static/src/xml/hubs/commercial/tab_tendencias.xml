@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabTendencias"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'tendencias'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Tendencia y Crecimiento de Ventas</span>
+                        <span>Último mes vs promedio de meses anteriores (unidades/día)</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <div class="border rounded p-3 bg-white">
+                                <h6 class="font-weight-bold mb-3 text-success">Productos en Crecimiento (Growers)</h6>
+                                <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">
+                                    <table class="zrn_analitics_commercial_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th style="text-align:right">Pace Histórico/Día</th>
+                                                <th style="text-align:right">Pace Reciente/Día</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('growers', 'trend')" style="cursor:pointer; text-align:right">Crecimiento Δ % <i class="fa fa-sort ms-1 text-muted"/></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedGrowers" t-as="g" t-key="g.name">
+                                                <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(g.detail)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="g.name"/></strong></td>
+                                                    <td style="text-align:right"><t t-esc="g.pace_q1_u"/> u/día</td>
+                                                    <td style="text-align:right"><t t-esc="g.pace_abr_u"/> u/día</td>
+                                                    <td style="text-align:right; font-weight:700; color:#16a34a;">
+                                                        +<t t-esc="g.trend"/>%
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="border rounded p-3 bg-white">
+                                <h6 class="font-weight-bold mb-3 text-danger">Productos en Caída (Decliners)</h6>
+                                <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">
+                                    <table class="zrn_analitics_commercial_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th style="text-align:right">Pace Histórico/Día</th>
+                                                <th style="text-align:right">Pace Reciente/Día</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('decliners', 'trend')" style="cursor:pointer; text-align:right">Caída Δ % <i class="fa fa-sort ms-1 text-muted"/></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedDecliners" t-as="d" t-key="d.name">
+                                                <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(d.detail)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="d.name"/></strong></td>
+                                                    <td style="text-align:right"><t t-esc="d.pace_q1_u"/> u/día</td>
+                                                    <td style="text-align:right"><t t-esc="d.pace_abr_u"/> u/día</td>
+                                                    <td style="text-align:right; font-weight:700; color:#b91c1c;">
+                                                        <t t-esc="d.trend"/>%
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </t>
+
+            </t>
+</templates>

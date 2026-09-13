@@ -1,0 +1,149 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubPdv">
+        <div class="zrn_analitics_pdv_hub" t-ref="hubRoot">
+            <div class="zrn_analitics_pdv_hero">
+                <div class="zrn_analitics_pdv_title_row">
+                    <div class="zrn_analitics_hub_panel_title">Hub PDV</div>
+                </div>
+            </div>
+
+            <div class="zrn_analitics_pdv_shell">
+                <button type="button" class="btn zrn_analitics_pdv_sidebar_toggle" t-on-click="togglePdvSidebar">
+                    <i class="fa fa-bars"/>
+                    <span>Secciones</span>
+                </button>
+
+                <div class="zrn_analitics_pdv_sidebar_overlay" t-att-class="state.pdvSidebarOpen ? 'is-open' : ''" t-on-click="closePdvSidebar"/>
+
+                <aside class="zrn_analitics_pdv_sidebar" t-att-class="state.pdvSidebarOpen ? 'is-open' : ''">
+                    <div class="zrn_analitics_pdv_sidebar_head">
+                        <div class="zrn_analitics_pdv_sidebar_title">Secciones</div>
+                        <button type="button" class="btn zrn_analitics_pdv_sidebar_close" t-on-click="closePdvSidebar">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+
+                    <div class="zrn_analitics_pdv_badges">
+                        <span class="zrn_analitics_pdv_badge zrn_analitics_pdv_badge_sync">
+                            Sync con Odoo: <t t-esc="pdvPayload.summary.sync_label"/>
+                        </span>
+                        <span class="zrn_analitics_pdv_badge">
+                            <t t-esc="pdvPayload.summary.period_label"/>
+                        </span>
+                        <span class="zrn_analitics_pdv_badge">
+                            <t t-esc="formatCount(pdvPayload.summary.total_pdvs)"/> PDVs / <t t-esc="formatCount(pdvPayload.summary.active_channel_count)"/> canales
+                        </span>
+                    </div>
+
+                    <div class="zrn_analitics_pdv_tabs">
+                        <t t-foreach="pdvTabs" t-as="tab" t-key="tab.key">
+                            <button type="button" class="btn zrn_analitics_pdv_tab" t-att-class="state.pdvTab === tab.key ? 'is-active' : ''" t-on-click="() =&gt; this.setPdvTab(tab.key)">
+                                <i class="fa zrn_analitics_pdv_tab_icon" t-att-class="tab.icon"/>
+                                <span><t t-esc="tab.label"/></span>
+                            </button>
+                        </t>
+                    </div>
+                </aside>
+
+                <div class="zrn_analitics_pdv_content">
+                    <t t-if="state.pdvLoading">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_text">Cargando centro PDV...</div>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.pdvLoading">
+                        <t t-call="zrn_analitics.HubPdvFilters"/>
+
+                        <t t-if="pdvPayload.empty_message">
+                            <div class="zrn_analitics_pdv_empty_note">
+                                <t t-esc="pdvPayload.empty_message"/>
+                            </div>
+                        </t>
+
+                        <t t-call="zrn_analitics.HubPdvTabOverview"/>
+
+                        <t t-call="zrn_analitics.HubPdvTabRanking"/>
+
+                        <t t-call="zrn_analitics.HubPdvTabCanales"/>
+
+                        <t t-if="false">
+                            <t t-set="pumaPayload" t-value="pdvPayload.puma"/>
+                            <div class="zrn_analitics_pdv_stats zrn_analitics_pdv_stats_chain">
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Sell-in</span>
+                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pumaPayload.summary.sellin_q)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Sell-out</span>
+                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pumaPayload.summary.sellout_q)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Sell-through</span>
+                                    <strong><t t-esc="formatPercent(pumaPayload.summary.sellthrough_q_pct)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>PDVs con data</span>
+                                    <strong><t t-esc="formatCount(pumaPayload.summary.pdvs_with_data)"/></strong>
+                                </div>
+                            </div>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_pdv_panel_head">
+                                    <span>Sell-in vs Sell-out</span>
+                                    <span>PUMA Super 7</span>
+                                </div>
+                                <div class="zrn_analitics_pdv_chart_wrap">
+                                    <t t-if="pumaPayload.by_month.length and hasEchartsLibrary">
+                                        <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-puma-monthly"/>
+                                    </t>
+                                    <t t-elif="pumaPayload.by_month.length">
+                                        <div class="zrn_analitics_pdv_chart_empty">Hay datos mensuales, pero ECharts no esta disponible.</div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_pdv_chart_empty">Sin data mensual para PUMA Super 7.</div>
+                                    </t>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_pdv_panel_head">
+                                    <span>Detalle por PDV</span>
+                                    <span>Click para drill-down</span>
+                                </div>
+                                <div class="zrn_analitics_pdv_table_wrap">
+                                    <table class="zrn_analitics_pdv_table">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'name_short')">PDV</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'sellin_q')" class="text-end">Sell-in</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'sellout_q')" class="text-end">Sell-out</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'sellthrough_q')" class="text-end">Sell-through</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'days_since_last')" class="text-end">Recencia</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedPdvPumaRows" t-as="row" t-key="'puma_' + row.partner_id">
+                                                <tr class="zrn_analitics_pdv_row_clickable" t-on-click="() =&gt; this.openPdvRow(row)">
+                                                    <td><strong><t t-esc="row.name_short"/></strong></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.sellin_q)"/></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.sellout_q)"/></td>
+                                                    <td class="text-end"><t t-esc="row.has_sellout ? formatPercent(row.sellthrough_q) : '—'"/></td>
+                                                    <td class="text-end"><t t-esc="row.days_since_last"/> d</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </t>
+
+                        <t t-call="zrn_analitics.HubPdvTabOtros"/>
+
+                        <t t-call="zrn_analitics.HubPdvTabAlertas"/>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

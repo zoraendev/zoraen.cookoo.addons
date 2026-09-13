@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubPdvTabCanales"><t t-if="state.pdvTab === 'canales'">
+                            <t t-set="channelComparePayload" t-value="pdvPayload.channel_compare"/>
+                            <div class="zrn_analitics_pdv_stats zrn_analitics_pdv_stats_chain">
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Sell-in</span>
+                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(channelComparePayload.summary.sellin_q)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Sell-out</span>
+                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(channelComparePayload.summary.sellout_q)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Sell-through</span>
+                                    <strong><t t-esc="formatPercent(channelComparePayload.summary.sellthrough_q_pct)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>PDVs con data</span>
+                                    <strong><t t-esc="formatCount(channelComparePayload.summary.pdvs_with_data)"/></strong>
+                                </div>
+                            </div>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_pdv_panel_head">
+                                    <span>Sell-in vs Sell-out</span>
+                                    <span><t t-esc="channelComparePayload.channel_labels.length ? channelComparePayload.channel_labels.join(', ') : 'Todos los canales'"/></span>
+                                </div>
+                                <div class="zrn_analitics_pdv_chart_wrap">
+                                    <t t-if="channelComparePayload.by_month.length and hasEchartsLibrary">
+                                        <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-channel-monthly"/>
+                                    </t>
+                                    <t t-elif="channelComparePayload.by_month.length">
+                                        <div class="zrn_analitics_pdv_chart_empty">Hay datos mensuales, pero ECharts no esta disponible.</div>
+                                    </t>
+                                    <t t-elif="channelComparePayload.empty_message">
+                                        <div class="zrn_analitics_pdv_chart_empty"><t t-esc="channelComparePayload.empty_message"/></div>
+                                    </t>
+                                    <t t-else="">
+                                        <div class="zrn_analitics_pdv_chart_empty">Sin data mensual para los canales filtrados.</div>
+                                    </t>
+                                </div>
+                            </section>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_pdv_panel_head">
+                                    <span>Detalle por PDV</span>
+                                    <span><t t-esc="channelComparePayload.supported_channel_labels.length ? 'Click para drill-down' : 'Vista filtrada por canal'"/></span>
+                                </div>
+                                <div class="zrn_analitics_pdv_table_wrap">
+                                    <table class="zrn_analitics_pdv_table">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'name_short')">PDV</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'channel')">Canal</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'subchain')">Subcanal</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'sellin_q')" class="text-end">Sell-in</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'sellout_q')" class="text-end">Sell-out</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'sellthrough_q')" class="text-end">Sell-through</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_chain', 'days_of_cover')" class="text-end">Cobertura</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedPdvChannelRows" t-as="row" t-key="'pdv_channel_' + row.partner_id">
+                                                <tr class="zrn_analitics_pdv_row_clickable" t-on-click="() =&gt; this.openPdvRow(row)">
+                                                    <td><strong><t t-esc="row.name_short"/></strong></td>
+                                                    <td><t t-esc="row.channel"/></td>
+                                                    <td><t t-esc="row.subchain"/></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.has_sellout ? row.sellin_q : row.rev)"/></td>
+                                                    <td class="text-end"><t t-esc="row.has_sellout ? pdvPayload.summary.currency_symbol + ' ' + formatMoney(row.sellout_q) : '—'"/></td>
+                                                    <td class="text-end"><t t-esc="row.has_sellout ? formatPercent(row.sellthrough_q) : '—'"/></td>
+                                                    <td class="text-end"><t t-esc="row.days_of_cover ? row.days_of_cover + ' d' : '—'"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

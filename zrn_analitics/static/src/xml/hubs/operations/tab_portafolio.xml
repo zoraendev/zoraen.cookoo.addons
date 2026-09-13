@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubOperationsTabPortafolio"><t t-if="state.operationsTab === 'portafolio'">
+                            <div class="zrn_analitics_operations_top_row">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Unidades por unidad</span>
+                                        <span>Drill operativo</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_line_chart">
+                                        <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-portfolio-units"/>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Fuentes</span>
+                                        <span>Lectura rapida</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_coverage_notes">
+                                        <t t-foreach="operationsPayload.notes_sources" t-as="note" t-key="note.label">
+                                            <div class="zrn_analitics_operations_coverage_note_row">
+                                                <strong><t t-esc="note.label"/></strong>
+                                                <span><t t-esc="note.detail"/></span>
+                                            </div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_operations_panel_head">
+                                    <span>Drill UN → Marca → Linea → SKU</span>
+                                    <span>Click en marca o SKU para abrir registro</span>
+                                </div>
+                                <div class="zrn_analitics_operations_portfolio_table_wrap">
+                                    <div class="o_list_renderer o_list_view table-responsive">
+                                        <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nivel</th>
+                                                    <th class="text-end">Unidades</th>
+                                                    <th class="text-end">SKUs</th>
+                                                    <th class="text-end">Pedidos</th>
+                                                    <th class="text-end">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="sortedOperationsPortfolioRows" t-as="row" t-key="row.key" t-if="this.isOperationsPortfolioRowVisible(row)" t-att-class="'zrn_analitics_operations_portfolio_row is-' + row.level" t-att-style="(row.level === 'brand' || row.level === 'sku') ? 'cursor: pointer;' : ''" t-on-click="() =&gt; this.openOperationsPortfolioRow(row)">
+                                                    <td>
+                                                        <div t-att-class="'zrn_analitics_operations_portfolio_cell is-' + row.level">
+                                                            <button t-if="row.level !== 'sku'" type="button" class="btn zrn_analitics_operations_portfolio_toggle" t-on-click.stop="() =&gt; this.toggleOperationsPortfolioRow(row.key)">
+                                                                <i class="fa" t-att-class="this.isOperationsPortfolioRowExpanded(row.key) ? 'fa-caret-down' : 'fa-caret-right'"/>
+                                                            </button>
+                                                            <span t-if="row.level === 'sku'" class="zrn_analitics_operations_portfolio_dot"/>
+                                                            <strong><t t-esc="row.label"/></strong>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.units)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.sku_count)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.order_count)"/></td>
+                                                    <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

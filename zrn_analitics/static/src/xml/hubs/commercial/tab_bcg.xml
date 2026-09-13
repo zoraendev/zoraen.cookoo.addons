@@ -1,0 +1,126 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabBcg"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'bcg'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Matriz BCG (Growth-Share Matrix)</span>
+                        <span>Mediana Venta YTD: <t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.bcg_data.mr)"/> · Mediana Margen: <t t-esc="commercialPayload.bcg_data.mm"/>%</span>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light" style="border-left: 4px solid #eab308 !important;">
+                                <div class="text-muted small uppercase">Estrellas</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.bcg_data.sum.S.n)"/> SKUs</h4>
+                                <span class="small text-muted">Venta: Q<t t-esc="formatMoney(commercialPayload.bcg_data.sum.S.r)"/> (Mrg <t t-esc="commercialPayload.bcg_data.sum.S.am"/>%)</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light" style="border-left: 4px solid #22c55e !important;">
+                                <div class="text-muted small uppercase">Vacas Lecheras</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.bcg_data.sum.C.n)"/> SKUs</h4>
+                                <span class="small text-muted">Venta: Q<t t-esc="formatMoney(commercialPayload.bcg_data.sum.C.r)"/> (Mrg <t t-esc="commercialPayload.bcg_data.sum.C.am"/>%)</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light" style="border-left: 4px solid #8b5cf6 !important;">
+                                <div class="text-muted small uppercase">Incógnitas</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.bcg_data.sum.I.n)"/> SKUs</h4>
+                                <span class="small text-muted">Venta: Q<t t-esc="formatMoney(commercialPayload.bcg_data.sum.I.r)"/> (Mrg <t t-esc="commercialPayload.bcg_data.sum.I.am"/>%)</span>
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <div class="border rounded p-3 text-center bg-light" style="border-left: 4px solid #ef4444 !important;">
+                                <div class="text-muted small uppercase">Perros</div>
+                                <h4 class="mb-0 mt-1 font-weight-bold"><t t-esc="formatCount(commercialPayload.bcg_data.sum.D.n)"/> SKUs</h4>
+                                <span class="small text-muted">Venta: Q<t t-esc="formatMoney(commercialPayload.bcg_data.sum.D.r)"/> (Mrg <t t-esc="commercialPayload.bcg_data.sum.D.am"/>%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border rounded p-3 bg-white mb-4 text-center">
+                        <h6 class="font-weight-bold mb-1">Mapa Estratégico de Posicionamiento de Productos</h6>
+                        <div class="zrn_analitics_bcg_plot mx-auto" style="max-width: 900px;">
+                            <div class="zrn_analitics_bcg_quadrant zrn_analitics_bcg_q_question align-items-start">
+                                <span class="font-weight-bold text-primary">Incógnitas (Alta Utilidad, Baja Participación)</span>
+                            </div>
+                            <div class="zrn_analitics_bcg_quadrant zrn_analitics_bcg_q_star align-items-end">
+                                <span class="font-weight-bold text-warning" style="color:#b45309 !important;">Estrellas (Alta Utilidad, Alta Participación)</span>
+                            </div>
+                            <div class="zrn_analitics_bcg_quadrant zrn_analitics_bcg_q_dog align-items-start justify-content-end">
+                                <span class="font-weight-bold text-danger">Perros (Baja Utilidad, Baja Participación)</span>
+                            </div>
+                            <div class="zrn_analitics_bcg_quadrant zrn_analitics_bcg_q_cow align-items-end justify-content-end">
+                                <span class="font-weight-bold text-success">Vacas (Baja Utilidad, Alta Participación)</span>
+                            </div>
+                            <div class="zrn_analitics_bcg_axis_line" style="top: 50%; left: 0; width: 100%;"/>
+                            <div class="zrn_analitics_bcg_axis_line" style="left: 50%; top: 0; height: 100%;"/>
+                            
+                            <t t-set="medRev" t-value="commercialPayload.bcg_data.mr"/>
+                            <t t-set="medMargin" t-value="commercialPayload.bcg_data.mm"/>
+                            <t t-foreach="commercialPayload.bcg_data.skus" t-as="s" t-key="s.n">
+                                <t t-set="hiVol" t-value="s.q === 'S' || s.q === 'C'"/>
+                                <t t-set="hiMrg" t-value="s.q === 'S' || s.q === 'I'"/>
+                                <t t-set="x_pos" t-value="hiVol ? (55 + Math.min((s.r - medRev) / (medRev * 1.5 || 1), 1) * 35) : (5 + Math.min(s.r / (medRev || 1), 1) * 40)"/>
+                                <t t-set="y_pos" t-value="hiMrg ? (45 - Math.min((s.m - medMargin) / (medMargin * 1.5 || 1), 1) * 35) : (55 + Math.min((medMargin - s.m) / (medMargin || 1), 1) * 35)"/>
+                                
+                                <div class="zrn_analitics_bcg_dot" t-att-class="s.q === 'S' ? 'zrn_analitics_bcg_dot_star' : (s.q === 'C' ? 'zrn_analitics_bcg_dot_cow' : (s.q === 'I' ? 'zrn_analitics_bcg_dot_question' : 'zrn_analitics_bcg_dot_dog'))" t-att-style="'left:' + x_pos + '%; top:' + y_pos + '%; width: 18px; height: 18px;'" t-att-title="s.n + ' (Venta: Q' + formatMoney(s.r) + ' · Margen: ' + s.m + '%)'">
+                                    •
+                                </div>
+                            </t>
+                            
+                            <span class="position-absolute small text-muted font-weight-bold" style="bottom: -22px; left: 50%; transform: translateX(-50%);">Facturación (Q) →</span>
+                            <span class="position-absolute small text-muted font-weight-bold" style="left: -48px; top: 50%; transform: rotate(-90deg) translate(-50%, -50%); transform-origin: left top;">Margen Bruto (%) →</span>
+                        </div>
+                    </div>
+
+                    <div class="border rounded p-3 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="font-weight-bold mb-0">Detalle por Producto SKU</h6>
+                            <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-dark" t-att-class="state.bcgFilter === 'all' ? 'active' : ''" t-on-click="() =&gt; this.setBcgFilter('all')">Todos (<t t-esc="formatCount(commercialPayload.bcg_data.skus.length)"/>)</button>
+                                <button type="button" class="btn btn-sm btn-outline-warning" t-att-class="state.bcgFilter === 'S' ? 'active' : ''" t-on-click="() =&gt; this.setBcgFilter('S')">Estrellas (<t t-esc="formatCount(commercialPayload.bcg_data.sum.S.n)"/>)</button>
+                                <button type="button" class="btn btn-sm btn-outline-success" t-att-class="state.bcgFilter === 'C' ? 'active' : ''" t-on-click="() =&gt; this.setBcgFilter('C')">Vacas (<t t-esc="formatCount(commercialPayload.bcg_data.sum.C.n)"/>)</button>
+                                <button type="button" class="btn btn-sm btn-outline-primary" t-att-class="state.bcgFilter === 'I' ? 'active' : ''" t-on-click="() =&gt; this.setBcgFilter('I')">Incógnitas (<t t-esc="formatCount(commercialPayload.bcg_data.sum.I.n)"/>)</button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" t-att-class="state.bcgFilter === 'D' ? 'active' : ''" t-on-click="() =&gt; this.setBcgFilter('D')">Perros (<t t-esc="formatCount(commercialPayload.bcg_data.sum.D.n)"/>)</button>
+                            </div>
+                        </div>
+                        <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">
+                            <table class="zrn_analitics_commercial_table">
+                                <thead>
+                                    <tr>
+                                        <th t-on-click="() =&gt; this.toggleSort('bcg_skus', 'n')" style="cursor:pointer">Producto <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('bcg_skus', 'c')" style="cursor:pointer">Categoría <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('bcg_skus', 'r')" style="cursor:pointer; text-align:right">Venta YTD <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('bcg_skus', 'u')" style="cursor:pointer; text-align:right">Unidades <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('bcg_skus', 'm')" style="cursor:pointer; text-align:right">Margen Bruto % <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('bcg_skus', 'g')" style="cursor:pointer; text-align:right">Ganancia Bruta Q <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th>Cuadrante</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="sortedBcgSkus" t-as="item" t-key="item.n">
+                                        <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(item.detail)" style="cursor: pointer;">
+                                            <td><strong><t t-esc="item.n"/></strong></td>
+                                            <td><t t-esc="item.c"/></td>
+                                            <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.r)"/></td>
+                                            <td style="text-align:right"><t t-esc="formatCount(item.u)"/></td>
+                                            <td style="text-align:right; font-weight:600;" t-att-class="item.m &gt;= 0 ? 'text-success' : 'text-danger'"><t t-esc="item.m"/>%</td>
+                                            <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.g)"/></td>
+                                            <td>
+                                                <span t-att-class="item.q === 'S' ? 'badge bg-warning text-dark' : (item.q === 'C' ? 'badge bg-success' : (item.q === 'I' ? 'badge bg-primary' : 'badge bg-danger'))">
+                                                    <t t-esc="item.q === 'S' ? 'Estrella' : (item.q === 'C' ? 'Vaca' : (item.q === 'I' ? 'Incógnita' : 'Perro'))"/>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </t>
+            
+                </t>
+</templates>

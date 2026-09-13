@@ -8,7 +8,7 @@ Al interactuar con el menú de selección de períodos ("Periodo") en cualquiera
 ### 2. Causas Identificadas
 
 #### A. Resolución de Referencias de Métodos en Plantillas de OWL 2
-Las plantillas XML del Hub Comercial (`hub_commercial.xml`) utilizaban la directiva `.bind` para enlazar los métodos de callback del componente principal `ZrnAnalyticsHubAction`:
+Las plantillas XML del Hub Comercial utilizaban la directiva `.bind` para enlazar los métodos de callback del componente principal `ZrnAnalyticsHubAction`:
 * Código anterior: `onSelect.bind="onOverviewPeriodSelect"` o `onChange.bind="onOverviewBrandsChange"`
 
 En OWL 2 (Odoo 17), el compilador de plantillas evalúa la directiva `.bind` en el contexto local de renderizado. Puesto que los métodos del componente no residen en las variables del estado (`state`) o propiedades del contexto directo, sino en el prototipo de la clase del componente principal, al omitir el prefijo `this.`, la referencia se resolvía como `undefined`. Esto hacía que se ejecutara un callback vacío (comportamiento por defecto del componente `SelectMenu`), fallando de manera silenciosa sin arrojar excepciones en consola.
@@ -26,7 +26,7 @@ Esto causaba que la lista de opciones enviada a `SelectMenu` tuviera siempre `va
 
 ### 3. Soluciones Implementadas
 
-#### Frontend XML ([hub_commercial.xml](file:///home/dgb/Documents/dev-zoraen/zoi.addons/zrn_analitics/static/src/xml/hubs/hub_commercial.xml))
+#### Frontend XML ([tab_overview.xml](../static/src/xml/hubs/commercial/tab_overview.xml))
 Se actualizaron todas las referencias de callbacks para incluir explícitamente el prefijo `this.`, permitiendo que OWL localice correctamente las definiciones de método en la instancia del componente:
 * `<SelectMenu ... onSelect.bind="this.onOverviewPeriodSelect"/>`
 * `<ZrnRelationalMultiSelect ... onChange.bind="this.onOverviewBrandsChange"/>`
@@ -96,7 +96,7 @@ Se solicitó añadir interactividad a todas las tablas del Hub Comercial de modo
 
 ### 2. Cambios Implementados
 
-#### A. Mapeo de IDs e Interactividad en Tablas (`models/analytics_home.py` & `static/src/xml/hubs/hub_commercial.xml`)
+#### A. Mapeo de IDs e Interactividad en Tablas (`models/analytics_home.py` & `static/src/xml/hubs/commercial/tab_overview.xml`)
 *   Se añadieron campos identificadores (`partner_id` para clientes, `product_id` para productos) en los conjuntos de datos del backend que carecían de ellos, específicamente en las listas de distribución `sellin_vs_sellout` de la pestaña **Desplazamiento**.
 *   Se implementaron manejadores de eventos `t-on-click="() => this.openRecordModal(model, id)"` en los elementos `<tr>` de todas las tablas analíticas del Hub Comercial. Esto redirige la acción al servicio `actionService` de Odoo utilizando el target `new` para abrir el formulario modal nativo en lugar de desviar la navegación.
 
@@ -107,7 +107,7 @@ Se solicitó añadir interactividad a todas las tablas del Hub Comercial de modo
     *   **Rosca (Pie)**: Configura una visualización circular segmentada con leyendas scrolleables para evitar saturación de pantalla.
 *   Se incluyó un selector en la cabecera del panel de productos en el XML para actualizar el estado del gráfico de forma reactiva al hacer clic en los tipos de visualización.
 
-#### C. Remoción de Marcadores y Ajuste de Filtros (`static/src/xml/hubs/hub_commercial.xml`)
+#### C. Remoción de Marcadores y Ajuste de Filtros (`static/src/xml/hubs/commercial/shared.xml`)
 *   Se eliminó el banner genérico de *"Esta vista queda reservada..."* en las pestañas no desarrolladas. En su lugar, ahora se despliega únicamente la barra unificada de **Filtros Comerciales** (`HubCommercialFilters`) para permitir la interacción global y mantener una estructura limpia y homogénea en toda la interfaz.
 *   Se documentó y comentó el código JS de renderizado de ECharts, y los callbacks XML para asegurar mantenibilidad futura.
 

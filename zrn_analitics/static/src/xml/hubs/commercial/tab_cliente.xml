@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabCliente"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'cliente'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Ranking completo de clientes / PDVs</span>
+                        <span>Total: <t t-esc="formatCount(commercialPayload.all_clients.length)"/> clientes</span>
+                    </div>
+                    <div class="zrn_analitics_commercial_table_wrap" style="max-height: 600px; overflow-y: auto;">
+                        <table class="zrn_analitics_commercial_table">
+                            <thead>
+                                <tr>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_clients', 'name')" style="cursor:pointer">Cliente / PDV <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_clients', 'channel')" style="cursor:pointer">Canal <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_clients', 'rev')" style="cursor:pointer; text-align:right">Facturado <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_clients', 'units')" style="cursor:pointer; text-align:right">Unidades <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_clients', 'invoices')" style="cursor:pointer; text-align:right">Facturas <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    <th style="text-align:right">Ticket prom.</th>
+                                    <th>Primera compra</th>
+                                    <th>Última compra</th>
+                                    <th t-on-click="() =&gt; this.toggleSort('all_clients', 'days_since')" style="cursor:pointer; text-align:right">Días sin facturar <i class="fa fa-sort ms-1 text-muted"/></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="sortedAllClients" t-as="item" t-key="item.id">
+                                    <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(item.detail)" style="cursor: pointer;">
+                                        <td><strong><t t-esc="item.name"/></strong></td>
+                                        <td><span class="badge bg-light text-dark"><t t-esc="item.channel"/></span></td>
+                                        <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.rev)"/></td>
+                                        <td style="text-align:right"><t t-esc="formatCount(item.units)"/></td>
+                                        <td style="text-align:right"><t t-esc="formatCount(item.invoices)"/></td>
+                                        <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.rev / item.invoices)"/></td>
+                                        <td><t t-esc="item.first"/></td>
+                                        <td><t t-esc="item.last"/></td>
+                                        <td style="text-align:right; font-weight:600;" t-att-class="item.days_since &gt;= 30 ? 'text-danger' : (item.days_since &gt;= 14 ? 'text-warning' : 'text-success')">
+                                            <t t-esc="item.days_since"/> días
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </t>
+
+            </t>
+</templates>

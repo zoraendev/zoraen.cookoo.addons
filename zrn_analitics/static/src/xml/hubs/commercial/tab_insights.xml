@@ -1,0 +1,179 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabInsights"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'insights'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <section class="zrn_analitics_hub_panel">
+                    <div class="zrn_analitics_commercial_panel_head">
+                        <span>Análisis de Comportamiento del Cliente</span>
+                        <span>Cohortes, Asociación, Recompra y LTV</span>
+                    </div>
+
+                    <!-- 1. COHORT RETENTION -->
+                    <div class="border rounded p-3 bg-white mb-4">
+                        <h6 class="font-weight-bold mb-2">Cohort Retention · % de clientes activos por mes</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered mt-2">
+                                <thead>
+                                    <tr class="bg-light text-center">
+                                        <th>Cohorte (1ra Compra)</th>
+                                        <th>Clientes Iniciales</th>
+                                        <t t-foreach="commercialPayload.cohort_retention.months" t-as="m" t-key="m">
+                                            <th>Mes <t t-esc="m_index"/></th>
+                                        </t>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="commercialPayload.cohort_retention.matrix" t-as="cohort" t-key="cohort.cohort">
+                                        <tr class="text-center">
+                                            <td class="bg-light font-weight-bold"><t t-esc="cohort.cohort"/></td>
+                                            <td><strong><t t-esc="formatCount(cohort.size)"/> pdvs</strong></td>
+                                            <t t-foreach="commercialPayload.cohort_retention.months" t-as="m" t-key="m">
+                                                <t t-set="offset_val" t-value="m_index - cohort_index"/>
+                                                <td>
+                                                    <t t-if="offset_val &gt;= 0">
+                                                        <t t-set="cell" t-value="cohort.cells[offset_val]"/>
+                                                        <t t-if="cell">
+                                                            <div class="zrn_analitics_retention_cell" t-att-style="cell.retention_pct &gt;= 0.8 ? 'background:#dcfce7; color:#15803d;' : (cell.retention_pct &gt;= 0.5 ? 'background:#fef9c3; color:#a16207;' : 'background:#fee2e2; color:#b91c1c;')">
+                                                                <t t-esc="Math.round(cell.retention_pct * 100)"/>%
+                                                            </div>
+                                                        </t>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="text-muted">—</span>
+                                                    </t>
+                                                </td>
+                                            </t>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 2. MARKET BASKET -->
+                    <div class="border rounded p-3 bg-white mb-4">
+                        <h6 class="font-weight-bold mb-2">Asociación Market Basket · Productos que se compran juntos</h6>
+                        <div class="zrn_analitics_commercial_table_wrap" style="max-height: 280px; overflow-y: auto;">
+                            <table class="zrn_analitics_commercial_table">
+                                <thead>
+                                    <tr>
+                                        <th t-on-click="() =&gt; this.toggleSort('market_basket', 'a')" style="cursor:pointer">Producto A <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('market_basket', 'b')" style="cursor:pointer">Producto B <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th t-on-click="() =&gt; this.toggleSort('market_basket', 'count')" style="cursor:pointer; text-align:right">Pedidos Co-ocurentes <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th style="text-align:right">Soporte</th>
+                                        <th style="text-align:right">Confianza A → B</th>
+                                        <th style="text-align:right">Confianza B → A</th>
+                                        <th t-on-click="() =&gt; this.toggleSort('market_basket', 'lift')" style="cursor:pointer; text-align:right">Correlación (Lift) <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="sortedMarketBasket" t-as="item" t-key="item.a + '-' + item.b">
+                                        <tr>
+                                            <td><strong><t t-esc="item.a"/></strong></td>
+                                            <td><strong><t t-esc="item.b"/></strong></td>
+                                            <td style="text-align:right; font-weight:600;"><t t-esc="formatCount(item.count)"/> facturas</td>
+                                            <td style="text-align:right"><t t-esc="Math.round(item.support * 1000)/10"/>%</td>
+                                            <td style="text-align:right"><t t-esc="Math.round(item.conf_ab * 100)"/>%</td>
+                                            <td style="text-align:right"><t t-esc="Math.round(item.conf_ba * 100)"/>%</td>
+                                            <td style="text-align:right; font-weight:600;" t-att-class="item.lift &gt; 1.2 ? 'text-success' : 'text-muted'">
+                                                <t t-esc="item.lift"/>x
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 3. CADENCIA & FUGADOS -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-4">
+                            <div class="border rounded p-3 bg-white h-100">
+                                <h6 class="font-weight-bold mb-2">Cadencia de Recompra</h6>
+                                <div class="zrn_analitics_commercial_chart_container" style="height: 180px;">
+                                    <div class="w-100 h-100" data-zrn-chart="insights-cadence"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-8">
+                            <div class="border rounded p-3 bg-white h-100">
+                                <h6 class="font-weight-bold mb-2 text-danger">⚠️ Clientes en Riesgo de Fuga</h6>
+                                <div class="zrn_analitics_commercial_table_wrap" style="max-height: 200px; overflow-y: auto;">
+                                    <table class="zrn_analitics_commercial_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Cliente</th>
+                                                <th style="text-align:right">Compras</th>
+                                                <th style="text-align:right">Cadencia Mediana</th>
+                                                <th style="text-align:right">Días inactivo</th>
+                                                <th style="text-align:right">Revenue YTD</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="commercialPayload.cadence.fugados_top" t-as="f" t-key="f.client">
+                                                <tr class="table-danger">
+                                                    <td><strong><t t-esc="f.client"/></strong></td>
+                                                    <td style="text-align:right"><t t-esc="f.n_purchases"/></td>
+                                                    <td style="text-align:right"><t t-esc="f.median_interval"/> días</td>
+                                                    <td style="text-align:right; font-weight:700; color:#b91c1c;"><t t-esc="f.days_since_last"/> días</td>
+                                                    <td style="text-align:right; font-weight:600;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(f.rev)"/></td>
+                                                </tr>
+                                            </t>
+                                            <t t-if="!commercialPayload.cadence.fugados_top.length">
+                                                <tr>
+                                                    <td colspan="5" class="text-muted text-center py-3">No hay clientes regulares fugados en el periodo</td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. LTV FORECAST -->
+                    <div class="border rounded p-3 bg-white">
+                        <h6 class="font-weight-bold mb-1">LTV Forecast · Proyección a 3 meses (Clientes A/B)</h6>
+                        <div class="text-muted small mb-2">Proyección lineal en base a los últimos 3 meses observados: <strong><t t-esc="commercialPayload.ltv_forecast.months_observed.join(', ')"/></strong></div>
+                        <div class="zrn_analitics_commercial_table_wrap" style="max-height: 380px; overflow-y: auto;">
+                            <table class="zrn_analitics_commercial_table">
+                                <thead>
+                                    <tr>
+                                        <th t-on-click="() =&gt; this.toggleSort('ltv_forecast', 'client')" style="cursor:pointer">Cliente <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th>Clase ABC</th>
+                                        <th style="text-align:right">Promedio Histórico</th>
+                                        <th t-on-click="() =&gt; this.toggleSort('ltv_forecast', 'slope')" style="cursor:pointer; text-align:right">Tendencia (pendiente) <i class="fa fa-sort ms-1 text-muted"/></th>
+                                        <th style="text-align:right"><t t-esc="commercialPayload.ltv_forecast.project_months[0]"/> (M+1)</th>
+                                        <th style="text-align:right"><t t-esc="commercialPayload.ltv_forecast.project_months[1]"/> (M+2)</th>
+                                        <th style="text-align:right"><t t-esc="commercialPayload.ltv_forecast.project_months[2]"/> (M+3)</th>
+                                        <th t-on-click="() =&gt; this.toggleSort('ltv_forecast', 'forecast_total_3m')" style="cursor:pointer; text-align:right">Total Proyectado 3m <i class="fa fa-sort ms-1 text-muted"/></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="sortedLtvForecast" t-as="item" t-key="item.client">
+                                        <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(item.detail)" style="cursor: pointer;">
+                                            <td><strong><t t-esc="item.client"/></strong></td>
+                                            <td style="text-align:center">
+                                                <span t-att-class="item.abc === 'A' ? 'badge bg-success' : 'badge bg-warning'">
+                                                    Clase <t t-esc="item.abc"/>
+                                                </span>
+                                            </td>
+                                            <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.avg_recent)"/></td>
+                                            <td style="text-align:right; font-weight:600;" t-att-class="item.slope &gt; 0 ? 'text-success' : (item.slope &lt; 0 ? 'text-danger' : 'text-muted')">
+                                                <t t-esc="item.slope &gt; 0 ? '+' : ''"/><t t-esc="formatMoney(item.slope)"/>
+                                            </td>
+                                            <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.forecast[0])"/></td>
+                                            <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.forecast[1])"/></td>
+                                            <td style="text-align:right"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.forecast[2])"/></td>
+                                            <td style="text-align:right; font-weight:700; background: #fafafa;"><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(item.forecast_total_3m)"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </t>
+
+            </t>
+</templates>

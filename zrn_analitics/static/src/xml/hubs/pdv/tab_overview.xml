@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubPdvTabOverview"><t t-if="state.pdvTab === 'overview'">
+                            <div class="zrn_analitics_pdv_stats">
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Revenue YTD</span>
+                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pdvPayload.summary.total_revenue)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>PDVs activos</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.total_pdvs)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Ticket promedio</span>
+                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pdvPayload.summary.avg_ticket)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>PDVs nuevos</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.new_count)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>PDVs con alertas</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.alert_count)"/></strong>
+                                </div>
+                            </div>
+
+                            <div class="zrn_analitics_pdv_grid_top">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_pdv_panel_head">
+                                        <span>Revenue por mes</span>
+                                        <span>Venta filtrada por PDV</span>
+                                    </div>
+                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                        <t t-if="pdvPayload.revenue_series.length and hasEchartsLibrary">
+                                            <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-overview-revenue"/>
+                                        </t>
+                                        <t t-elif="pdvPayload.revenue_series.length">
+                                            <div class="zrn_analitics_pdv_chart_empty">Hay datos de revenue, pero ECharts no esta disponible.</div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_pdv_chart_empty">Sin revenue para graficar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_pdv_panel_head">
+                                        <span>Cobertura por canal</span>
+                                        <span>PDVs activos vs red total</span>
+                                    </div>
+                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                        <t t-if="pdvPayload.channel_coverage.length and hasEchartsLibrary">
+                                            <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-overview-coverage"/>
+                                        </t>
+                                        <t t-elif="pdvPayload.channel_coverage.length">
+                                            <div class="zrn_analitics_pdv_chart_empty">Hay cobertura por canal, pero ECharts no esta disponible.</div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_pdv_chart_empty">Sin cobertura para mostrar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+                            </div>
+
+                            <div class="zrn_analitics_pdv_grid_bottom">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_pdv_panel_head">
+                                        <span>Top PDVs</span>
+                                        <span>Revenue acumulado</span>
+                                    </div>
+                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                        <t t-if="pdvPayload.top_pdvs.length and hasEchartsLibrary">
+                                            <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-overview-top"/>
+                                        </t>
+                                        <t t-elif="pdvPayload.top_pdvs.length">
+                                            <div class="zrn_analitics_pdv_chart_empty">Hay top PDVs, pero ECharts no esta disponible.</div>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_pdv_chart_empty">Sin PDVs para mostrar.</div>
+                                        </t>
+                                    </div>
+                                </section>
+
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_pdv_panel_head">
+                                        <span>Altas recientes y dormancia</span>
+                                        <span>Senales operativas</span>
+                                    </div>
+                                    <div class="zrn_analitics_pdv_lists">
+                                        <div class="zrn_analitics_pdv_list_block">
+                                            <strong>PDVs nuevos</strong>
+                                            <t t-if="pdvPayload.new_pdvs.length">
+                                                <t t-foreach="pdvPayload.new_pdvs" t-as="row" t-key="'new_' + row.partner_id">
+                                                    <button type="button" class="btn zrn_analitics_pdv_list_item" t-on-click="() =&gt; this.openPdvRow(row)">
+                                                        <span><t t-esc="row.name_short"/></span>
+                                                        <small><t t-esc="row.days_since_first"/> dias</small>
+                                                    </button>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="zrn_analitics_pdv_list_empty">Sin PDVs nuevos.</div>
+                                            </t>
+                                        </div>
+                                        <div class="zrn_analitics_pdv_list_block">
+                                            <strong>PDVs dormantes</strong>
+                                            <t t-if="pdvPayload.dormant_pdvs.length">
+                                                <t t-foreach="pdvPayload.dormant_pdvs" t-as="row" t-key="'dormant_' + row.partner_id">
+                                                    <button type="button" class="btn zrn_analitics_pdv_list_item" t-on-click="() =&gt; this.openPdvRow(row)">
+                                                        <span><t t-esc="row.name_short"/></span>
+                                                        <small><t t-esc="row.days_since_last"/> dias</small>
+                                                    </button>
+                                                </t>
+                                            </t>
+                                            <t t-else="">
+                                                <div class="zrn_analitics_pdv_list_empty">Sin PDVs dormantes.</div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                        </t>
+
+                        </t>
+</templates>

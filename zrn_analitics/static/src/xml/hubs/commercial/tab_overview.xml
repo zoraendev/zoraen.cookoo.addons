@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubCommercialTabOverview"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'overview'">
+                        <t t-call="zrn_analitics.HubCommercialFilters"/>
+                <t t-if="!hasCommercialBrands">
+                    <div class="zrn_analitics_commercial_plain_empty zrn_analitics_commercial_plain_empty_main">
+                        <t t-esc="commercialPayload.empty_message or 'No hay marcas comerciales creadas en (ZRN) Manejo Comercial.'"/>
+                    </div>
+                </t>
+
+                <t t-if="hasCommercialBrands">
+                    <div class="zrn_analitics_commercial_summary_table_wrap">
+                        <table class="table table-sm o_list_table zrn_analitics_commercial_summary_table mb-0">
+                            <thead>
+                                <tr>
+                                    <th><i class="fa fa-line-chart me-1"/> Venta total</th>
+                                    <th><i class="fa fa-shopping-cart me-1"/> Pedidos</th>
+                                    <th><i class="fa fa-briefcase me-1"/> Cuentas</th>
+                                    <th><i class="fa fa-map-marker me-1"/> PDVs</th>
+                                    <th><i class="fa fa-ticket me-1"/> Ticket promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.summary.total_amount)"/></strong></td>
+                                    <td><strong><t t-esc="formatCount(commercialPayload.summary.order_count)"/></strong></td>
+                                    <td><strong><t t-esc="formatCount(commercialPayload.summary.customer_count)"/></strong></td>
+                                    <td><strong><t t-esc="formatCount(commercialPayload.summary.point_count)"/></strong></td>
+                                    <td><strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.summary.average_ticket)"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <t t-if="commercialPayload.empty_message">
+                        <div class="zrn_analitics_commercial_plain_empty">
+                            <t t-esc="commercialPayload.empty_message"/>
+                        </div>
+                    </t>
+
+                <div class="zrn_analitics_commercial_top_row">
+                    <section class="zrn_analitics_hub_panel zrn_analitics_commercial_panel_main">
+                        <div class="zrn_analitics_commercial_panel_head">
+                            <span>Venta por mes</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('tendencias')" aria-label="Ver tendencias">
+                                    <i class="fa fa-arrow-right"/>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('revenue')" aria-label="Cambiar grafica">
+                                    <i class="fa fa-bar-chart"/>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="zrn_analitics_commercial_chart_meta">
+                            <strong>Venta YTD de productos asociados a marcas</strong>
+                        </div>
+                        <div class="zrn_analitics_commercial_line_chart">
+                            <t t-if="hasCommercialRevenueSeries and hasEchartsLibrary">
+                                <div class="zrn_analitics_commercial_echart" data-zrn-chart="overview-line"/>
+                            </t>
+                            <t t-elif="hasCommercialRevenueSeries">
+                                <div class="zrn_analitics_commercial_chart_empty">Hay datos de venta, pero la librería ECharts aún no está cargada en assets.</div>
+                            </t>
+                            <t t-else="">
+                                <div class="zrn_analitics_commercial_chart_empty">Sin datos de venta para graficar.</div>
+                            </t>
+                        </div>
+                    </section>
+
+                    <section class="zrn_analitics_hub_panel zrn_analitics_commercial_panel_side">
+                        <div class="zrn_analitics_commercial_panel_head">
+                            <span>Mix por marca</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('portafolio')" aria-label="Ver portafolio">
+                                    <i class="fa fa-arrow-right"/>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('brandMix')" aria-label="Cambiar grafica">
+                                    <i class="fa fa-pie-chart"/>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="zrn_analitics_commercial_donut_wrap">
+                            <t t-if="hasCommercialBrandMix and hasEchartsLibrary">
+                                <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_donut" data-zrn-chart="overview-donut"/>
+                            </t>
+                            <t t-elif="hasCommercialBrandMix">
+                                <div class="zrn_analitics_commercial_chart_empty">Hay mix por marca, pero la librería ECharts aún no está cargada en assets.</div>
+                            </t>
+                            <t t-else="">
+                                <div class="zrn_analitics_commercial_chart_empty">Sin marcas con venta en el periodo.</div>
+                            </t>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="zrn_analitics_commercial_bottom_grid">
+                    <section class="zrn_analitics_hub_panel">
+                        <div class="zrn_analitics_commercial_panel_head">
+                            <span>Top clientes</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('cliente')" aria-label="Ver clientes">
+                                    <i class="fa fa-arrow-right"/>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('customers')" aria-label="Cambiar grafica">
+                                    <i class="fa fa-bar-chart"/>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="zrn_analitics_commercial_bar_list">
+                            <t t-if="hasCommercialTopCustomers and hasEchartsLibrary">
+                                <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="overview-customers"/>
+                            </t>
+                            <t t-elif="hasCommercialTopCustomers">
+                                <div class="zrn_analitics_commercial_chart_empty">Hay clientes con venta, pero la librería ECharts aún no está cargada en assets.</div>
+                            </t>
+                            <t t-else="">
+                                <div class="zrn_analitics_commercial_chart_empty">Sin clientes para mostrar.</div>
+                            </t>
+                        </div>
+                    </section>
+
+                    <section class="zrn_analitics_hub_panel">
+                        <div class="zrn_analitics_commercial_panel_head">
+                            <span>Top productos</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('producto')" aria-label="Ver productos">
+                                    <i class="fa fa-arrow-right"/>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleSort('top_products', 'sales_amount')" aria-label="Ordenar tabla">
+                                    <i class="fa fa-sort-amount-desc"/>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="zrn_analitics_commercial_table_wrap">
+                            <div class="o_list_renderer o_list_view table-responsive">
+                            <t t-if="sortedTopProducts.length">
+                                <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th t-on-click="() =&gt; this.toggleSort('top_products', 'name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Producto
+                                                <t t-if="state.sorts.top_products.column === 'name'">
+                                                    <i class="fa" t-att-class="state.sorts.top_products.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('top_products', 'category_name')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Categoria
+                                                <t t-if="state.sorts.top_products.column === 'category_name'">
+                                                    <i class="fa" t-att-class="state.sorts.top_products.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('top_products', 'quantity_sold')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Unidades
+                                                <t t-if="state.sorts.top_products.column === 'quantity_sold'">
+                                                    <i class="fa" t-att-class="state.sorts.top_products.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                            <th t-on-click="() =&gt; this.toggleSort('top_products', 'sales_amount')" class="o_column_sortable" style="cursor: pointer; user-select: none;">
+                                                Venta
+                                                <t t-if="state.sorts.top_products.column === 'sales_amount'">
+                                                    <i class="fa" t-att-class="state.sorts.top_products.order === 'asc' ? 'fa-caret-up ms-1' : 'fa-caret-down ms-1'"/>
+                                                </t>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="sortedTopProducts" t-as="product" t-key="product.product_id">
+                                            <tr t-on-click="() =&gt; this.openAnalyticsDetailModal(product.detail)" style="cursor: pointer;">
+                                                <td>
+                                                    <strong><t t-esc="product.name"/></strong>
+                                                    <div t-if="product.default_code" class="text-muted small"><t t-esc="product.default_code"/></div>
+                                                </td>
+                                                <td><t t-esc="product.category_name"/></td>
+                                                <td><t t-esc="formatCount(product.quantity_sold)"/></td>
+                                                <td><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(product.sales_amount)"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </t>
+                            <t t-else="">
+                                <div class="zrn_analitics_commercial_chart_empty">Sin productos para mostrar.</div>
+                            </t>
+                            </div>
+                        </div>
+                    </section>
+                        </div>
+                </t>
+                    </t>
+
+            </t>
+</templates>

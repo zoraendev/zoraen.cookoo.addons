@@ -1,0 +1,143 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubOperationsTabCompras"><t t-if="state.operationsTab === 'compras'">
+                            <div class="zrn_analitics_operations_stats">
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Ordenes abiertas</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.purchases.summary.open_orders)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Monto abierto</span>
+                                    <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.purchases.summary.open_amount)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Spend periodo</span>
+                                    <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.purchases.summary.period_spend)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Lead time</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.purchases.summary.avg_lead_time_days)"/> d</strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Lineas atrasadas</span>
+                                    <strong><t t-esc="formatCount(operationsPayload.purchases.summary.late_lines)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_operations_stat_box">
+                                    <span>Concentracion top</span>
+                                    <strong><t t-esc="formatPercent(operationsPayload.purchases.summary.supplier_concentration_pct)"/></strong>
+                                </div>
+                            </div>
+                            <div class="zrn_analitics_operations_top_row">
+                                <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_main">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Spend mensual</span>
+                                        <span>Evolucion del gasto</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_line_chart">
+                                        <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-purchases-spend"/>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_side">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Top proveedores</span>
+                                        <span>Spend del periodo</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-purchases-suppliers"/>
+                                    </div>
+                                </section>
+                            </div>
+                            <div class="zrn_analitics_operations_bottom_grid">
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Proveedores</span>
+                                        <span>Click para abrir proveedor</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_suppliers', 'supplier')" class="o_column_sortable" style="cursor: pointer;">Proveedor</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_suppliers', 'spend')" class="o_column_sortable text-end" style="cursor: pointer;">Spend</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_suppliers', 'open_amount')" class="o_column_sortable text-end" style="cursor: pointer;">Abierto</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_suppliers', 'avg_lead_time_days')" class="o_column_sortable text-end" style="cursor: pointer;">Lead time</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_suppliers', 'late_lines')" class="o_column_sortable text-end" style="cursor: pointer;">Atrasos</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedOperationsPurchaseSuppliers" t-as="row" t-key="'ops_sup_' + row.partner_id" t-on-click="() =&gt; this.openOperationsSupplier(row)" style="cursor: pointer;">
+                                                        <td><strong><t t-esc="row.supplier"/></strong></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.spend)"/></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.open_amount)"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.avg_lead_time_days)"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.late_lines)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                                <section class="zrn_analitics_hub_panel">
+                                    <div class="zrn_analitics_operations_panel_head">
+                                        <span>Ordenes abiertas</span>
+                                        <span>Click para abrir OC</span>
+                                    </div>
+                                    <div class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_orders', 'name')" class="o_column_sortable" style="cursor: pointer;">OC</th>
+                                                        <th>Proveedor</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_orders', 'date_order')" class="o_column_sortable" style="cursor: pointer;">Fecha</th>
+                                                        <th t-on-click="() =&gt; this.toggleSort('operations_purchase_orders', 'open_amount')" class="o_column_sortable text-end" style="cursor: pointer;">Abierto</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedOperationsPurchaseOrders" t-as="row" t-key="'ops_po_' + row.order_id" t-on-click="() =&gt; this.openOperationsPurchaseOrder(row)" style="cursor: pointer;">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td><t t-esc="row.supplier"/></td>
+                                                        <td><t t-esc="row.date_order"/></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.open_amount)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </section>
+                            </div>
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_operations_panel_head">
+                                    <span>Backlog por SKU</span>
+                                    <span>Lineas pendientes de recibir</span>
+                                </div>
+                                <div class="zrn_analitics_operations_table_wrap">
+                                    <div class="o_list_renderer o_list_view table-responsive">
+                                        <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                            <thead>
+                                                <tr>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_purchase_backlog', 'product_name')" class="o_column_sortable" style="cursor: pointer;">Producto</th>
+                                                    <th>Proveedor</th>
+                                                    <th>Canal producto</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_purchase_backlog', 'open_qty')" class="o_column_sortable text-end" style="cursor: pointer;">Pendiente</th>
+                                                    <th t-on-click="() =&gt; this.toggleSort('operations_purchase_backlog', 'open_amount')" class="o_column_sortable text-end" style="cursor: pointer;">Monto</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="sortedOperationsPurchaseBacklog" t-as="row" t-key="'ops_back_' + row.order_id + '_' + row.product_id" t-on-click="() =&gt; this.openOperationsPurchaseOrder(row)" style="cursor: pointer;">
+                                                    <td><strong><t t-esc="row.product_name"/></strong></td>
+                                                    <td><t t-esc="row.supplier"/></td>
+                                                    <td><t t-esc="row.product_channel_name"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.open_qty)"/></td>
+                                                    <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.open_amount)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </section>
+                        </t>
+
+                        </t>
+</templates>

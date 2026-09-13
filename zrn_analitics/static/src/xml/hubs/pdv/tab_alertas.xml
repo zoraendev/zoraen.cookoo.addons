@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubPdvTabAlertas"><t t-if="state.pdvTab === 'alertas'">
+                            <div class="zrn_analitics_pdv_stats zrn_analitics_pdv_stats_alerts">
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Dormantes</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.dormant_count)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Nuevos</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.new_count)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Low sell-through</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.low_st_count)"/></strong>
+                                </div>
+                                <div class="zrn_analitics_pdv_stat_box">
+                                    <span>Total alertas</span>
+                                    <strong><t t-esc="formatCount(pdvPayload.summary.alert_count)"/></strong>
+                                </div>
+                            </div>
+
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_pdv_panel_head">
+                                    <span>Alertas por PDV</span>
+                                    <span>Click para drill-down</span>
+                                </div>
+                                <div class="zrn_analitics_pdv_table_wrap">
+                                    <table class="zrn_analitics_pdv_table">
+                                        <thead>
+                                            <tr>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_alerts', 'name_short')">PDV</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_alerts', 'channel')">Canal</th>
+                                                <th>Alertas</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_alerts', 'days_since_last')" class="text-end">Recencia</th>
+                                                <th t-on-click="() =&gt; this.toggleSort('pdv_alerts', 'rev')" class="text-end">Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="sortedPdvAlerts" t-as="row" t-key="'alert_' + row.partner_id">
+                                                <tr class="zrn_analitics_pdv_row_clickable" t-on-click="() =&gt; this.openPdvRow(row)">
+                                                    <td><strong><t t-esc="row.name_short"/></strong></td>
+                                                    <td><t t-esc="row.channel"/></td>
+                                                    <td>
+                                                        <div class="zrn_analitics_pdv_alert_tags">
+                                                            <t t-foreach="row.alerts" t-as="alert" t-key="alert.type">
+                                                                <span class="zrn_analitics_pdv_alert_tag" t-att-class="'is-' + alert.sev"><t t-esc="alert.msg"/></span>
+                                                            </t>
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-end"><t t-esc="row.days_since_last"/> d</td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.rev)"/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </section>
+                        </t>
+                    </t>
+</templates>

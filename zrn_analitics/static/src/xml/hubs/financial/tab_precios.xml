@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubFinancialTabPrecios"><t t-if="state.financialTab === 'precios'">
+                            <section class="zrn_analitics_hub_panel">
+                                <div class="zrn_analitics_financial_panel_head">
+                                    <span>
+                                        <t t-if="state.financialTab === 'precios'">Precios vs Costos</t>
+                                        </span>
+                                    <span>Pendiente de backend y datos específicos</span>
+                                </div>
+                                <div class="zrn_analitics_financial_empty_note">
+                                    <t t-if="state.financialTab === 'precios'">
+                                        Esta tab queda reservada para la matriz de precios, costos y margen por canal. Aun no se conecta porque la fuente maestra de pricing no vive de forma persistida en este hub.
+                                    </t>
+                                    </div>
+                            </section>
+                        </t>
+                    </t>
+</templates>

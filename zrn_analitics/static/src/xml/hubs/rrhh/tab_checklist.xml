@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve">
+  <t t-name="zrn_analitics.HubRrhhTabChecklist"><t t-if="!state.rrhhLoading &amp;&amp; !rrhhPayload.empty_message &amp;&amp; rrhhPayload.current_applicant &amp;&amp; state.rrhhTab === 'checklist'">
+                        <section class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_commercial_panel_head">
+                                <span>Checklist de entrevista</span>
+                                <span><t t-esc="rrhhPayload.current_applicant ? rrhhPayload.current_applicant.name : 'Seleccione una solicitud'"/></span>
+                            </div>
+                            <div class="zrn_analitics_rrhh_form_head">
+                                <div class="zrn_analitics_rrhh_field">
+                                    <label>Fecha de entrevista</label>
+                                    <input type="date" class="form-control" t-att-value="state.rrhhChecklistForm.interview_date" t-on-input="(ev) =&gt; this.updateRrhhChecklistValue('interview_date', ev.target.value)"/>
+                                </div>
+                                <div class="zrn_analitics_rrhh_field zrn_analitics_rrhh_field_wide">
+                                    <label>Observaciones</label>
+                                    <textarea class="form-control" rows="2" t-on-input="(ev) =&gt; this.updateRrhhChecklistValue('observations', ev.target.value)"><t t-esc="state.rrhhChecklistForm.observations"/></textarea>
+                                </div>
+                            </div>
+
+                            <div class="zrn_analitics_rrhh_result_box">
+                                <strong><t t-esc="rrhhPayload.current_checklist ? rrhhPayload.current_checklist.summary_text : 'Marque las alertas detectadas durante la entrevista.'"/></strong>
+                                <span>
+                                    <t t-esc="rrhhPayload.current_checklist ? formatCount(rrhhPayload.current_checklist.alert_count) : '0'"/> alertas registradas.
+                                </span>
+                            </div>
+
+                            <div class="zrn_analitics_rrhh_checklist_grid">
+                                <t t-foreach="rrhhPayload.checklist_template.sections" t-as="section" t-key="section.key">
+                                    <div class="zrn_analitics_rrhh_checklist_block">
+                                        <div class="zrn_analitics_rrhh_factor_head">
+                                            <strong><t t-esc="section.label"/></strong>
+                                        </div>
+                                        <t t-foreach="section.items" t-as="item" t-key="item.key">
+                                            <label class="zrn_analitics_rrhh_check_item">
+                                                <input type="checkbox" t-att-checked="state.rrhhChecklistForm[item.key] ? true : undefined" t-on-change="(ev) =&gt; this.updateRrhhChecklistValue(item.key, ev.target.checked)"/>
+                                                <span><t t-esc="item.label"/></span>
+                                            </label>
+                                            <div class="zrn_analitics_rrhh_check_help"><t t-esc="item.alert"/></div>
+                                        </t>
+                                    </div>
+                                </t>
+                            </div>
+
+                            <div class="zrn_analitics_rrhh_actions">
+                                <button type="button" class="btn btn-primary" t-on-click="saveRrhhChecklist">Guardar checklist</button>
+                            </div>
+                        </section>
+                    </t>
+
+                    </t>
+</templates>

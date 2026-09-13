@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.RelationalMultiSelect">
+        <div class="zrn_analitics_relational_filter o_field_many2manytags">
+            <div class="o_field_tags d-inline-flex flex-wrap gap-1 o_tags_input o_input">
+                <TagsList tags="tags"/>
+                <div class="o_field_many2many_selection d-inline-flex w-100">
+                    <Many2XAutocomplete placeholder="tags.length ? '' : props.placeholder" resModel="props.resModel" fieldString="props.fieldString" activeActions="activeActions" update.bind="addRecords" getDomain.bind="getDomain" isToMany="true" autoSelect="true" context="props.context"/>
+                </div>
+            </div>
+        </div>
+    </t>
+
+    <t t-name="zrn_analitics.HubCommercialFilters">
+        <div class="zrn_analitics_commercial_toolbar">
+            <div class="zrn_analitics_commercial_context">
+                <strong><t t-esc="activeCommercialTab.label"/></strong>
+            </div>
+            <div class="zrn_analitics_commercial_search">
+                <input type="text" class="form-control" placeholder="Cliente, PDV, producto o codigo" t-att-value="activeCommercialFilters.search" t-on-input="(ev) =&gt; this.updateCommercialFilter('search', ev.target.value)" t-on-keydown="this.onCommercialSearchKeydown"/>
+                <button t-if="activeCommercialFilters.search" type="button" class="btn zrn_analitics_commercial_search_clear" t-on-click="() =&gt; this.updateCommercialFilter('search', '')" aria-label="Limpiar busqueda">
+                    <i class="fa fa-times"/>
+                </button>
+                <button type="button" class="btn btn-primary zrn_analitics_commercial_search_btn" t-on-click="this.applyCommercialFilters" aria-label="Buscar">
+                    <i class="fa fa-search"/>
+                </button>
+            </div>
+            <button type="button" class="btn zrn_analitics_commercial_filter_btn zrn_analitics_commercial_filter_btn_icon" t-on-click="toggleCommercialFilters" aria-label="Abrir filtros">
+                <i class="fa fa-sliders"/>
+            </button>
+        </div>
+
+        <t t-if="state.commercialFiltersOpen">
+            <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeCommercialFilters"/>
+            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content zrn_analitics_commercial_filters_modal" t-on-click.stop="() =&gt; {}">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title">Filtros</h5>
+                                <div class="zrn_analitics_commercial_filters_scope"><t t-esc="activeCommercialTab.label"/></div>
+                            </div>
+                            <button type="button" class="btn-close" aria-label="Cerrar" t-on-click="closeCommercialFilters"/>
+                        </div>
+                        <div class="modal-body">
+            <div class="zrn_analitics_commercial_channel_filters zrn_analitics_commercial_filters_grid">
+                <div class="zrn_analitics_commercial_field">
+                    <label>Desde</label>
+                    <input type="date" class="form-control" t-att-value="activeCommercialFilters.date_from" t-on-input="(ev) =&gt; this.onCommercialDateFromInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_commercial_field">
+                    <label>Hasta</label>
+                    <input type="date" class="form-control" t-att-value="activeCommercialFilters.date_to" t-on-input="(ev) =&gt; this.onCommercialDateToInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_commercial_field">
+                    <label>Datos</label>
+                    <select class="form-select" t-att-value="activeCommercialFilters.order_type" t-on-change="this.onCommercialOrderTypeChange">
+                        <option value="sale">Ventas</option>
+                        <option value="purchase">Compras</option>
+                    </select>
+                </div>
+                <div class="zrn_analitics_commercial_field">
+                    <label>Estado</label>
+                    <select class="form-select" t-att-value="activeCommercialFilters.order_status" t-on-change="(ev) =&gt; this.updateCommercialFilter('order_status', ev.target.value)">
+                        <t t-if="activeCommercialFilters.order_type === 'purchase'">
+                            <option value="confirmed">Confirmadas</option>
+                            <option value="draft">Solicitudes</option>
+                            <option value="all">Todas</option>
+                        </t>
+                        <t t-else="">
+                            <option value="confirmed">Confirmadas</option>
+                            <option value="draft">Cotizaciones</option>
+                            <option value="all">Todas</option>
+                        </t>
+                    </select>
+                </div>
+                <div t-if="activeCommercialFilters.order_type !== 'purchase'" class="zrn_analitics_commercial_field zrn_analitics_commercial_field_inline">
+                    <label>Facturacion</label>
+                    <label class="zrn_analitics_commercial_check">
+                        <input type="checkbox" class="form-check-input" t-att-checked="activeCommercialFilters.invoiced_only" t-on-change="(ev) =&gt; this.updateCommercialFilter('invoiced_only', ev.target.checked)"/>
+                        <span>Solo facturados</span>
+                    </label>
+                </div>
+                <div class="zrn_analitics_commercial_field">
+                    <label>Marca</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.brands, activeCommercialFilters.brand_ids)" domain="getOptionDomain(activeCommercialFilterOptions.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onCommercialBrandsChange"/>
+                </div>
+                <div t-if="state.commercialTab !== 'canal' &amp;&amp; state.commercialTab !== 'cliente' &amp;&amp; state.commercialTab !== 'rfm' &amp;&amp; state.commercialTab !== 'insights'" class="zrn_analitics_commercial_field">
+                    <label>Categoria</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.categories, activeCommercialFilters.category_ids)" domain="getOptionDomain(activeCommercialFilterOptions.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onCommercialCategoriesChange"/>
+                </div>
+                <div t-if="state.commercialTab !== 'portafolio' &amp;&amp; state.commercialTab !== 'producto' &amp;&amp; state.commercialTab !== 'bcg'" class="zrn_analitics_commercial_field">
+                    <label>Canal</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.channels, activeCommercialFilters.channel_ids)" domain="getOptionDomain(activeCommercialFilterOptions.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onCommercialChannelsChange"/>
+                </div>
+            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" t-on-click="this.clearCommercialFilters">Limpiar</button>
+                            <button type="button" class="btn btn-primary" t-on-click="this.applyCommercialFilters">Aplicar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </t>
+
+    </templates>

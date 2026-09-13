@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<templates xml:space="preserve"><t t-name="zrn_analitics.HubOperations">
+        <div class="zrn_analitics_operations_hub" t-ref="hubRoot">
+            <div class="zrn_analitics_operations_hero">
+                <div class="zrn_analitics_operations_title_row">
+                    <div class="zrn_analitics_hub_panel_title">Hub Operaciones</div>
+                </div>
+            </div>
+
+            <div class="zrn_analitics_operations_shell">
+                <button type="button" class="btn zrn_analitics_operations_sidebar_toggle" t-on-click="toggleCommercialSidebar">
+                    <i class="fa fa-bars"/>
+                    <span>Secciones</span>
+                </button>
+
+                <div class="zrn_analitics_operations_sidebar_overlay" t-att-class="state.commercialSidebarOpen ? 'is-open' : ''" t-on-click="closeCommercialSidebar"/>
+
+                <aside class="zrn_analitics_operations_sidebar" t-att-class="state.commercialSidebarOpen ? 'is-open' : ''">
+                    <div class="zrn_analitics_operations_sidebar_head">
+                        <div class="zrn_analitics_operations_sidebar_title">Secciones</div>
+                        <button type="button" class="btn zrn_analitics_operations_sidebar_close" t-on-click="closeCommercialSidebar">
+                            <i class="fa fa-times"/>
+                        </button>
+                    </div>
+
+                    <div class="zrn_analitics_operations_badges zrn_analitics_operations_badges_sidebar">
+                        <span class="zrn_analitics_operations_badge zrn_analitics_operations_badge_sync">
+                            Sync con Odoo: <t t-esc="activeHubSummary.sync_label"/>
+                        </span>
+                        <span class="zrn_analitics_operations_badge">
+                            <t t-esc="activeHubSummary.period_label"/>
+                        </span>
+                        <span class="zrn_analitics_operations_badge">
+                            <t t-esc="formatCount(operationsPayload.summary.brand_count)"/> marcas / <t t-esc="formatCount(operationsPayload.summary.product_count)"/> productos
+                        </span>
+                    </div>
+
+                    <div class="zrn_analitics_operations_section_tabs">
+                        <t t-foreach="operationsTabs" t-as="tab" t-key="tab.key">
+                            <button type="button" class="btn zrn_analitics_operations_section_tab" t-att-class="state.operationsTab === tab.key ? 'is-active' : ''" t-on-click="() =&gt; this.setOperationsTab(tab.key)">
+                                <i class="fa zrn_analitics_operations_section_tab_icon" t-att-class="tab.icon"/>
+                                <span><t t-esc="tab.label"/></span>
+                            </button>
+                        </t>
+                    </div>
+                </aside>
+
+                <div class="zrn_analitics_operations_content">
+                    <t t-if="state.operationsLoading">
+                        <div class="zrn_analitics_hub_panel">
+                            <div class="zrn_analitics_hub_panel_text">Cargando resumen operativo...</div>
+                        </div>
+                    </t>
+
+                    <t t-if="!state.operationsLoading">
+                        <t t-call="zrn_analitics.HubOperationsFilters"/>
+
+                        <div class="zrn_analitics_operations_stats">
+                            <div class="zrn_analitics_operations_stat_box">
+                                <span>Unidades vendidas</span>
+                                <strong><t t-esc="formatCount(operationsPayload.summary.total_units)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_operations_stat_box">
+                                <span>Revenue</span>
+                                <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.summary.total_revenue)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_operations_stat_box">
+                                <span>Pedidos</span>
+                                <strong><t t-esc="formatCount(operationsPayload.summary.order_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_operations_stat_box">
+                                <span>PDVs</span>
+                                <strong><t t-esc="formatCount(operationsPayload.summary.point_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_operations_stat_box">
+                                <span>SKUs activos</span>
+                                <strong><t t-esc="formatCount(operationsPayload.summary.product_count)"/></strong>
+                            </div>
+                            <div class="zrn_analitics_operations_stat_box">
+                                <span>Promedio unid/dia</span>
+                                <strong><t t-esc="formatCount(operationsPayload.summary.avg_units_day)"/></strong>
+                            </div>
+                        </div>
+
+                        <t t-if="operationsPayload.empty_message">
+                            <div class="zrn_analitics_operations_empty_note">
+                                <t t-esc="operationsPayload.empty_message"/>
+                            </div>
+                        </t>
+
+                        <t t-call="zrn_analitics.HubOperationsTabOverview"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabDemanda"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabAbc"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabPortafolio"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabTendencias"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabForecast"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabInventarios"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabCompras"/>
+
+                        <t t-call="zrn_analitics.HubOperationsTabAlertas"/>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
