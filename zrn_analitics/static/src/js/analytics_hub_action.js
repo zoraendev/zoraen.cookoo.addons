@@ -90,9 +90,13 @@ function getDefaultDateTo() {
 const DEFAULT_FILTERS = Object.freeze({
   date_from: getDefaultDateFrom(),
   date_to: getDefaultDateTo(),
+  business_unit_ids: [],
   channel_ids: [],
   brand_ids: [],
   category_ids: [],
+  channel_category_ids: [],
+  product_ids: [],
+  partner_ids: [],
   search: "",
   order_type: "sale",
   order_status: "confirmed",
@@ -104,9 +108,13 @@ function cloneDefaultFilters() {
     ...DEFAULT_FILTERS,
     date_from: getDefaultDateFrom(),
     date_to: getDefaultDateTo(),
+    business_unit_ids: [],
     channel_ids: [],
     brand_ids: [],
     category_ids: [],
+    channel_category_ids: [],
+    product_ids: [],
+    partner_ids: [],
     order_type: "sale",
     order_status: "confirmed",
     invoiced_only: false,
@@ -114,7 +122,15 @@ function cloneDefaultFilters() {
 }
 
 function normalizeCommercialFilterValue(key, value) {
-  if (key === "channel_ids" || key === "brand_ids" || key === "category_ids") {
+  if ([
+    "business_unit_ids",
+    "channel_ids",
+    "brand_ids",
+    "category_ids",
+    "channel_category_ids",
+    "product_ids",
+    "partner_ids",
+  ].includes(key)) {
     return normalizeFilterIds(value);
   }
   if (key === "invoiced_only") {
@@ -402,6 +418,7 @@ class ZrnAnalyticsHubAction extends Component {
       overviewCustomersChartType: "bar",
       pdvSidebarOpen: false,
       commercialPayload: null,
+      commercialFilterOptions: {},
       commercialLoading: false,
       financialPayload: null,
       financialLoading: false,
@@ -954,6 +971,7 @@ class ZrnAnalyticsHubAction extends Component {
       await this.loadChannelPayload();
     } else {
       await this.loadCommercialPayload();
+      this.state.commercialFilterOptions = this.commercialPayload?.filter_options || {};
     }
     this.queueChartRender();
   }
@@ -1017,6 +1035,15 @@ class ZrnAnalyticsHubAction extends Component {
 
   closeCommercialFilters() {
     this.state.commercialFiltersOpen = false;
+  }
+
+  async refreshCommercialFilterOptions() {
+    const options = await this.orm.call(
+      "zrn_analitics.home",
+      "get_commercial_filter_options",
+      [this.activeCommercialFilters, this.state.commercialTab],
+    );
+    this.state.commercialFilterOptions = options || {};
   }
 
   toggleHubMenu() {
@@ -1200,9 +1227,13 @@ class ZrnAnalyticsHubAction extends Component {
     const nextFilters = {
       date_from: activeFilters.date_from || DEFAULT_FILTERS.date_from,
       date_to: activeFilters.date_to || DEFAULT_FILTERS.date_to,
+      business_unit_ids: normalizeFilterIds(activeFilters.business_unit_ids),
       channel_ids: normalizeFilterIds(activeFilters.channel_ids),
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
+      channel_category_ids: normalizeFilterIds(activeFilters.channel_category_ids),
+      product_ids: normalizeFilterIds(activeFilters.product_ids),
+      partner_ids: normalizeFilterIds(activeFilters.partner_ids),
       search: activeFilters.search || "",
       order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
       order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
@@ -1210,6 +1241,7 @@ class ZrnAnalyticsHubAction extends Component {
     };
     this.state.overviewFilters = { ...nextFilters };
     this.state.portfolioFilters = { ...nextFilters };
+    this.state.commercialFilterOptions = payload?.filter_options || {};
   }
 
   syncCoverageFiltersFromPayload(payload) {
@@ -1217,9 +1249,13 @@ class ZrnAnalyticsHubAction extends Component {
     this.state.coverageFilters = {
       date_from: activeFilters.date_from || DEFAULT_FILTERS.date_from,
       date_to: activeFilters.date_to || DEFAULT_FILTERS.date_to,
+      business_unit_ids: normalizeFilterIds(activeFilters.business_unit_ids),
       channel_ids: normalizeFilterIds(activeFilters.channel_ids),
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
+      channel_category_ids: normalizeFilterIds(activeFilters.channel_category_ids),
+      product_ids: normalizeFilterIds(activeFilters.product_ids),
+      partner_ids: normalizeFilterIds(activeFilters.partner_ids),
       search: activeFilters.search || "",
       order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
       order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
@@ -1232,9 +1268,13 @@ class ZrnAnalyticsHubAction extends Component {
     this.state.channelFilters = {
       date_from: activeFilters.date_from || DEFAULT_FILTERS.date_from,
       date_to: activeFilters.date_to || DEFAULT_FILTERS.date_to,
+      business_unit_ids: normalizeFilterIds(activeFilters.business_unit_ids),
       channel_ids: normalizeFilterIds(activeFilters.channel_ids),
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
+      channel_category_ids: normalizeFilterIds(activeFilters.channel_category_ids),
+      product_ids: normalizeFilterIds(activeFilters.product_ids),
+      partner_ids: normalizeFilterIds(activeFilters.partner_ids),
       search: activeFilters.search || "",
       order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
       order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
@@ -1592,14 +1632,49 @@ class ZrnAnalyticsHubAction extends Component {
 
   onCommercialBrandsChange(records) {
     this.updateCommercialFilter("brand_ids", records.map((r) => r.id));
+    this.updateCommercialFilter("category_ids", []);
+    this.updateCommercialFilter("product_ids", []);
+    return this.refreshCommercialFilterOptions();
   }
 
   onCommercialCategoriesChange(records) {
     this.updateCommercialFilter("category_ids", records.map((r) => r.id));
+    this.updateCommercialFilter("product_ids", []);
+    return this.refreshCommercialFilterOptions();
   }
 
   onCommercialChannelsChange(records) {
     this.updateCommercialFilter("channel_ids", records.map((r) => r.id));
+    this.updateCommercialFilter("channel_category_ids", []);
+    this.updateCommercialFilter("partner_ids", []);
+    return this.refreshCommercialFilterOptions();
+  }
+
+  onCommercialBusinessUnitsChange(records) {
+    this.updateCommercialFilter("business_unit_ids", records.map((r) => r.id));
+    this.updateCommercialFilter("brand_ids", []);
+    this.updateCommercialFilter("category_ids", []);
+    this.updateCommercialFilter("product_ids", []);
+    this.updateCommercialFilter("channel_ids", []);
+    this.updateCommercialFilter("channel_category_ids", []);
+    this.updateCommercialFilter("partner_ids", []);
+    return this.refreshCommercialFilterOptions();
+  }
+
+  onCommercialProductsChange(records) {
+    this.updateCommercialFilter("product_ids", records.map((r) => r.id));
+    return this.refreshCommercialFilterOptions();
+  }
+
+  onCommercialChannelCategoriesChange(records) {
+    this.updateCommercialFilter("channel_category_ids", records.map((r) => r.id));
+    this.updateCommercialFilter("partner_ids", []);
+    return this.refreshCommercialFilterOptions();
+  }
+
+  onCommercialPartnersChange(records) {
+    this.updateCommercialFilter("partner_ids", records.map((r) => r.id));
+    return this.refreshCommercialFilterOptions();
   }
 
   getOptionDomain(options) {
@@ -2107,7 +2182,7 @@ class ZrnAnalyticsHubAction extends Component {
     if (this.state.commercialTab === "canal") {
       return this.channelPayload.filter_options || {};
     }
-    return this.commercialPayload.filter_options || {};
+    return this.state.commercialFilterOptions || this.commercialPayload.filter_options || {};
   }
 
   get activeFinancialTab() {

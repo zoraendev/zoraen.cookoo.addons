@@ -81,6 +81,10 @@
                     </label>
                 </div>
                 <div class="zrn_analitics_commercial_field">
+                    <label>Unidad de negocio</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.business_units, activeCommercialFilters.business_unit_ids)" domain="getOptionDomain(activeCommercialFilterOptions.business_units)" resModel="'zrn_commercial.business.unit'" fieldString="'Unidad de negocio'" placeholder="'Todas las unidades'" onChange.bind="this.onCommercialBusinessUnitsChange"/>
+                </div>
+                <div class="zrn_analitics_commercial_field">
                     <label>Marca</label>
                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.brands, activeCommercialFilters.brand_ids)" domain="getOptionDomain(activeCommercialFilterOptions.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onCommercialBrandsChange"/>
                 </div>
@@ -88,9 +92,21 @@
                     <label>Categoria</label>
                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.categories, activeCommercialFilters.category_ids)" domain="getOptionDomain(activeCommercialFilterOptions.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onCommercialCategoriesChange"/>
                 </div>
+                <div t-if="state.commercialTab !== 'canal' &amp;&amp; state.commercialTab !== 'cliente' &amp;&amp; state.commercialTab !== 'rfm' &amp;&amp; state.commercialTab !== 'insights'" class="zrn_analitics_commercial_field">
+                    <label>Producto</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.products, activeCommercialFilters.product_ids)" domain="getOptionDomain(activeCommercialFilterOptions.products)" resModel="'product.product'" fieldString="'Producto'" placeholder="'Todos los productos'" onChange.bind="this.onCommercialProductsChange"/>
+                </div>
                 <div t-if="state.commercialTab !== 'portafolio' &amp;&amp; state.commercialTab !== 'producto' &amp;&amp; state.commercialTab !== 'bcg'" class="zrn_analitics_commercial_field">
                     <label>Canal</label>
                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.channels, activeCommercialFilters.channel_ids)" domain="getOptionDomain(activeCommercialFilterOptions.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onCommercialChannelsChange"/>
+                </div>
+                <div t-if="state.commercialTab === 'cobertura' || state.commercialTab === 'canal' || state.commercialTab === 'cliente' || state.commercialTab === 'rfm' || state.commercialTab === 'insights'" class="zrn_analitics_commercial_field">
+                    <label>Categoria del canal</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.channel_categories, activeCommercialFilters.channel_category_ids)" domain="getOptionDomain(activeCommercialFilterOptions.channel_categories)" resModel="'zrn_commercial.commercial.channel.category'" fieldString="'Categoria del canal'" placeholder="'Todas las categorias'" onChange.bind="this.onCommercialChannelCategoriesChange"/>
+                </div>
+                <div t-if="state.commercialTab === 'cobertura' || state.commercialTab === 'canal' || state.commercialTab === 'cliente' || state.commercialTab === 'rfm' || state.commercialTab === 'insights'" class="zrn_analitics_commercial_field">
+                    <label>Cliente / PDV</label>
+                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.partners, activeCommercialFilters.partner_ids)" domain="getOptionDomain(activeCommercialFilterOptions.partners)" resModel="'res.partner'" fieldString="'Cliente / PDV'" placeholder="'Todos los clientes'" onChange.bind="this.onCommercialPartnersChange"/>
                 </div>
             </div>
                         </div>

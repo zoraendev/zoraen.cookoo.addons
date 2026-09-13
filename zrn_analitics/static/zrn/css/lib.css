@@ -2140,10 +2140,33 @@
 }
 
 .zrn_analitics_commercial_summary_table_wrap {
+  flex: 0 0 auto;
+  min-height: 0;
   border: 1px solid rgba(116, 132, 157, 0.3);
   border-radius: 4px;
   background: var(--zrn-analitics-surface);
-  overflow: hidden;
+  overflow: visible;
+}
+
+.zrn_analitics_commercial_summary_table {
+  display: table;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  margin-bottom: 0;
+  table-layout: fixed;
+}
+
+.zrn_analitics_commercial_summary_table thead,
+.zrn_analitics_commercial_summary_table tbody,
+.zrn_analitics_commercial_summary_table tr {
+  height: auto;
+}
+
+.zrn_analitics_commercial_summary_table th,
+.zrn_analitics_commercial_summary_table td {
+  vertical-align: middle;
+  line-height: 1.25;
 }
 
 .zrn_analitics_commercial_summary_table th {
