@@ -1,5 +1,5 @@
 /* ─────────────────────────────────────────────────────────────────────────────
-   Zoraen Planning – Dark mode semantic overrides
+   (ZRN) Planeacion – Dark mode semantic overrides
    ─────────────────────────────────────────────────────────────────────────────
    Este archivo se carga vía web.assets_web_dark, por lo que Odoo solo lo
    inyecta cuando el usuario tiene dark mode activo.

@@ -48,7 +48,7 @@ class TestCommercialHome(TransactionCase):
         cls.home_record = cls.home_model.search([], limit=1)
         if not cls.home_record:
             cls.home_record = cls.home_model.create({
-                'name': 'Test Zoraen Commercial Home',
+                'name': 'Test (ZRN) Manejo Comercial Home',
                 'page_key': 'overview',
             })
 

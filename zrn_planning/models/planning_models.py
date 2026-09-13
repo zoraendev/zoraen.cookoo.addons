@@ -35,10 +35,10 @@ class ZrnPlanningNavigationMixin:
 
 class ZrnPlanningHome(ZrnPlanningNavigationMixin, models.Model):
     _name = 'zrn_planning.home'
-    _description = 'Centro principal de Zoraen Planning'
+    _description = 'Centro principal de Planeacion Zoraen'
     _order = 'sequence, id'
 
-    name = fields.Char(string='Nombre', required=True, default='Zoraen Planning')
+    name = fields.Char(string='Nombre', required=True, default='(ZRN) Planeacion')
     sequence = fields.Integer(string='Secuencia', default=10)
     page_key = fields.Selection(
         [

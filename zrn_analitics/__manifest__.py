@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Zoraen Analytics',
+    'name': '(ZRN) Analitica',
     'summary': 'Centro base para hubs, reporteria y analisis de datos de Zoraen',
     'description': """
-Zoraen Analytics
-================
+(ZRN) Analitica
+===============
 
 Addon base para la capa analitica:
 - hubs ejecutivos y operativos

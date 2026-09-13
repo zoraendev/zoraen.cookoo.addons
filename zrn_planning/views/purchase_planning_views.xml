@@ -648,7 +648,7 @@
                             name="action_open_home"
                             type="object"
                             icon="fa-arrow-left"
-                            string="Volver a Planning"
+                            string="Volver a Planeacion"
                             class="btn zrn_planning_back_btn"
                         />
                     </div>

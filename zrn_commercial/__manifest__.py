@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Zoraen Commercial',
+    'name': '(ZRN) Manejo Comercial',
     'summary': 'Capa comercial operativa independiente para Zoraen',
     'description': """
-Zoraen Commercial
-=================
+(ZRN) Manejo Comercial
+======================
 
 Addon dedicado a la capa comercial operativa:
 - marcas comerciales propias con categorias

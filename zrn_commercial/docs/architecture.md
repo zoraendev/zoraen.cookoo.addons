@@ -1,8 +1,8 @@
-# Arquitectura de Zoraen Commercial
+# Arquitectura de (ZRN) Manejo Comercial
 
 ## Objetivo
 
-Separar la capa comercial operativa de `zrn_prodigyn` en un addon independiente y mantenible.
+Mantener la capa comercial operativa de Zoraen en un addon independiente y mantenible.
 
 ## Alcance actual
 
@@ -33,5 +33,5 @@ No debe concentrar:
 Cuando entren nuevos frentes en este addon:
 
 1. cada dominio debe tener modelos y vistas propios
-2. las acciones deben mantenerse desacopladas de `zrn_prodigyn`
+2. las acciones deben mantenerse desacopladas por dominio funcional
 3. las metricas deben consumirse despues desde addons analiticos, no calcularse aqui por defecto

@@ -1,4 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_pbi_connections_inicio,pbi_connections.inicio,model_pbi_connections_inicio,base.group_user,1,1,1,1
-access_pbi_connections_endpoint,pbi_connections.endpoint,model_pbi_connections_endpoint,base.group_user,1,1,1,1
-access_pbi_connections_api_config,pbi_connections.api.config,model_pbi_connections_api_config,base.group_system,1,1,1,1

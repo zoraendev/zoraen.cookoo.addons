@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 {
-    'name': 'Zoraen Planning',
+    'name': '(ZRN) Planeacion',
     'summary': 'Planeacion operativa, abastecimiento y logistica para Zoraen',
     'description': """
-Zoraen Planning
-===============
+(ZRN) Planeacion
+================
 
 Addon dedicado a planeacion operativa:
 - planeacion de produccion

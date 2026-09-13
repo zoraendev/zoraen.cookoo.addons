@@ -71,10 +71,10 @@ class ZrnAnalyticsNavigationMixin:
 
 class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
     _name = 'zrn_analitics.home'
-    _description = 'Centro principal de Zoraen Analytics'
+    _description = 'Centro principal de (ZRN) Analitica'
     _order = 'sequence, id'
 
-    name = fields.Char(string='Nombre', required=True, default='Zoraen Analytics')
+    name = fields.Char(string='Nombre', required=True, default='(ZRN) Analitica')
     sequence = fields.Integer(string='Secuencia', default=10)
     page_key = fields.Selection(
         [
@@ -225,7 +225,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
     @api.model
     def _get_channel_empty_message(self, setup_status):
         if not setup_status['has_channels']:
-            return 'No hay canales comerciales creados en Zoraen Commercial.'
+            return 'No hay canales comerciales creados en (ZRN) Manejo Comercial.'
         if not setup_status['has_assignments']:
             return 'No hay PDVs o clientes cargados en los canales comerciales.'
         return 'No hay datos para los filtros seleccionados.'
@@ -261,12 +261,26 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         return channel_link.channel_id.name if channel_link and channel_link.channel_id else False
 
     @api.model
-    def _get_commercial_sale_order_lines(self, date_from, date_to, product_ids):
+    def _get_commercial_sale_order_lines(
+        self,
+        date_from,
+        date_to,
+        product_ids,
+        order_status='confirmed',
+        invoiced_only=False,
+    ):
+        state_map = {
+            'draft': ['draft', 'sent'],
+            'confirmed': ['sale', 'done'],
+            'all': ['draft', 'sent', 'sale', 'done'],
+        }
         domain = [
-            ('order_id.state', 'in', ['sale', 'done']),
+            ('order_id.state', 'in', state_map.get(order_status, state_map['confirmed'])),
             ('display_type', '=', False),
             ('product_id', 'in', product_ids),
         ]
+        if invoiced_only:
+            domain.append(('order_id.invoice_status', '=', 'invoiced'))
         if date_from:
             domain.append(('order_id.date_order', '>=', f'{date_from} 00:00:00'))
         if date_to:
@@ -448,7 +462,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         }
 
     @api.model
-    def _get_empty_commercial_hub_payload(self, empty_message='No hay marcas comerciales creadas en Zoraen Commercial.'):
+    def _get_empty_commercial_hub_payload(self, empty_message='No hay marcas comerciales creadas en (ZRN) Manejo Comercial.'):
         date_from, date_to = self._get_commercial_hub_period()
         _month_starts, month_labels = self._get_recent_month_labels(date_to)
         rfm_segments = [
@@ -618,6 +632,12 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             date_to = fields.Date.to_date(raw_date_to) if isinstance(raw_date_to, str) else raw_date_to
         else:
             period_key, date_from, date_to = self._get_channel_period_range(filters.get('period_key'))
+        order_type = (filters.get('order_type') or 'sale').strip()
+        if order_type not in ('sale', 'purchase'):
+            order_type = 'sale'
+        order_status = (filters.get('order_status') or 'confirmed').strip()
+        if order_status not in ('draft', 'confirmed', 'all'):
+            order_status = 'confirmed'
         return {
             'period_key': period_key,
             'date_from': date_from,
@@ -626,6 +646,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             'brand_ids': self._normalize_filter_ids(filters.get('brand_ids') or filters.get('brand')),
             'category_ids': self._normalize_filter_ids(filters.get('category_ids') or filters.get('category')),
             'search': (filters.get('search') or '').strip(),
+            'order_type': order_type,
+            'order_status': order_status,
+            'invoiced_only': bool(filters.get('invoiced_only')) if order_type == 'sale' else False,
         }
 
     @api.model
@@ -694,6 +717,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             'brand_ids': normalized_filters['brand_ids'],
             'category_ids': normalized_filters['category_ids'],
             'search': normalized_filters['search'],
+            'order_type': normalized_filters.get('order_type') or 'sale',
+            'order_status': normalized_filters.get('order_status') or 'confirmed',
+            'invoiced_only': bool(normalized_filters.get('invoiced_only')),
         }
 
     @api.model
@@ -709,7 +735,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
 
         NOTA DE IMPLEMENTACION (CATEGORIAS DE MARCA):
         Las categorias del filtro 'Categoria' corresponden al modelo 'zrn_commercial.commercial.brand.category'
-        de Zoraen Commercial (p. ej. 'Wappers'). Se consultan directamente desde el catalogo de marcas para
+        de (ZRN) Manejo Comercial (p. ej. 'Wappers'). Se consultan directamente desde el catalogo de marcas para
         mostrar exactamente la configuracion hecha por el usuario en el modulo Comercial.
         """
         brands = brands or self._get_commercial_brand_records()
@@ -726,6 +752,20 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                     'name': cat.name,
                 }
                 for cat in brand_categories
+            ],
+            'order_types': [
+                {'value': 'sale', 'label': 'Ventas'},
+                {'value': 'purchase', 'label': 'Compras'},
+            ],
+            'sale_order_statuses': [
+                {'value': 'confirmed', 'label': 'Confirmadas'},
+                {'value': 'draft', 'label': 'Cotizaciones'},
+                {'value': 'all', 'label': 'Todas'},
+            ],
+            'purchase_order_statuses': [
+                {'value': 'confirmed', 'label': 'Confirmadas'},
+                {'value': 'draft', 'label': 'Solicitudes'},
+                {'value': 'all', 'label': 'Todas'},
             ],
         }
 
@@ -941,7 +981,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 },
                 {
                     'label': 'Segmentacion',
-                    'detail': 'Marca, canal comercial y canal de producto reutilizan Zoraen Commercial para sostener el mismo corte operativo del hub.',
+                    'detail': 'Marca, canal comercial y canal de producto reutilizan (ZRN) Manejo Comercial para sostener el mismo corte operativo del hub.',
                 },
             ],
         }
@@ -1015,7 +1055,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 },
                 {
                     'label': 'Segmentacion',
-                    'detail': 'Marca y canal reutilizan Zoraen Commercial para mantener el mismo corte analitico.',
+                    'detail': 'Marca y canal reutilizan (ZRN) Manejo Comercial para mantener el mismo corte analitico.',
                 },
             ],
         }
@@ -1075,7 +1115,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 },
                 {
                     'label': 'Segmentación',
-                    'detail': 'Marca y canal reutilizan Zoraen Commercial para mantener consistencia analítica.',
+                    'detail': 'Marca y canal reutilizan (ZRN) Manejo Comercial para mantener consistencia analítica.',
                 },
             ],
         }
@@ -1769,7 +1809,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 },
                 {
                     'label': 'Catálogo comercial',
-                    'detail': 'Marcas y canales reutilizan Zoraen Commercial para sostener el mismo corte analítico.',
+                    'detail': 'Marcas y canales reutilizan (ZRN) Manejo Comercial para sostener el mismo corte analítico.',
                 },
             ],
         }
@@ -1782,8 +1822,41 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         currency_symbol = self.env.company.currency_id.symbol or '$'
         brands, product_brand_map = self._get_commercial_brand_map()
         channel_setup = self._get_channel_setup_status()
-        if not brands or not product_brand_map:
+        if not brands:
             payload = self._get_empty_commercial_hub_payload()
+            payload['active_filters'] = self._serialize_active_filters(normalized_filters)
+            payload['filter_options'] = self._build_filter_options([], brands)
+            return payload
+        if not product_brand_map:
+            payload = self._get_empty_commercial_hub_payload(
+                'Hay marcas comerciales creadas, pero todavia no tienen productos asociados a sus categorias.'
+            )
+            payload['summary']['brand_count'] = len(brands)
+            payload['has_brands'] = True
+            payload['brand_catalog'] = [
+                {
+                    'name': brand.name,
+                    'product_count': brand.product_count,
+                }
+                for brand in brands
+            ]
+            payload['active_filters'] = self._serialize_active_filters(normalized_filters)
+            payload['filter_options'] = self._build_filter_options([], brands)
+            return payload
+        if normalized_filters.get('order_type') == 'purchase':
+            payload = self._get_empty_commercial_hub_payload(
+                'El filtro de compras ya esta disponible. Esta vista todavia calcula los indicadores con ordenes de venta.'
+            )
+            payload['summary']['brand_count'] = len(brands)
+            payload['summary']['product_count'] = len(product_brand_map)
+            payload['has_brands'] = True
+            payload['brand_catalog'] = [
+                {
+                    'name': brand.name,
+                    'product_count': brand.product_count,
+                }
+                for brand in brands
+            ]
             payload['active_filters'] = self._serialize_active_filters(normalized_filters)
             payload['filter_options'] = self._build_filter_options([], brands)
             return payload
@@ -1810,6 +1883,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             date_from,
             date_to,
             list(product_brand_map.keys()),
+            normalized_filters.get('order_status') or 'confirmed',
+            normalized_filters.get('invoiced_only'),
         )
         filter_options = self._build_filter_options(order_lines, brands)
         filtered_lines = order_lines.filtered(lambda line: self._line_matches_filters(line, product_brand_map, normalized_filters, partner_channel_map=partner_channel_map))
@@ -3205,6 +3280,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             date_from,
             date_to,
             list(product_brand_map.keys()),
+            normalized_filters.get('order_status') or 'confirmed',
+            normalized_filters.get('invoiced_only'),
         )
         if not order_lines:
             return self._build_empty_operations_payload(
@@ -4125,7 +4202,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 },
                 {
                     'label': 'Segmentacion',
-                    'detail': 'Marca, canal comercial y canal de producto reutilizan Zoraen Commercial para no duplicar catalogos.',
+                    'detail': 'Marca, canal comercial y canal de producto reutilizan (ZRN) Manejo Comercial para no duplicar catalogos.',
                 },
                 {
                     'label': 'Supply',
@@ -4160,6 +4237,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             date_from,
             date_to,
             list(product_brand_map.keys()),
+            normalized_filters.get('order_status') or 'confirmed',
+            normalized_filters.get('invoiced_only'),
         )
 
         base_channels = set()
@@ -4493,6 +4572,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             date_from,
             date_to,
             list(product_brand_map.keys()),
+            normalized_filters.get('order_status') or 'confirmed',
+            normalized_filters.get('invoiced_only'),
         )
         filter_options = self._build_filter_options(order_lines, brands)
         filtered_lines = order_lines.filtered(lambda line: self._line_matches_filters(line, product_brand_map, normalized_filters, partner_channel_map=partner_channel_map))
@@ -4929,6 +5010,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             date_from,
             date_to,
             list(product_brand_map.keys()),
+            normalized_filters.get('order_status') or 'confirmed',
+            normalized_filters.get('invoiced_only'),
         )
         filter_options = self._build_filter_options(order_lines, brands)
 
@@ -5358,7 +5441,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 },
                 {
                     'label': 'Commercial',
-                    'detail': 'Marcas, canales y sell-in vs sell-out reutilizan Zoraen Commercial y el hub comercial sin cambiar su logica base.',
+                    'detail': 'Marcas, canales y sell-in vs sell-out reutilizan (ZRN) Manejo Comercial y el hub comercial sin cambiar su logica base.',
                 },
                 {
                     'label': 'Alertas',

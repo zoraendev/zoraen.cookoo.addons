@@ -1,4 +1,4 @@
-# Zoraen Planning
+# (ZRN) Planeacion
 
 Addon operativo para centralizar:
 
@@ -9,7 +9,7 @@ Addon operativo para centralizar:
 
 ## Alcance inicial
 
-Este addon nace separando la capa de planeacion operativa que hoy existia en `zrn_prodigyn`, sin mover todavia los hubs analiticos ni el frente comercial.
+Este addon concentra la planeacion operativa de Zoraen para produccion, abastecimiento y logistica.
 
 Incluye:
 

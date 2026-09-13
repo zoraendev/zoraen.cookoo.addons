@@ -1,4 +1,4 @@
-# Zoraen Commercial
+# (ZRN) Manejo Comercial
 
 Addon comercial operativo para centralizar:
 
@@ -9,11 +9,11 @@ Addon comercial operativo para centralizar:
 
 ## Alcance inicial
 
-Este addon nace separando la capa comercial operativa que hoy vivia dentro de `zrn_prodigyn`, sin mover todavia hubs ni reporterias.
+Este addon concentra la capa comercial operativa de Zoraen con maestros de marcas, unidades de negocio y canales.
 
 Incluye:
 
-- app propia de Zoraen Commercial
+- app propia de (ZRN) Manejo Comercial
 - maestro de marcas comerciales
 - maestro de canales comerciales
 - asignacion de productos vendibles por marca

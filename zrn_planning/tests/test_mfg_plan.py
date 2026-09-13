@@ -41,8 +41,8 @@ class TestZrnPlanningMfgPlan(TestMrpCommon):
         production, bom, product, _component_1, _component_2 = self.generate_mo(qty_final=4)
         line = self._create_plan_line(product, bom, 4)
         production.write({
-            'zrn_prodigyn_plan_id': line.plan_id.id,
-            'zrn_prodigyn_plan_line_id': line.id,
+            'zrn_planning_plan_id': line.plan_id.id,
+            'zrn_planning_plan_line_id': line.id,
         })
         production.move_finished_ids.filtered(
             lambda move: move.product_id == product
@@ -58,8 +58,8 @@ class TestZrnPlanningMfgPlan(TestMrpCommon):
         })
         backorder = split_productions - production
 
-        self.assertEqual(backorder.zrn_prodigyn_plan_id, line.plan_id)
-        self.assertEqual(backorder.zrn_prodigyn_plan_line_id, line)
+        self.assertEqual(backorder.zrn_planning_plan_id, line.plan_id)
+        self.assertEqual(backorder.zrn_planning_plan_line_id, line)
 
     def test_supply_plan_uses_adjusted_purchase_quantity(self):
         finished_1, finished_2, component = self.env['product.product'].create([

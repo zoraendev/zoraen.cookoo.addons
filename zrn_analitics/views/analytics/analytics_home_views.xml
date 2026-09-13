@@ -2,31 +2,31 @@
 <odoo>
 
     <record id="zrn_analitics_home_default" model="zrn_analitics.home">
-        <field name="name">Zoraen Analytics</field>
+        <field name="name">(ZRN) Analitica</field>
         <field name="sequence">10</field>
         <field name="page_key">overview</field>
     </record>
 
     <record id="zrn_analitics_workspace_default" model="zrn_analitics.home">
-        <field name="name">Zoraen Analytics</field>
+        <field name="name">(ZRN) Analitica</field>
         <field name="sequence">20</field>
         <field name="page_key">workspace</field>
     </record>
 
     <record id="zrn_analitics_processing_default" model="zrn_analitics.home">
-        <field name="name">Zoraen Analytics</field>
+        <field name="name">(ZRN) Analitica</field>
         <field name="sequence">25</field>
         <field name="page_key">processing</field>
     </record>
 
     <record id="zrn_analitics_processing_workspace_default" model="zrn_analitics.home">
-        <field name="name">Zoraen Analytics</field>
+        <field name="name">(ZRN) Analitica</field>
         <field name="sequence">26</field>
         <field name="page_key">processing_workspace</field>
     </record>
 
     <record id="zrn_analitics_scenarios_default" model="zrn_analitics.home">
-        <field name="name">Zoraen Analytics</field>
+        <field name="name">(ZRN) Analitica</field>
         <field name="sequence">30</field>
         <field name="page_key">scenarios</field>
     </record>
@@ -35,7 +35,7 @@
         <field name="name">zrn_analitics.home.form</field>
         <field name="model">zrn_analitics.home</field>
         <field name="arch" type="xml">
-            <form string="Zoraen Analytics" js_class="zrn_analitics_form" create="0" edit="0" delete="0" duplicate="0" class="zrn_analitics_form_shell">
+            <form string="(ZRN) Analitica" js_class="zrn_analitics_form" create="0" edit="0" delete="0" duplicate="0" class="zrn_analitics_form_shell">
                 <sheet>
                     <field name="name" invisible="1"/>
                     <field name="page_key" invisible="1"/>
@@ -46,7 +46,7 @@
     </record>
 
     <record id="action_zrn_analitics_home" model="ir.actions.act_window">
-        <field name="name">Zoraen Analytics</field>
+        <field name="name">(ZRN) Analitica</field>
         <field name="res_model">zrn_analitics.home</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_zrn_analitics_home_form"/>
@@ -97,7 +97,7 @@
 
     <menuitem
         id="menu_zrn_analitics_root"
-        name="Zoraen Analytics"
+        name="(ZRN) Analitica"
         sequence="15"
         action="action_zrn_analitics_home"
         web_icon="zrn_analitics,static/description/icon.png"

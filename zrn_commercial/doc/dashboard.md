@@ -1,6 +1,6 @@
-# Documentación del Dashboard: Zoraen Commercial
+# Documentación del Dashboard: (ZRN) Manejo Comercial
 
-Esta documentación detalla los cambios implementados para replicar el layout de **Zoraen Planning** en el menú de inicio de **Zoraen Commercial**, incorporando gráficos dinámicos interactivos mediante la librería **ECharts**.
+Esta documentación detalla los cambios implementados para replicar el layout de **(ZRN) Planeacion** en el menú de inicio de **(ZRN) Manejo Comercial**, incorporando gráficos dinámicos interactivos mediante la librería **ECharts**.
 
 ---
 

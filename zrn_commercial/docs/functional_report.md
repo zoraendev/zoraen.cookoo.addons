@@ -1,4 +1,4 @@
-# Zoraen Commercial - Reporte Funcional
+# (ZRN) Manejo Comercial - Reporte Funcional
 
 ## Objetivo del addon
 

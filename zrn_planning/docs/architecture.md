@@ -1,8 +1,8 @@
-# Arquitectura de Zoraen Planning
+# Arquitectura de (ZRN) Planeacion
 
 ## Objetivo
 
-Separar la capa de planeacion operativa del addon monolitico original para permitir que el stack evolucione por dominios.
+Mantener la capa de planeacion operativa en un dominio independiente para que el stack evolucione por areas funcionales.
 
 ## Incluido en esta migracion
 
@@ -28,7 +28,6 @@ Separar la capa de planeacion operativa del addon monolitico original para permi
 
 ## Estrategia
 
-- mantener `zrn_prodigyn` intacto por ahora
-- crear `zrn_planning` con namespace propio
-- migrar primero lo operativo que ya esta avanzado
-- dejar listas las bases para luego desenganchar menús y dependencias del addon legado
+- mantener `zrn_planning` con namespace propio
+- consolidar primero lo operativo que ya esta avanzado
+- dejar listas las bases para evolucionar menus, reportes y dependencias por dominio

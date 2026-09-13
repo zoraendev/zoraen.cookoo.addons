@@ -10,7 +10,7 @@ class ZrnPlanningMfgPlan(models.Model):
     _name = 'zrn_planning.mfg.plan'
     _description = 'Plan maestro de fabricacion y abastecimiento'
     _order = 'date_start desc, id desc'
-    _table = 'zrn_prodigyn_mfg_plan'
+    _table = 'zrn_planning_mfg_plan'
 
     name = fields.Char(
         string='Nombre',
@@ -230,8 +230,8 @@ class ZrnPlanningMfgPlan(models.Model):
                                 else False
                             )
                         ),
-                        'zrn_prodigyn_plan_id': plan.id,
-                        'zrn_prodigyn_plan_line_id': line.id,
+                        'zrn_planning_plan_id': plan.id,
+                        'zrn_planning_plan_line_id': line.id,
                     }
                     production = Production.create(production_vals)
                     created_productions |= production
@@ -438,7 +438,7 @@ class ZrnPlanningMfgPlanLine(models.Model):
     _name = 'zrn_planning.mfg.plan.line'
     _description = 'Linea del plan maestro de fabricacion'
     _order = 'production_date asc, sequence asc, id asc'
-    _table = 'zrn_prodigyn_mfg_plan_line'
+    _table = 'zrn_planning_mfg_plan_line'
 
     plan_id = fields.Many2one(
         'zrn_planning.mfg.plan',
@@ -508,7 +508,7 @@ class ZrnPlanningMfgPlanLine(models.Model):
     )
     production_ids = fields.One2many(
         'mrp.production',
-        'zrn_prodigyn_plan_line_id',
+        'zrn_planning_plan_line_id',
         string='Ordenes de fabricacion',
         readonly=True,
     )
@@ -645,7 +645,7 @@ class ZrnPlanningMfgPlanSupply(models.Model):
     _name = 'zrn_planning.mfg.plan.supply'
     _description = 'Insumo requerido por una linea de plan maestro'
     _order = 'component_id, id'
-    _table = 'zrn_prodigyn_mfg_plan_supply'
+    _table = 'zrn_planning_mfg_plan_supply'
 
     plan_line_id = fields.Many2one(
         'zrn_planning.mfg.plan.line',
@@ -689,7 +689,7 @@ class ZrnPlanningMfgPlanSource(models.Model):
     _name = 'zrn_planning.mfg.plan.source'
     _description = 'Documento origen del plan maestro'
     _order = 'source_date asc, id asc'
-    _table = 'zrn_prodigyn_mfg_plan_source'
+    _table = 'zrn_planning_mfg_plan_source'
 
     plan_id = fields.Many2one(
         'zrn_planning.mfg.plan',
@@ -708,13 +708,13 @@ class ZrnPlanningMfgPlanSource(models.Model):
 class MrpProduction(models.Model):
     _inherit = 'mrp.production'
 
-    zrn_prodigyn_plan_id = fields.Many2one(
+    zrn_planning_plan_id = fields.Many2one(
         'zrn_planning.mfg.plan',
         string='Planning Zoraen',
         readonly=True,
         copy=False,
     )
-    zrn_prodigyn_plan_line_id = fields.Many2one(
+    zrn_planning_plan_line_id = fields.Many2one(
         'zrn_planning.mfg.plan.line',
         string='Linea de planning Zoraen',
         readonly=True,
@@ -724,8 +724,8 @@ class MrpProduction(models.Model):
     def _get_backorder_mo_vals(self):
         values = super()._get_backorder_mo_vals()
         values.update({
-            'zrn_prodigyn_plan_id': self.zrn_prodigyn_plan_id.id,
-            'zrn_prodigyn_plan_line_id': self.zrn_prodigyn_plan_line_id.id,
+            'zrn_planning_plan_id': self.zrn_planning_plan_id.id,
+            'zrn_planning_plan_line_id': self.zrn_planning_plan_line_id.id,
         })
         return values
 
@@ -757,7 +757,7 @@ class StockMoveLine(models.Model):
 
     Esta validacion SOLO se aplica a movimientos de materia prima
     vinculados a ordenes de fabricacion generadas desde el planeador
-    de abastecimiento de Zoraen Planning (zrn_prodigyn_plan_id).
+    de abastecimiento de (ZRN) Planeacion (zrn_planning_plan_id).
     No afecta movimientos de stock nativos ni OFs creadas manualmente.
     """
     _inherit = 'stock.move.line'
@@ -767,10 +767,10 @@ class StockMoveLine(models.Model):
         for line in self:
             if not line.lot_id or line.lot_id.active:
                 continue
-            # Solo validamos en movimientos de materia prima de una OF de Zoraen Planning
+            # Solo validamos en movimientos de materia prima de una OF de (ZRN) Planeacion
             production = line.move_id.raw_material_production_id
-            if production and production.zrn_prodigyn_plan_id:
+            if production and production.zrn_planning_plan_id:
                 raise ValidationError(_(
                     "El lote '%s' esta archivado y no puede utilizarse en una orden de "
-                    "fabricacion generada por el planeador de Zoraen Planning."
+                    "fabricacion generada por el planeador de (ZRN) Planeacion."
                 ) % line.lot_id.name)

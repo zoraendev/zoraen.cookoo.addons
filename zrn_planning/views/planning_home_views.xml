@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="zrn_planning_home_default" model="zrn_planning.home">
-        <field name="name">Zoraen Planning</field>
+        <field name="name">(ZRN) Planeacion</field>
         <field name="sequence">10</field>
         <field name="page_key">overview</field>
     </record>
@@ -11,7 +11,7 @@
         <field name="name">zrn_planning.home.form</field>
         <field name="model">zrn_planning.home</field>
         <field name="arch" type="xml">
-            <form string="Zoraen Planning" js_class="zrn_planning_form" create="0" edit="0" delete="0" duplicate="0" class="zrn_planning_submodule_form zrn_planning_production_planning_form zrn_planning_home_form">
+            <form string="(ZRN) Planeacion" js_class="zrn_planning_form" create="0" edit="0" delete="0" duplicate="0" class="zrn_planning_submodule_form zrn_planning_production_planning_form zrn_planning_home_form">
                 <sheet>
                     <field name="name" invisible="1"/>
                     <field name="page_key" invisible="1"/>
@@ -140,7 +140,7 @@
     </record>
 
     <record id="action_zrn_planning_home" model="ir.actions.act_window">
-        <field name="name">Zoraen Planning</field>
+        <field name="name">(ZRN) Planeacion</field>
         <field name="res_model">zrn_planning.home</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_zrn_planning_home_form"/>
@@ -150,7 +150,7 @@
 
     <menuitem
         id="menu_zrn_planning_root"
-        name="Zoraen Planning"
+        name="(ZRN) Planeacion"
         sequence="10"
         action="action_zrn_planning_home"
         web_icon="zrn_planning,static/description/icon.png"

@@ -22,73 +22,126 @@
     </t>
 
     <t t-name="zrn_analitics.HubCommercialFilters">
-        <section class="zrn_analitics_hub_panel">
-            <div class="zrn_analitics_commercial_panel_head">
-                <span>Filtros comerciales</span>
-                <span>Filtra la información del Hub Comercial</span>
+        <div class="zrn_analitics_commercial_toolbar">
+            <div class="zrn_analitics_commercial_context">
+                <strong><t t-esc="activeCommercialTab.label"/></strong>
             </div>
-            <div class="zrn_analitics_commercial_channel_filters">
+            <div class="zrn_analitics_commercial_search">
+                <input type="text" class="form-control" placeholder="Cliente, PDV, producto o codigo" t-att-value="activeCommercialFilters.search" t-on-input="(ev) => this.updateCommercialFilter('search', ev.target.value)" t-on-keydown="this.onCommercialSearchKeydown"/>
+                <button t-if="activeCommercialFilters.search" type="button" class="btn zrn_analitics_commercial_search_clear" t-on-click="() => this.updateCommercialFilter('search', '')" aria-label="Limpiar busqueda">
+                    <i class="fa fa-times"></i>
+                </button>
+                <button type="button" class="btn btn-primary zrn_analitics_commercial_search_btn" t-on-click="this.applyCommercialFilters" aria-label="Buscar">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+            <button type="button" class="btn zrn_analitics_commercial_filter_btn zrn_analitics_commercial_filter_btn_icon" t-on-click="toggleCommercialFilters" aria-label="Abrir filtros">
+                <i class="fa fa-sliders"></i>
+            </button>
+        </div>
+
+        <t t-if="state.commercialFiltersOpen">
+            <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeCommercialFilters"></div>
+            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content zrn_analitics_commercial_filters_modal" t-on-click.stop="() => {}">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title">Filtros</h5>
+                                <div class="zrn_analitics_commercial_filters_scope"><t t-esc="activeCommercialTab.label"/></div>
+                            </div>
+                            <button type="button" class="btn-close" aria-label="Cerrar" t-on-click="closeCommercialFilters"></button>
+                        </div>
+                        <div class="modal-body">
+            <div class="zrn_analitics_commercial_channel_filters zrn_analitics_commercial_filters_grid">
                 <div class="zrn_analitics_commercial_field">
                     <label>Desde</label>
-                    <input type="date" class="form-control" t-att-value="state.overviewFilters.date_from" t-on-input="(ev) => this.onOverviewDateFromInput(ev)"/>
+                    <input type="date" class="form-control" t-att-value="activeCommercialFilters.date_from" t-on-input="(ev) => this.onCommercialDateFromInput(ev)"/>
                 </div>
                 <div class="zrn_analitics_commercial_field">
                     <label>Hasta</label>
-                    <input type="date" class="form-control" t-att-value="state.overviewFilters.date_to" t-on-input="(ev) => this.onOverviewDateToInput(ev)"/>
+                    <input type="date" class="form-control" t-att-value="activeCommercialFilters.date_to" t-on-input="(ev) => this.onCommercialDateToInput(ev)"/>
+                </div>
+                <div class="zrn_analitics_commercial_field">
+                    <label>Datos</label>
+                    <select
+                        class="form-select"
+                        t-att-value="activeCommercialFilters.order_type"
+                        t-on-change="this.onCommercialOrderTypeChange"
+                    >
+                        <option value="sale">Ventas</option>
+                        <option value="purchase">Compras</option>
+                    </select>
+                </div>
+                <div class="zrn_analitics_commercial_field">
+                    <label>Estado</label>
+                    <select class="form-select" t-att-value="activeCommercialFilters.order_status" t-on-change="(ev) => this.updateCommercialFilter('order_status', ev.target.value)">
+                        <t t-if="activeCommercialFilters.order_type === 'purchase'">
+                            <option value="confirmed">Confirmadas</option>
+                            <option value="draft">Solicitudes</option>
+                            <option value="all">Todas</option>
+                        </t>
+                        <t t-else="">
+                            <option value="confirmed">Confirmadas</option>
+                            <option value="draft">Cotizaciones</option>
+                            <option value="all">Todas</option>
+                        </t>
+                    </select>
+                </div>
+                <div t-if="activeCommercialFilters.order_type !== 'purchase'" class="zrn_analitics_commercial_field zrn_analitics_commercial_field_inline">
+                    <label>Facturacion</label>
+                    <label class="zrn_analitics_commercial_check">
+                        <input type="checkbox" class="form-check-input" t-att-checked="activeCommercialFilters.invoiced_only" t-on-change="(ev) => this.updateCommercialFilter('invoiced_only', ev.target.checked)"/>
+                        <span>Solo facturados</span>
+                    </label>
                 </div>
                 <div class="zrn_analitics_commercial_field">
                     <label>Marca</label>
                     <ZrnRelationalMultiSelect
-                        records="getSelectedOptionRecords(commercialPayload.filter_options.brands, state.overviewFilters.brand_ids)"
-                        domain="getOptionDomain(commercialPayload.filter_options.brands)"
+                        records="getSelectedOptionRecords(activeCommercialFilterOptions.brands, activeCommercialFilters.brand_ids)"
+                        domain="getOptionDomain(activeCommercialFilterOptions.brands)"
                         resModel="'zrn_commercial.commercial.brand'"
                         fieldString="'Marca'"
                         placeholder="'Todas las marcas'"
-                        onChange.bind="this.onOverviewBrandsChange"
+                        onChange.bind="this.onCommercialBrandsChange"
                     />
                 </div>
-                <div class="zrn_analitics_commercial_field">
+                <div t-if="state.commercialTab !== 'canal' &amp;&amp; state.commercialTab !== 'cliente' &amp;&amp; state.commercialTab !== 'rfm' &amp;&amp; state.commercialTab !== 'insights'" class="zrn_analitics_commercial_field">
                     <label>Categoria</label>
                     <ZrnRelationalMultiSelect
-                        records="getSelectedOptionRecords(commercialPayload.filter_options.categories, state.overviewFilters.category_ids)"
-                        domain="getOptionDomain(commercialPayload.filter_options.categories)"
+                        records="getSelectedOptionRecords(activeCommercialFilterOptions.categories, activeCommercialFilters.category_ids)"
+                        domain="getOptionDomain(activeCommercialFilterOptions.categories)"
                         resModel="'zrn_commercial.commercial.brand.category'"
                         fieldString="'Categoria'"
                         placeholder="'Todas las categorias'"
-                        onChange.bind="this.onOverviewCategoriesChange"
+                        onChange.bind="this.onCommercialCategoriesChange"
                     />
                 </div>
-                <div class="zrn_analitics_commercial_field">
+                <div t-if="state.commercialTab !== 'portafolio' &amp;&amp; state.commercialTab !== 'producto' &amp;&amp; state.commercialTab !== 'bcg'" class="zrn_analitics_commercial_field">
                     <label>Canal</label>
                     <ZrnRelationalMultiSelect
-                        records="getSelectedOptionRecords(commercialPayload.filter_options.channels, state.overviewFilters.channel_ids)"
-                        domain="getOptionDomain(commercialPayload.filter_options.channels)"
+                        records="getSelectedOptionRecords(activeCommercialFilterOptions.channels, activeCommercialFilters.channel_ids)"
+                        domain="getOptionDomain(activeCommercialFilterOptions.channels)"
                         resModel="'zrn_commercial.commercial.channel'"
                         fieldString="'Canal'"
                         placeholder="'Todos los canales'"
-                        onChange.bind="this.onOverviewChannelsChange"
+                        onChange.bind="this.onCommercialChannelsChange"
                     />
                 </div>
-                <div class="zrn_analitics_commercial_field zrn_analitics_commercial_field_search">
-                    <label>Buscar</label>
-                    <input type="text" class="form-control" placeholder="Cliente, PDV, producto o codigo" t-att-value="state.overviewFilters.search" t-on-input="(ev) => this.updateOverviewFilter('search', ev.target.value)" t-on-keydown="this.onOverviewSearchKeydown"/>
+            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" t-on-click="this.clearCommercialFilters">Limpiar</button>
+                            <button type="button" class="btn btn-primary" t-on-click="this.applyCommercialFilters">Aplicar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="zrn_analitics_commercial_channel_actions">
-                <button type="button" class="btn btn-primary" t-on-click="this.applyOverviewFilters">Aplicar</button>
-                <button type="button" class="btn btn-secondary" t-on-click="this.clearOverviewFilters">Limpiar</button>
-            </div>
-        </section>
+        </t>
     </t>
 
     <t t-name="zrn_analitics.HubCommercial">
         <div class="zrn_analitics_commercial_hub" t-ref="hubRoot">
-            <div class="zrn_analitics_commercial_hero">
-                <div class="zrn_analitics_commercial_title_row">
-                    <div class="zrn_analitics_hub_panel_title">Hub Comercial</div>
-                </div>
-            </div>
-
             <div class="zrn_analitics_commercial_shell">
                 <button
                     type="button"
@@ -133,7 +186,7 @@
                     </div>
 
                     <div class="zrn_analitics_commercial_section_tabs">
-                        <t t-foreach="commercialTabs" t-as="tab" t-key="tab.key">
+                        <t t-foreach="visibleCommercialTabs" t-as="tab" t-key="tab.key">
                             <button
                                 type="button"
                                 class="btn zrn_analitics_commercial_section_tab"
@@ -157,44 +210,57 @@
 
                     <t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'overview'">
                         <t t-call="zrn_analitics.HubCommercialFilters"/>
-                        <div class="zrn_analitics_commercial_stats">
-                    <div class="zrn_analitics_commercial_stat_box">
-                        <span>Venta total</span>
-                        <strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.summary.total_amount)"/></strong>
-                    </div>
-                    <div class="zrn_analitics_commercial_stat_box">
-                        <span>Pedidos</span>
-                        <strong><t t-esc="formatCount(commercialPayload.summary.order_count)"/></strong>
-                    </div>
-                    <div class="zrn_analitics_commercial_stat_box">
-                        <span>Cuentas comerciales</span>
-                        <strong><t t-esc="formatCount(commercialPayload.summary.customer_count)"/></strong>
-                    </div>
-                    <div class="zrn_analitics_commercial_stat_box">
-                        <span>PDVs</span>
-                        <strong><t t-esc="formatCount(commercialPayload.summary.point_count)"/></strong>
-                    </div>
-                    <div class="zrn_analitics_commercial_stat_box">
-                        <span>Ticket promedio</span>
-                        <strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.summary.average_ticket)"/></strong>
-                    </div>
-                </div>
-
-                <t t-if="!commercialPayload.has_brands || commercialPayload.empty_message">
-                    <div class="zrn_analitics_commercial_empty_note">
-                        <t t-esc="commercialPayload.empty_message"/>
+                <t t-if="!hasCommercialBrands">
+                    <div class="zrn_analitics_commercial_plain_empty zrn_analitics_commercial_plain_empty_main">
+                        <t t-esc="commercialPayload.empty_message or 'No hay marcas comerciales creadas en (ZRN) Manejo Comercial.'"/>
                     </div>
                 </t>
+
+                <t t-if="hasCommercialBrands">
+                    <div class="zrn_analitics_commercial_summary_table_wrap">
+                        <table class="table table-sm o_list_table zrn_analitics_commercial_summary_table mb-0">
+                            <thead>
+                                <tr>
+                                    <th><i class="fa fa-line-chart me-1"></i> Venta total</th>
+                                    <th><i class="fa fa-shopping-cart me-1"></i> Pedidos</th>
+                                    <th><i class="fa fa-briefcase me-1"></i> Cuentas</th>
+                                    <th><i class="fa fa-map-marker me-1"></i> PDVs</th>
+                                    <th><i class="fa fa-ticket me-1"></i> Ticket promedio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.summary.total_amount)"/></strong></td>
+                                    <td><strong><t t-esc="formatCount(commercialPayload.summary.order_count)"/></strong></td>
+                                    <td><strong><t t-esc="formatCount(commercialPayload.summary.customer_count)"/></strong></td>
+                                    <td><strong><t t-esc="formatCount(commercialPayload.summary.point_count)"/></strong></td>
+                                    <td><strong><t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.summary.average_ticket)"/></strong></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <t t-if="commercialPayload.empty_message">
+                        <div class="zrn_analitics_commercial_plain_empty">
+                            <t t-esc="commercialPayload.empty_message"/>
+                        </div>
+                    </t>
 
                 <div class="zrn_analitics_commercial_top_row">
                     <section class="zrn_analitics_hub_panel zrn_analitics_commercial_panel_main">
                         <div class="zrn_analitics_commercial_panel_head">
                             <span>Venta por mes</span>
-                            <span>Vista principal</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.setCommercialTab('tendencias')" aria-label="Ver tendencias">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.toggleOverviewChart('revenue')" aria-label="Cambiar grafica">
+                                    <i class="fa fa-bar-chart"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="zrn_analitics_commercial_chart_meta">
                             <strong>Venta YTD de productos asociados a marcas</strong>
-                            <span>Se calcula solo con productos ligados a marcas activas de Zoraen Commercial.</span>
                         </div>
                         <div class="zrn_analitics_commercial_line_chart">
                             <t t-if="hasCommercialRevenueSeries and hasEchartsLibrary">
@@ -212,7 +278,14 @@
                     <section class="zrn_analitics_hub_panel zrn_analitics_commercial_panel_side">
                         <div class="zrn_analitics_commercial_panel_head">
                             <span>Mix por marca</span>
-                            <span>Participacion del periodo</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.setCommercialTab('portafolio')" aria-label="Ver portafolio">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.toggleOverviewChart('brandMix')" aria-label="Cambiar grafica">
+                                    <i class="fa fa-pie-chart"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="zrn_analitics_commercial_donut_wrap">
                             <t t-if="hasCommercialBrandMix and hasEchartsLibrary">
@@ -232,7 +305,14 @@
                     <section class="zrn_analitics_hub_panel">
                         <div class="zrn_analitics_commercial_panel_head">
                             <span>Top clientes</span>
-                            <span>Venta acumulada</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.setCommercialTab('cliente')" aria-label="Ver clientes">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.toggleOverviewChart('customers')" aria-label="Cambiar grafica">
+                                    <i class="fa fa-bar-chart"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="zrn_analitics_commercial_bar_list">
                             <t t-if="hasCommercialTopCustomers and hasEchartsLibrary">
@@ -250,7 +330,14 @@
                     <section class="zrn_analitics_hub_panel">
                         <div class="zrn_analitics_commercial_panel_head">
                             <span>Top productos</span>
-                            <span>Base por marca</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.setCommercialTab('producto')" aria-label="Ver productos">
+                                    <i class="fa fa-arrow-right"></i>
+                                </button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() => this.toggleSort('top_products', 'sales_amount')" aria-label="Ordenar tabla">
+                                    <i class="fa fa-sort-amount-desc"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="zrn_analitics_commercial_table_wrap">
                             <div class="o_list_renderer o_list_view table-responsive">
@@ -306,67 +393,12 @@
                         </div>
                     </section>
                         </div>
+                </t>
                     </t>
 
             <t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'portafolio'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
                 <div class="zrn_analitics_commercial_portfolio">
-                    <section class="zrn_analitics_hub_panel">
-                        <div class="zrn_analitics_commercial_panel_head">
-                            <span>Filtros del tab</span>
-                            <span>Portafolio real por marca</span>
-                        </div>
-                        <div class="zrn_analitics_commercial_channel_filters">
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Desde</label>
-                                <input type="date" class="form-control" t-att-value="state.portfolioFilters.date_from" t-on-input="(ev) => this.onPortfolioDateFromInput(ev)"/>
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Hasta</label>
-                                <input type="date" class="form-control" t-att-value="state.portfolioFilters.date_to" t-on-input="(ev) => this.onPortfolioDateToInput(ev)"/>
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Marca</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(commercialPayload.filter_options.brands, state.portfolioFilters.brand_ids)"
-                                    domain="getOptionDomain(commercialPayload.filter_options.brands)"
-                                    resModel="'zrn_commercial.commercial.brand'"
-                                    fieldString="'Marca'"
-                                    placeholder="'Todas las marcas'"
-                                    onChange.bind="this.onPortfolioBrandsChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Categoria</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(commercialPayload.filter_options.categories, state.portfolioFilters.category_ids)"
-                                    domain="getOptionDomain(commercialPayload.filter_options.categories)"
-                                    resModel="'zrn_commercial.commercial.brand.category'"
-                                    fieldString="'Categoria'"
-                                    placeholder="'Todas las categorias'"
-                                    onChange.bind="this.onPortfolioCategoriesChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Canal</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(commercialPayload.filter_options.channels, state.portfolioFilters.channel_ids)"
-                                    domain="getOptionDomain(commercialPayload.filter_options.channels)"
-                                    resModel="'zrn_commercial.commercial.channel'"
-                                    fieldString="'Canal'"
-                                    placeholder="'Todos los canales'"
-                                    onChange.bind="this.onPortfolioChannelsChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field zrn_analitics_commercial_field_search">
-                                <label>Buscar</label>
-                                <input type="text" class="form-control" placeholder="Marca, categoria o SKU" t-att-value="state.portfolioFilters.search" t-on-input="(ev) => this.updatePortfolioFilter('search', ev.target.value)" t-on-keydown="onPortfolioSearchKeydown"/>
-                            </div>
-                        </div>
-                        <div class="zrn_analitics_commercial_channel_actions">
-                            <button type="button" class="btn btn-primary" t-on-click="applyPortfolioFilters">Aplicar</button>
-                            <button type="button" class="btn btn-secondary" t-on-click="clearPortfolioFilters">Limpiar</button>
-                        </div>
-                    </section>
                     <div class="zrn_analitics_commercial_portfolio_note">
                         <strong>Portafolio oficial</strong>
                         <span>UN → Marca Comercial → Línea → SKU.</span>
@@ -376,7 +408,7 @@
                         <div class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_hub_panel_title">Portafolio</div>
                             <div class="zrn_analitics_hub_panel_text">
-                                No hay marcas comerciales creadas en Zoraen Commercial para construir esta vista.
+                                No hay marcas comerciales creadas en (ZRN) Manejo Comercial para construir esta vista.
                             </div>
                         </div>
                     </t>
@@ -510,64 +542,8 @@
             </t>
 
             <t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'cobertura'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
                 <div class="zrn_analitics_commercial_coverage">
-                    <section class="zrn_analitics_hub_panel">
-                        <div class="zrn_analitics_commercial_panel_head">
-                            <span>Filtros del tab</span>
-                            <span>Cobertura y distribucion</span>
-                        </div>
-                        <div class="zrn_analitics_commercial_channel_filters">
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Desde</label>
-                                <input type="date" class="form-control" t-att-value="state.coverageFilters.date_from" t-on-input="(ev) => this.onCoverageDateFromInput(ev)"/>
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Hasta</label>
-                                <input type="date" class="form-control" t-att-value="state.coverageFilters.date_to" t-on-input="(ev) => this.onCoverageDateToInput(ev)"/>
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Canal</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(coveragePayload.filter_options.channels, state.coverageFilters.channel_ids)"
-                                    domain="getOptionDomain(coveragePayload.filter_options.channels)"
-                                    resModel="'zrn_commercial.commercial.channel'"
-                                    fieldString="'Canal'"
-                                    placeholder="'Todos los canales'"
-                                    onChange.bind="this.onCoverageChannelsChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Marca</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(coveragePayload.filter_options.brands, state.coverageFilters.brand_ids)"
-                                    domain="getOptionDomain(coveragePayload.filter_options.brands)"
-                                    resModel="'zrn_commercial.commercial.brand'"
-                                    fieldString="'Marca'"
-                                    placeholder="'Todas las marcas'"
-                                    onChange.bind="this.onCoverageBrandsChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Categoria</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(coveragePayload.filter_options.categories, state.coverageFilters.category_ids)"
-                                    domain="getOptionDomain(coveragePayload.filter_options.categories)"
-                                    resModel="'zrn_commercial.commercial.brand.category'"
-                                    fieldString="'Categoria'"
-                                    placeholder="'Todas las categorias'"
-                                    onChange.bind="this.onCoverageCategoriesChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field zrn_analitics_commercial_field_search">
-                                <label>Buscar</label>
-                                <input type="text" class="form-control" placeholder="Cliente, PDV, producto o codigo" t-att-value="state.coverageFilters.search" t-on-input="(ev) => this.updateCoverageFilter('search', ev.target.value)" t-on-keydown="onCoverageSearchKeydown"/>
-                            </div>
-                        </div>
-                        <div class="zrn_analitics_commercial_channel_actions">
-                            <button type="button" class="btn btn-primary" t-on-click="applyCoverageFilters">Aplicar</button>
-                            <button type="button" class="btn btn-secondary" t-on-click="clearCoverageFilters">Limpiar</button>
-                        </div>
-                    </section>
                     <div class="zrn_analitics_commercial_coverage_note">
                         <strong>Cobertura y distribución</strong>
                         <span>Universo PDV, cobertura por canal, white space, marcas por canal, holes de portafolio y clientes A/B en riesgo.</span>
@@ -976,76 +952,8 @@
             </t>
 
             <t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'canal'">
+                <t t-call="zrn_analitics.HubCommercialFilters"/>
                 <div class="zrn_analitics_commercial_channel">
-                    <section class="zrn_analitics_hub_panel">
-                        <div class="zrn_analitics_commercial_panel_head">
-                            <span>Filtros del tab</span>
-                            <span>Por canal trabaja mejor con filtros propios</span>
-                        </div>
-                        <div class="zrn_analitics_commercial_channel_filters">
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Desde</label>
-                                <input type="date" class="form-control" t-att-value="state.channelFilters.date_from" t-on-input="(ev) => this.onChannelDateFromInput(ev)"/>
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Hasta</label>
-                                <input type="date" class="form-control" t-att-value="state.channelFilters.date_to" t-on-input="(ev) => this.onChannelDateToInput(ev)"/>
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Canal</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(channelPayload.filter_options.channels, state.channelFilters.channel_ids)"
-                                    domain="getOptionDomain(channelPayload.filter_options.channels)"
-                                    resModel="'zrn_commercial.commercial.channel'"
-                                    fieldString="'Canal'"
-                                    placeholder="'Todos los canales'"
-                                    onChange.bind="this.onChannelChannelsChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Marca</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(channelPayload.filter_options.brands, state.channelFilters.brand_ids)"
-                                    domain="getOptionDomain(channelPayload.filter_options.brands)"
-                                    resModel="'zrn_commercial.commercial.brand'"
-                                    fieldString="'Marca'"
-                                    placeholder="'Todas las marcas'"
-                                    onChange.bind="this.onChannelBrandsChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field">
-                                <label>Categoria</label>
-                                <ZrnRelationalMultiSelect
-                                    records="getSelectedOptionRecords(channelPayload.filter_options.categories, state.channelFilters.category_ids)"
-                                    domain="getOptionDomain(channelPayload.filter_options.categories)"
-                                    resModel="'zrn_commercial.commercial.brand.category'"
-                                    fieldString="'Categoria'"
-                                    placeholder="'Todas las categorias'"
-                                    onChange.bind="this.onChannelCategoriesChange"
-                                />
-                            </div>
-                            <div class="zrn_analitics_commercial_field zrn_analitics_commercial_field_search">
-                                <label>Buscar</label>
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    placeholder="Cliente, PDV, producto o codigo"
-                                    t-att-value="state.channelFilters.search"
-                                    t-on-input="(ev) => this.updateChannelFilter('search', ev.target.value)"
-                                    t-on-keydown="onChannelSearchKeydown"
-                                />
-                            </div>
-                        </div>
-                        <div class="zrn_analitics_commercial_channel_actions">
-                            <button type="button" class="btn btn-primary" t-on-click="applyChannelFilters">Aplicar</button>
-                            <button type="button" class="btn btn-secondary" t-on-click="clearChannelFilters">Limpiar</button>
-                            <div class="zrn_analitics_commercial_channel_period">
-                                <strong>Periodo:</strong>
-                                <span><t t-esc="channelPayload.summary.period_label"/></span>
-                            </div>
-                        </div>
-                    </section>
-
                     <t t-if="state.channelLoading">
                         <div class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_hub_panel_text">Cargando resumen por canal...</div>

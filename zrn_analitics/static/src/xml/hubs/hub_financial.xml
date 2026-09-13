@@ -470,7 +470,7 @@
                             <div class="zrn_analitics_financial_portfolio">
                                 <div class="zrn_analitics_financial_portfolio_note">
                                     <strong>Portafolio financiero por unidad</strong>
-                                    <span>Lectura jerárquica UN → Marca → Línea → SKU usando el catálogo actual de Odoo y Zoraen Commercial.</span>
+                                    <span>Lectura jerárquica UN → Marca → Línea → SKU usando el catálogo actual de Odoo y (ZRN) Manejo Comercial.</span>
                                 </div>
 
                                 <div class="zrn_analitics_financial_portfolio_cards">

@@ -20,10 +20,10 @@ class ZrnCommercialNavigationMixin:
 
 class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
     _name = 'zrn_commercial.home'
-    _description = 'Inicio de Zoraen Commercial'
+    _description = 'Inicio de Manejo Comercial Zoraen'
     _order = 'sequence, id'
 
-    name = fields.Char(string='Nombre', required=True, default='Zoraen Commercial')
+    name = fields.Char(string='Nombre', required=True, default='(ZRN) Manejo Comercial')
     sequence = fields.Integer(string='Secuencia', default=10)
     page_key = fields.Selection(
         [
@@ -40,6 +40,10 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
     )
     brand_count = fields.Integer(
         string='Marcas',
+        compute='_compute_dashboard_metrics',
+    )
+    business_unit_count = fields.Integer(
+        string='Unidades de negocio',
         compute='_compute_dashboard_metrics',
     )
     category_count = fields.Integer(
@@ -68,6 +72,7 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
     def _compute_dashboard_metrics(self):
         Brand = self.env['zrn_commercial.commercial.brand'].sudo()
         Category = self.env['zrn_commercial.commercial.brand.category'].sudo()
+        BusinessUnit = self.env['zrn_commercial.business.unit'].sudo()
         Channel = self.env['zrn_commercial.commercial.channel'].sudo()
         SaleOrder = self.env['sale.order'].sudo()
 
@@ -79,6 +84,7 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
         for record in self:
             record.currency_id = company.currency_id
             record.brand_count = Brand.search_count([('company_id', '=', company.id)])
+            record.business_unit_count = BusinessUnit.search_count([('company_id', '=', company.id)])
             record.category_count = len(categories)
             record.mapped_product_count = len(categories.mapped('product_ids'))
             record.channel_count = Channel.search_count([('company_id', '=', company.id)])
@@ -90,6 +96,9 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
 
     def action_open_channels(self):
         return self._open_singleton_action('zrn_commercial.action_zrn_commercial_channels')
+
+    def action_open_business_units(self):
+        return self._open_singleton_action('zrn_commercial.action_zrn_commercial_business_units')
 
     def action_open_categories(self):
         self.ensure_one()

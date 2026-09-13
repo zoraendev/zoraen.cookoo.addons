@@ -1,4 +1,4 @@
-# Zoraen Analytics
+# (ZRN) Analitica
 
 Addon base para centralizar:
 
@@ -9,11 +9,11 @@ Addon base para centralizar:
 
 ## Alcance inicial
 
-Este addon nace como una base liviana separada de `zrn_prodigyn`, sin mover todavia la logica analitica pesada ni los hubs reales.
+Este addon concentra la base analitica de Zoraen para hubs, reporteria y procesamiento de datos.
 
 Incluye:
 
-- app propia de Zoraen Analytics
+- app propia de (ZRN) Analitica
 - pantalla principal con dos paginas
 - workspace reservado para hubs y dashboards futuros
 - assets minimos de color y estructura visual

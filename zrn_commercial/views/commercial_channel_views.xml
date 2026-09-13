@@ -1,6 +1,170 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="view_zrn_commercial_business_unit_search" model="ir.ui.view">
+        <field name="name">zrn_commercial.business.unit.search</field>
+        <field name="model">zrn_commercial.business.unit</field>
+        <field name="arch" type="xml">
+            <search string="Unidades de negocio">
+                <field name="name"/>
+                <field name="code"/>
+                <filter string="Activas" name="active_true" domain="[('active', '=', True)]"/>
+                <filter string="Inactivas" name="active_false" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_zrn_commercial_business_unit_list" model="ir.ui.view">
+        <field name="name">zrn_commercial.business.unit.list</field>
+        <field name="model">zrn_commercial.business.unit</field>
+        <field name="arch" type="xml">
+            <tree string="Unidades de negocio">
+                <field name="active" optional="show"/>
+                <field name="name"/>
+                <field name="code" optional="show"/>
+                <field name="brand_count" string="Marcas"/>
+                <field name="channel_count" string="Canales"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_zrn_commercial_business_unit_form" model="ir.ui.view">
+        <field name="name">zrn_commercial.business.unit.form</field>
+        <field name="model">zrn_commercial.business.unit</field>
+        <field name="arch" type="xml">
+            <form string="Unidad de negocio">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nombre de la unidad"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="code"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="channel_count" readonly="1"/>
+                            <field name="brand_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Marcas">
+                            <field name="brand_ids" context="{'default_business_unit_id': id}">
+                                <tree string="Marcas">
+                                    <field name="name"/>
+                                    <field name="code" optional="show"/>
+                                    <field name="category_count" string="Categorias"/>
+                                    <field name="product_count" string="Productos"/>
+                                </tree>
+                                <form string="Marca">
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <h1>
+                                                <field name="name" placeholder="Nombre de la marca"/>
+                                            </h1>
+                                        </div>
+                                        <group>
+                                            <field name="business_unit_id" required="1" options="{'no_create_edit': True}"/>
+                                            <field name="code"/>
+                                            <field name="category_count" readonly="1"/>
+                                            <field name="product_count" readonly="1"/>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Canales">
+                            <field name="channel_ids" context="{'default_business_unit_id': id}">
+                                <tree string="Canales">
+                                    <field name="name"/>
+                                    <field name="code" optional="show"/>
+                                    <field name="category_count" string="Categorias"/>
+                                    <field name="partner_count" string="Registros"/>
+                                    <field name="active" optional="show"/>
+                                </tree>
+                                <form string="Canal comercial">
+                                    <sheet>
+                                        <div class="oe_title">
+                                            <h1>
+                                                <field name="name" placeholder="Nombre del canal"/>
+                                            </h1>
+                                        </div>
+                                        <group>
+                                            <group>
+                                                <field name="company_id" invisible="1"/>
+                                                <field name="business_unit_id" required="1" options="{'no_create_edit': True}"/>
+                                                <field name="code"/>
+                                                <field name="owner_user_id" widget="many2one_avatar_user"/>
+                                                <field name="active"/>
+                                            </group>
+                                            <group>
+                                                <field name="category_count" readonly="1"/>
+                                                <field name="partner_count" readonly="1"/>
+                                            </group>
+                                        </group>
+                                        <notebook>
+                                            <page string="Categorias">
+                                                <field name="category_ids" context="{'default_channel_id': id}">
+                                                    <tree string="Categorias">
+                                                        <field name="sequence" widget="handle"/>
+                                                        <field name="name"/>
+                                                        <field name="code" optional="show"/>
+                                                        <field name="partner_count" string="Registros"/>
+                                                    </tree>
+                                                    <form string="Categoria de canal">
+                                                        <group>
+                                                            <field name="sequence"/>
+                                                            <field name="name"/>
+                                                            <field name="code"/>
+                                                            <field name="description"/>
+                                                            <field name="partner_count" readonly="1"/>
+                                                        </group>
+                                                    </form>
+                                                </field>
+                                            </page>
+                                            <page string="Registros asignados">
+                                                <field name="partner_link_ids" context="{'default_channel_id': id}">
+                                                    <tree editable="bottom" string="Clientes, PDVs y personas">
+                                                        <field name="available_partner_ids" column_invisible="1"/>
+                                                        <field name="channel_id" column_invisible="1"/>
+                                                        <field name="sequence" widget="handle"/>
+                                                        <field name="category_id" required="1"/>
+                                                        <field name="partner_id"/>
+                                                        <field name="commercial_partner_id" readonly="1"/>
+                                                        <field name="vat" readonly="1" optional="show"/>
+                                                        <field name="city" readonly="1" optional="show"/>
+                                                        <field name="state_id" readonly="1" optional="show"/>
+                                                        <field name="active" optional="show"/>
+                                                        <field name="notes" optional="hide"/>
+                                                    </tree>
+                                                </field>
+                                            </page>
+                                            <page string="Detalle">
+                                                <group>
+                                                    <field name="description"/>
+                                                    <field name="notes"/>
+                                                </group>
+                                            </page>
+                                        </notebook>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Detalle">
+                            <group>
+                                <field name="description"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <record id="view_zrn_commercial_channel_search" model="ir.ui.view">
         <field name="name">zrn_commercial.commercial.channel.search</field>
         <field name="model">zrn_commercial.commercial.channel</field>
@@ -8,9 +172,13 @@
             <search string="Canales comerciales">
                 <field name="name"/>
                 <field name="code"/>
+                <field name="business_unit_id"/>
                 <field name="owner_user_id"/>
                 <filter string="Activos" name="active_true" domain="[('active', '=', True)]"/>
                 <filter string="Inactivos" name="active_false" domain="[('active', '=', False)]"/>
+                <group>
+                    <filter string="Unidad de negocio" name="group_business_unit" context="{'group_by': 'business_unit_id'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -21,11 +189,79 @@
         <field name="arch" type="xml">
             <tree string="Canales comerciales">
                 <field name="active" optional="show"/>
+                <field name="business_unit_id"/>
                 <field name="name"/>
                 <field name="code" optional="show"/>
-                <field name="partner_count" string="Clientes / PDVs"/>
-                <field name="company_id" groups="base.group_multi_company" optional="show"/>
+                <field name="category_count" string="Categorias"/>
+                <field name="partner_count" string="Registros"/>
+                <field name="company_id" groups="base.group_multi_company" optional="hide"/>
             </tree>
+        </field>
+    </record>
+
+    <record id="view_zrn_commercial_channel_category_form" model="ir.ui.view">
+        <field name="name">zrn_commercial.commercial.channel.category.form</field>
+        <field name="model">zrn_commercial.commercial.channel.category</field>
+        <field name="arch" type="xml">
+            <form string="Categoria de canal">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Nombre de la categoria"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="channel_id" options="{'no_create_edit': True}"/>
+                            <field name="business_unit_id" readonly="1"/>
+                            <field name="code"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group>
+                            <field name="partner_count" readonly="1"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Registros">
+                            <field name="partner_link_ids" context="{'default_category_id': id, 'default_channel_id': channel_id}">
+                                <tree editable="bottom" string="Clientes, PDVs y personas">
+                                    <field name="available_partner_ids" column_invisible="1"/>
+                                    <field name="channel_id" column_invisible="1"/>
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="partner_id"/>
+                                    <field name="commercial_partner_id" readonly="1"/>
+                                    <field name="vat" readonly="1" optional="show"/>
+                                    <field name="city" readonly="1" optional="show"/>
+                                    <field name="state_id" readonly="1" optional="show"/>
+                                    <field name="active" optional="show"/>
+                                    <field name="notes" optional="hide"/>
+                                </tree>
+                                <form string="Registro asignado">
+                                    <group>
+                                        <field name="available_partner_ids" invisible="1"/>
+                                        <field name="category_id" required="1"/>
+                                        <field name="channel_id" required="1" options="{'no_create_edit': True}"/>
+                                        <field name="partner_id"/>
+                                        <field name="commercial_partner_id" readonly="1"/>
+                                        <field name="vat" readonly="1"/>
+                                        <field name="city" readonly="1"/>
+                                        <field name="state_id" readonly="1"/>
+                                        <field name="country_id" readonly="1"/>
+                                        <field name="active"/>
+                                        <field name="notes"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Detalle">
+                            <group>
+                                <field name="description"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
         </field>
     </record>
 
@@ -42,27 +278,44 @@
                     </div>
                     <group>
                         <group>
+                            <field name="business_unit_id" required="1" options="{'no_create_edit': True}"/>
                             <field name="code"/>
                             <field name="owner_user_id" widget="many2one_avatar_user"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                             <field name="active"/>
                         </group>
                         <group>
+                            <field name="category_count" readonly="1"/>
                             <field name="partner_count" readonly="1"/>
                         </group>
                     </group>
                     <notebook>
-                        <page string="Detalle">
-                            <group>
-                                <field name="description" placeholder="Descripcion funcional del canal"/>
-                                <field name="notes" placeholder="Notas internas"/>
-                            </group>
-                        </page>
-                        <page string="Clientes / PDVs">
-                            <field name="partner_link_ids" context="{'default_channel_id': id}">
-                                <tree editable="bottom" string="Clientes / PDVs asociados">
-                                    <field name="available_partner_ids" column_invisible="1"/>
+                        <page string="Categorias">
+                            <field name="category_ids" context="{'default_channel_id': id}">
+                                <tree string="Categorias">
                                     <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="code" optional="show"/>
+                                    <field name="partner_count" string="Registros"/>
+                                </tree>
+                                <form string="Categoria de canal">
+                                    <group>
+                                        <field name="sequence"/>
+                                        <field name="name"/>
+                                        <field name="code"/>
+                                        <field name="description"/>
+                                        <field name="partner_count" readonly="1"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Registros asignados">
+                            <field name="partner_link_ids" context="{'default_channel_id': id}">
+                                                    <tree editable="bottom" string="Clientes, PDVs y personas">
+                                                        <field name="available_partner_ids" column_invisible="1"/>
+                                                        <field name="channel_id" column_invisible="1"/>
+                                                        <field name="sequence" widget="handle"/>
+                                    <field name="category_id" required="1"/>
                                     <field name="partner_id"/>
                                     <field name="commercial_partner_id" readonly="1"/>
                                     <field name="vat" readonly="1" optional="show"/>
@@ -71,9 +324,11 @@
                                     <field name="active" optional="show"/>
                                     <field name="notes" optional="hide"/>
                                 </tree>
-                                <form string="Cliente / PDV asociado">
+                                <form string="Registro asignado">
                                     <group>
                                         <field name="available_partner_ids" invisible="1"/>
+                                        <field name="channel_id" invisible="1"/>
+                                        <field name="category_id" required="1"/>
                                         <field name="partner_id"/>
                                         <field name="commercial_partner_id" readonly="1"/>
                                         <field name="vat" readonly="1"/>
@@ -86,10 +341,26 @@
                                 </form>
                             </field>
                         </page>
+                        <page string="Detalle">
+                            <group>
+                                <field name="description" placeholder="Descripcion funcional del canal"/>
+                                <field name="notes" placeholder="Notas internas"/>
+                            </group>
+                        </page>
                     </notebook>
                 </sheet>
             </form>
         </field>
+    </record>
+
+    <record id="action_zrn_commercial_business_units" model="ir.actions.act_window">
+        <field name="name">Unidades de negocio</field>
+        <field name="res_model">zrn_commercial.business.unit</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_zrn_commercial_business_unit_list"/>
+        <field name="search_view_id" ref="view_zrn_commercial_business_unit_search"/>
+        <field name="target">current</field>
+        <field name="context">{'active_test': False}</field>
     </record>
 
     <record id="action_zrn_commercial_channels" model="ir.actions.act_window">
@@ -103,9 +374,6 @@
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Crea tu primer canal comercial
-            </p>
-            <p>
-                Aqui podras registrar canales y asignar clientes o PDVs de forma exclusiva para consolidar reportes comerciales.
             </p>
         </field>
     </record>

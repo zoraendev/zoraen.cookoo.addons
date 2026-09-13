@@ -1,4 +1,4 @@
-# Arquitectura de Zoraen Analytics
+# Arquitectura de (ZRN) Analitica
 
 ## Objetivo
 
@@ -33,5 +33,5 @@ No debe concentrar:
 Cuando entren frentes reales:
 
 1. cada hub debe vivir en vistas o modelos propios
-2. la navegacion debe mantenerse desacoplada de `zrn_prodigyn`
+2. la navegacion debe mantenerse desacoplada por dominio funcional
 3. los assets deben seguir siendo sobrios y orientados a trabajo interno

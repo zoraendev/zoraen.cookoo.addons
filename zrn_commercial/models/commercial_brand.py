@@ -12,7 +12,7 @@ from odoo.tools.mimetypes import guess_mimetype
 class ZrnCommercialBrand(models.Model):
     _name = 'zrn_commercial.commercial.brand'
     _description = 'Marca comercial'
-    _order = 'name, id'
+    _order = 'business_unit_id, name, id'
 
     _LOGO_MAX_FILE_SIZE = 5 * 1024 * 1024
     _LOGO_ALLOWED_MIMETYPES = {
@@ -28,6 +28,11 @@ class ZrnCommercialBrand(models.Model):
         string='Compania',
         required=True,
         default=lambda self: self.env.company,
+    )
+    business_unit_id = fields.Many2one(
+        'zrn_commercial.business.unit',
+        string='Unidad de negocio',
+        ondelete='restrict',
     )
     logo = fields.Image(string='Logo', max_width=512, max_height=512, attachment=False)
     source_model = fields.Char(string='Modelo origen', readonly=True, copy=False)

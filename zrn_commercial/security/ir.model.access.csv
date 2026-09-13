@@ -1,7 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_zrn_commercial_brand,zrn_commercial.commercial.brand,model_zrn_commercial_commercial_brand,base.group_user,1,1,1,1
 access_zrn_commercial_brand_category,zrn_commercial.commercial.brand.category,model_zrn_commercial_commercial_brand_category,base.group_user,1,1,1,1
+access_zrn_commercial_business_unit,zrn_commercial.business.unit,model_zrn_commercial_business_unit,base.group_user,1,1,1,1
 access_zrn_commercial_channel,zrn_commercial.commercial.channel,model_zrn_commercial_commercial_channel,base.group_user,1,1,1,1
+access_zrn_commercial_channel_category,zrn_commercial.commercial.channel.category,model_zrn_commercial_commercial_channel_category,base.group_user,1,1,1,1
 access_zrn_commercial_channel_partner,zrn_commercial.commercial.channel.partner,model_zrn_commercial_commercial_channel_partner,base.group_user,1,1,1,1
 access_zrn_commercial_home,zrn_commercial.home,model_zrn_commercial_home,base.group_user,1,1,1,1
 access_zrn_commercial_brand_import_wizard,zrn_commercial.brand.import.wizard,model_zrn_commercial_brand_import_wizard,base.group_user,1,1,1,1

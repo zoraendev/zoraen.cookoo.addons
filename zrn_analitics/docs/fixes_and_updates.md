@@ -1,4 +1,4 @@
-# Historial de Correcciones y Actualizaciones - Zoraen Analytics
+# Historial de Correcciones y Actualizaciones - (ZRN) Analitica
 
 ## Corrección del Filtro de Período y Enlaces de Callbacks (Junio 2026)
 
@@ -85,7 +85,7 @@ Para unificar y potenciar la inteligencia de negocio dentro de Odoo sin depender
 ### 3. Aspectos de Arquitectura y Estilo (Cumplimiento de `AGENTS.md`)
 *   Se eliminaron gradientes invasivos,cards excesivas y decoraciones innecesarias, prefiriendo la estética sobria y nativa de Odoo.
 *   Se usaron las clases de tabla de Odoo (`o_list_table table-sm table-hover table-striped`) en conjunto con el prefijo `zrn_` para los estilos personalizados del módulo.
-*   Los gráficos se implementaron usando **Apache ECharts** (`window.echarts`), asegurando compatibilidad con el resto del ecosistema de Zoraen Analytics.
+*   Los gráficos se implementaron usando **Apache ECharts** (`window.echarts`), asegurando compatibilidad con el resto del ecosistema de (ZRN) Analitica.
 
 ---
 

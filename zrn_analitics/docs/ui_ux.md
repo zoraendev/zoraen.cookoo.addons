@@ -1,4 +1,4 @@
-# UI/UX de Zoraen Analytics
+# UI/UX de (ZRN) Analitica
 
 ## Direccion visual
 

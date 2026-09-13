@@ -2,7 +2,7 @@
 <odoo>
 
     <record id="zrn_commercial_home_default" model="zrn_commercial.home">
-        <field name="name">Zoraen Commercial</field>
+        <field name="name">(ZRN) Manejo Comercial</field>
         <field name="sequence">10</field>
         <field name="page_key">overview</field>
     </record>
@@ -11,7 +11,7 @@
         <field name="name">zrn_commercial.home.form</field>
         <field name="model">zrn_commercial.home</field>
         <field name="arch" type="xml">
-            <form string="Zoraen Commercial" js_class="zrn_commercial_home_dashboard" create="0" edit="0" delete="0" duplicate="0" class="zrn_commercial_home_form">
+            <form string="(ZRN) Manejo Comercial" js_class="zrn_commercial_home_dashboard" create="0" edit="0" delete="0" duplicate="0" class="zrn_commercial_home_form">
                 <sheet>
                     <field name="name" invisible="1"/>
                     <field name="page_key" invisible="1"/>
@@ -20,6 +20,10 @@
 
                     <div class="zrn_commercial_home">
                         <div class="zrn_commercial_kpis">
+                            <div class="zrn_commercial_kpi">
+                                <button name="action_open_business_units" type="object" string="Unidades de negocio" class="btn btn-link zrn_commercial_text_link"/>
+                                <strong><field name="business_unit_count" readonly="1" nolabel="1"/></strong>
+                            </div>
                             <div class="zrn_commercial_kpi">
                                 <button name="action_open_brands" type="object" string="Marcas" class="btn btn-link zrn_commercial_text_link"/>
                                 <strong><field name="brand_count" readonly="1" nolabel="1"/></strong>
@@ -91,7 +95,7 @@
     </record>
 
     <record id="action_zrn_commercial_home" model="ir.actions.act_window">
-        <field name="name">Zoraen Commercial</field>
+        <field name="name">(ZRN) Manejo Comercial</field>
         <field name="res_model">zrn_commercial.home</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_zrn_commercial_home_form"/>
@@ -101,7 +105,7 @@
 
     <menuitem
         id="menu_zrn_commercial_root"
-        name="Zoraen Commercial"
+        name="(ZRN) Manejo Comercial"
         sequence="70"
         action="action_zrn_commercial_home"
         web_icon="zrn_commercial,static/description/icon.png"
@@ -121,6 +125,14 @@
         parent="menu_zrn_commercial_root"
         action="action_zrn_commercial_brands"
         sequence="10"
+    />
+
+    <menuitem
+        id="menu_zrn_commercial_business_units_sub"
+        name="Unidades de negocio"
+        parent="menu_zrn_commercial_root"
+        action="action_zrn_commercial_business_units"
+        sequence="12"
     />
 
     <menuitem

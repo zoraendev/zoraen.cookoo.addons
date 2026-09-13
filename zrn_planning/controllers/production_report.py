@@ -30,7 +30,7 @@ class ZrnPlanningProductionReportController(http.Controller):
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="ProgId" content="Excel.Sheet" />
-    <meta name="Generator" content="Odoo Zrn Planning" />
+    <meta name="Generator" content="Odoo ZRN Planeacion" />
     <style>
         body {{
             font-family: Calibri, Arial, sans-serif;

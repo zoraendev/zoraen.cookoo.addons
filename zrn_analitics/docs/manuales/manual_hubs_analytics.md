@@ -55,7 +55,7 @@ El Hub Operaciones usa la misma logica base, pero ademas convierte el periodo a 
 
 ### 4.2 Productos incluidos
 
-La mayor parte de los hubs solo considera productos asociados a marcas activas de `Zoraen Commercial`.
+La mayor parte de los hubs solo considera productos asociados a marcas activas de `(ZRN) Manejo Comercial`.
 
 Eso significa:
 
@@ -91,7 +91,7 @@ Por eso puede pasar que:
 
 El Hub Comercial centraliza el analisis de ventas de marcas activas, clientes, portafolio, cobertura, comportamiento de compra y posicionamiento de SKUs.
 
-![Pantalla Principal de Zoraen Analytics](/home/dgb/.gemini/antigravity/brain/1f5a542e-3c54-40bf-a62d-c6a9f1261aac/media__1783400915605.png)
+![Pantalla Principal de (ZRN) Analitica](/home/dgb/.gemini/antigravity/brain/1f5a542e-3c54-40bf-a62d-c6a9f1261aac/media__1783400915605.png)
 
 Sirve para:
 

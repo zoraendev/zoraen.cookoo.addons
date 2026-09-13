@@ -1,4 +1,4 @@
-# UI/UX de Zoraen Planning
+# UI/UX de (ZRN) Planeacion
 
 ## Direccion visual
 

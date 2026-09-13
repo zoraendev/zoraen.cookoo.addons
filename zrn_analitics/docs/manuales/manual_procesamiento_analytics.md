@@ -1,4 +1,4 @@
-# Manual de Zoraen Analytics
+# Manual de (ZRN) Analitica
 
 ## Procesamiento de datos, menus, vistas y simulaciones
 
@@ -50,7 +50,7 @@ El sistema avisa esto de forma explicita en la vista de carga y tambien antes de
 
 El flujo funcional actual es:
 
-1. `Zoraen Analytics`
+1. `(ZRN) Analitica`
 2. `Procesamiento`
 3. pantalla `Centro de carga`
 4. opcion `Abrir workspace temporal`

@@ -1,11 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <record id="view_zrn_commercial_brand_search" model="ir.ui.view">
+        <field name="name">zrn_commercial.commercial.brand.search</field>
+        <field name="model">zrn_commercial.commercial.brand</field>
+        <field name="arch" type="xml">
+            <search string="Marcas">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="business_unit_id"/>
+                <group>
+                    <filter string="Unidad de negocio" name="group_business_unit" context="{'group_by': 'business_unit_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="view_zrn_commercial_brand_list" model="ir.ui.view">
         <field name="name">zrn_commercial.commercial.brand.list</field>
         <field name="model">zrn_commercial.commercial.brand</field>
         <field name="arch" type="xml">
             <tree string="Marcas">
+                <field name="business_unit_id"/>
                 <field name="name"/>
                 <field name="code" optional="show"/>
                 <field name="category_count" string="Categorias"/>
@@ -82,6 +98,7 @@
                     </div>
                     <group>
                         <group>
+                            <field name="business_unit_id" required="1" options="{'no_create_edit': True}"/>
                             <field name="code"/>
                             <field name="company_id" groups="base.group_multi_company"/>
                         </group>
@@ -166,6 +183,7 @@
         <field name="res_model">zrn_commercial.commercial.brand</field>
         <field name="view_mode">tree,form</field>
         <field name="view_id" ref="view_zrn_commercial_brand_list"/>
+        <field name="search_view_id" ref="view_zrn_commercial_brand_search"/>
         <field name="target">current</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">

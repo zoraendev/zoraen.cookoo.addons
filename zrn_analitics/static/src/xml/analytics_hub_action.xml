@@ -48,18 +48,29 @@
                         <span>Regresar</span>
                     </button>
                 </div>
-                <div class="zrn_analitics_hub_tabs_shell">
-                    <div class="zrn_analitics_hub_tabs">
+                <div class="zrn_analitics_hub_switcher">
+                    <span class="zrn_analitics_hub_switcher_label">Hub</span>
+                    <div class="dropdown zrn_analitics_hub_dropdown" t-att-class="state.hubMenuOpen ? 'show' : ''">
+                        <button
+                            type="button"
+                            class="btn dropdown-toggle zrn_analitics_hub_dropdown_btn"
+                            t-att-aria-expanded="state.hubMenuOpen ? 'true' : 'false'"
+                            t-on-click="toggleHubMenu"
+                        >
+                            <t t-esc="activeHub.label"/>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-end zrn_analitics_hub_dropdown_menu" t-att-class="state.hubMenuOpen ? 'show' : ''">
                         <t t-foreach="hubs" t-as="hub" t-key="hub.key">
                             <button
                                 type="button"
-                                class="btn zrn_analitics_hub_tab"
-                                t-att-class="state.activeHub === hub.key ? 'zrn_analitics_hub_tab_active' : ''"
+                                class="dropdown-item zrn_analitics_hub_dropdown_item"
+                                t-att-class="state.activeHub === hub.key ? 'active' : ''"
                                 t-on-click="() => this.setActiveHub(hub.key)"
                             >
                                 <t t-esc="hub.label"/>
                             </button>
                         </t>
+                        </div>
                     </div>
                 </div>
             </div>

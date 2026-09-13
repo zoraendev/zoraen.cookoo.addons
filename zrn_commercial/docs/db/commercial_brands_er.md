@@ -9,7 +9,7 @@ Separar la entidad de marca comercial de los productos vendibles de Odoo para po
 - Una marca comercial puede tener muchos productos asignados.
 - Un producto de Odoo solo puede pertenecer a una marca comercial dentro de esta capa.
 - La tabla puente solo guarda la relacion y datos de apoyo.
-- La marca comercial es una entidad propia del cliente dentro de Zoraen Commercial; no depende del maestro de clientes o proveedores de Odoo.
+- La marca comercial es una entidad propia del cliente dentro de (ZRN) Manejo Comercial; no depende del maestro de clientes o proveedores de Odoo.
 
 ## Diagrama ER
 

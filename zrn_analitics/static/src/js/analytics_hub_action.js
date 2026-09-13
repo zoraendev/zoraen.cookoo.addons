@@ -94,6 +94,9 @@ const DEFAULT_FILTERS = Object.freeze({
   brand_ids: [],
   category_ids: [],
   search: "",
+  order_type: "sale",
+  order_status: "confirmed",
+  invoiced_only: false,
 });
 
 function cloneDefaultFilters() {
@@ -104,7 +107,20 @@ function cloneDefaultFilters() {
     channel_ids: [],
     brand_ids: [],
     category_ids: [],
+    order_type: "sale",
+    order_status: "confirmed",
+    invoiced_only: false,
   };
+}
+
+function normalizeCommercialFilterValue(key, value) {
+  if (key === "channel_ids" || key === "brand_ids" || key === "category_ids") {
+    return normalizeFilterIds(value);
+  }
+  if (key === "invoiced_only") {
+    return Boolean(value);
+  }
+  return value ?? "";
 }
 
 const OPERATIONS_DEFAULT_FILTERS = Object.freeze({
@@ -379,6 +395,11 @@ class ZrnAnalyticsHubAction extends Component {
       pdvTab: "overview",
       rrhhTab: "overview",
       commercialSidebarOpen: false,
+      commercialFiltersOpen: false,
+      hubMenuOpen: false,
+      overviewRevenueChartType: "line",
+      overviewBrandMixChartType: "doughnut",
+      overviewCustomersChartType: "bar",
       pdvSidebarOpen: false,
       commercialPayload: null,
       commercialLoading: false,
@@ -880,7 +901,9 @@ class ZrnAnalyticsHubAction extends Component {
 
   async setActiveHub(hubKey) {
     this.state.activeHub = hubKey;
+    this.state.hubMenuOpen = false;
     this.state.channelModalRow = null;
+    this.closeCommercialFilters();
     this.clearAnalyticsDetailModals();
     if (hubKey === "pdv") {
       await this.loadPdvPayload();
@@ -917,8 +940,12 @@ class ZrnAnalyticsHubAction extends Component {
   }
 
   async setCommercialTab(tabKey) {
+    if (!this.hasCommercialBrands && tabKey !== "overview") {
+      tabKey = "overview";
+    }
     this.state.commercialTab = tabKey;
     this.closeCommercialSidebar();
+    this.closeCommercialFilters();
     this.state.channelModalRow = null;
     this.clearAnalyticsDetailModals();
     if (tabKey === "cobertura") {
@@ -984,6 +1011,36 @@ class ZrnAnalyticsHubAction extends Component {
     this.state.commercialSidebarOpen = false;
   }
 
+  toggleCommercialFilters() {
+    this.state.commercialFiltersOpen = !this.state.commercialFiltersOpen;
+  }
+
+  closeCommercialFilters() {
+    this.state.commercialFiltersOpen = false;
+  }
+
+  toggleHubMenu() {
+    this.state.hubMenuOpen = !this.state.hubMenuOpen;
+  }
+
+  closeHubMenu() {
+    this.state.hubMenuOpen = false;
+  }
+
+  toggleOverviewChart(chartKey) {
+    if (chartKey === "revenue") {
+      this.state.overviewRevenueChartType =
+        this.state.overviewRevenueChartType === "line" ? "bar" : "line";
+    } else if (chartKey === "brandMix") {
+      this.state.overviewBrandMixChartType =
+        this.state.overviewBrandMixChartType === "doughnut" ? "pie" : "doughnut";
+    } else if (chartKey === "customers") {
+      this.state.overviewCustomersChartType =
+        this.state.overviewCustomersChartType === "bar" ? "line" : "bar";
+    }
+    this.queueChartRender();
+  }
+
   togglePdvSidebar() {
     this.state.pdvSidebarOpen = !this.state.pdvSidebarOpen;
   }
@@ -1005,6 +1062,12 @@ class ZrnAnalyticsHubAction extends Component {
       );
       const normalizedPayload = this.normalizeCommercialPayload(payload);
       this.state.commercialPayload = normalizedPayload;
+      if (
+        !normalizedPayload.has_brands &&
+        Number(normalizedPayload.summary?.brand_count || 0) <= 0
+      ) {
+        this.state.commercialTab = "overview";
+      }
       this.syncCommercialFiltersFromPayload(normalizedPayload);
       this.syncPortfolioStateFromPayload();
     } finally {
@@ -1141,6 +1204,9 @@ class ZrnAnalyticsHubAction extends Component {
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
       search: activeFilters.search || "",
+      order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
+      order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
+      invoiced_only: Boolean(activeFilters.invoiced_only),
     };
     this.state.overviewFilters = { ...nextFilters };
     this.state.portfolioFilters = { ...nextFilters };
@@ -1155,6 +1221,9 @@ class ZrnAnalyticsHubAction extends Component {
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
       search: activeFilters.search || "",
+      order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
+      order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
+      invoiced_only: Boolean(activeFilters.invoiced_only),
     };
   }
 
@@ -1167,6 +1236,9 @@ class ZrnAnalyticsHubAction extends Component {
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
       search: activeFilters.search || "",
+      order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
+      order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
+      invoiced_only: Boolean(activeFilters.invoiced_only),
     };
   }
 
@@ -1281,45 +1353,47 @@ class ZrnAnalyticsHubAction extends Component {
   }
 
   updateOverviewFilter(key, value) {
-    console.log("[ZRN DEBUG] updateOverviewFilter", key, value);
     this.state.overviewFilters = {
       ...this.state.overviewFilters,
-      [key]:
-        key === "channel_ids" || key === "brand_ids" || key === "category_ids"
-          ? normalizeFilterIds(value)
-          : value ?? "",
+      [key]: normalizeCommercialFilterValue(key, value),
     };
-    console.log("[ZRN DEBUG] overviewFilters now:", JSON.stringify(this.state.overviewFilters));
   }
 
   updatePortfolioFilter(key, value) {
     this.state.portfolioFilters = {
       ...this.state.portfolioFilters,
-      [key]:
-        key === "channel_ids" || key === "brand_ids" || key === "category_ids"
-          ? normalizeFilterIds(value)
-          : value ?? "",
+      [key]: normalizeCommercialFilterValue(key, value),
     };
   }
 
   updateCoverageFilter(key, value) {
     this.state.coverageFilters = {
       ...this.state.coverageFilters,
-      [key]:
-        key === "channel_ids" || key === "brand_ids" || key === "category_ids"
-          ? normalizeFilterIds(value)
-          : value ?? "",
+      [key]: normalizeCommercialFilterValue(key, value),
     };
   }
 
   updateChannelFilter(key, value) {
     this.state.channelFilters = {
       ...this.state.channelFilters,
-      [key]:
-        key === "channel_ids" || key === "brand_ids" || key === "category_ids"
-          ? normalizeFilterIds(value)
-          : value ?? "",
+      [key]: normalizeCommercialFilterValue(key, value),
     };
+  }
+
+  updateCommercialFilter(key, value) {
+    if (this.state.commercialTab === "portafolio") {
+      this.updatePortfolioFilter(key, value);
+      return;
+    }
+    if (this.state.commercialTab === "cobertura") {
+      this.updateCoverageFilter(key, value);
+      return;
+    }
+    if (this.state.commercialTab === "canal") {
+      this.updateChannelFilter(key, value);
+      return;
+    }
+    this.updateOverviewFilter(key, value);
   }
 
   updateFinancialFilter(key, value) {
@@ -1500,6 +1574,34 @@ class ZrnAnalyticsHubAction extends Component {
     this.updatePdvFilter("category_ids", records.map((r) => r.id));
   }
 
+  onCommercialDateFromInput(ev) {
+    this.updateCommercialFilter("date_from", ev.target.value);
+  }
+
+  onCommercialDateToInput(ev) {
+    this.updateCommercialFilter("date_to", ev.target.value);
+  }
+
+  onCommercialOrderTypeChange(ev) {
+    this.updateCommercialFilter("order_type", ev.target.value);
+    this.updateCommercialFilter("order_status", "confirmed");
+    if (ev.target.value === "purchase") {
+      this.updateCommercialFilter("invoiced_only", false);
+    }
+  }
+
+  onCommercialBrandsChange(records) {
+    this.updateCommercialFilter("brand_ids", records.map((r) => r.id));
+  }
+
+  onCommercialCategoriesChange(records) {
+    this.updateCommercialFilter("category_ids", records.map((r) => r.id));
+  }
+
+  onCommercialChannelsChange(records) {
+    this.updateCommercialFilter("channel_ids", records.map((r) => r.id));
+  }
+
   getOptionDomain(options) {
     const ids = (options || [])
       .map((option) => Number(option.id))
@@ -1545,6 +1647,19 @@ class ZrnAnalyticsHubAction extends Component {
     await this.loadPdvPayload(true);
   }
 
+  async applyCommercialFilters() {
+    if (this.state.commercialTab === "cobertura") {
+      await this.applyCoverageFilters();
+    } else if (this.state.commercialTab === "canal") {
+      await this.applyChannelFilters();
+    } else if (this.state.commercialTab === "portafolio") {
+      await this.applyPortfolioFilters();
+    } else {
+      await this.applyOverviewFilters();
+    }
+    this.closeCommercialFilters();
+  }
+
   async clearOverviewFilters() {
     this.state.overviewFilters = cloneDefaultFilters();
     await this.loadCommercialPayload(true);
@@ -1578,6 +1693,19 @@ class ZrnAnalyticsHubAction extends Component {
   async clearPdvFilters() {
     this.state.pdvFilters = cloneDefaultFilters();
     await this.loadPdvPayload(true);
+  }
+
+  async clearCommercialFilters() {
+    if (this.state.commercialTab === "cobertura") {
+      await this.clearCoverageFilters();
+    } else if (this.state.commercialTab === "canal") {
+      await this.clearChannelFilters();
+    } else if (this.state.commercialTab === "portafolio") {
+      await this.clearPortfolioFilters();
+    } else {
+      await this.clearOverviewFilters();
+    }
+    this.closeCommercialFilters();
   }
 
   normalizeRrhhApplicantId(value) {
@@ -1718,6 +1846,12 @@ class ZrnAnalyticsHubAction extends Component {
   onChannelSearchKeydown(ev) {
     if (ev.key === "Enter") {
       this.applyChannelFilters();
+    }
+  }
+
+  onCommercialSearchKeydown(ev) {
+    if (ev.key === "Enter") {
+      this.applyCommercialFilters();
     }
   }
 
@@ -1944,6 +2078,36 @@ class ZrnAnalyticsHubAction extends Component {
       this.commercialTabs.find((tab) => tab.key === this.state.commercialTab) ||
       this.commercialTabs[0]
     );
+  }
+
+  get visibleCommercialTabs() {
+    if (!this.hasCommercialBrands) {
+      return this.commercialTabs.filter((tab) => tab.key === "overview");
+    }
+    return this.commercialTabs;
+  }
+
+  get activeCommercialFilters() {
+    if (this.state.commercialTab === "portafolio") {
+      return this.state.portfolioFilters;
+    }
+    if (this.state.commercialTab === "cobertura") {
+      return this.state.coverageFilters;
+    }
+    if (this.state.commercialTab === "canal") {
+      return this.state.channelFilters;
+    }
+    return this.state.overviewFilters;
+  }
+
+  get activeCommercialFilterOptions() {
+    if (this.state.commercialTab === "cobertura") {
+      return this.coveragePayload.filter_options || {};
+    }
+    if (this.state.commercialTab === "canal") {
+      return this.channelPayload.filter_options || {};
+    }
+    return this.commercialPayload.filter_options || {};
   }
 
   get activeFinancialTab() {
@@ -2495,6 +2659,13 @@ class ZrnAnalyticsHubAction extends Component {
     return Boolean((this.commercialPayload.revenue_series || []).length);
   }
 
+  get hasCommercialBrands() {
+    return Boolean(
+      this.commercialPayload.has_brands ||
+        Number(this.commercialPayload.summary?.brand_count || 0) > 0,
+    );
+  }
+
   get hasCommercialBrandMix() {
     return Boolean((this.commercialPayload.brand_mix || []).length);
   }
@@ -2979,6 +3150,7 @@ class ZrnAnalyticsHubAction extends Component {
     if (!chart) {
       return;
     }
+    const chartType = this.state.overviewRevenueChartType || "line";
     chart.setOption(
       {
         animationDuration: 650,
@@ -2986,14 +3158,14 @@ class ZrnAnalyticsHubAction extends Component {
         grid: { top: 16, right: 20, bottom: 26, left: 24, containLabel: true },
         tooltip: {
           trigger: "axis",
-          axisPointer: { type: "line" },
+          axisPointer: { type: chartType === "bar" ? "shadow" : "line" },
           valueFormatter: (value) =>
             `${this.commercialPayload.summary.currency_symbol} ${this.formatMoney(value)}`,
         },
         xAxis: {
           type: "category",
           data: series.map((item) => item.label),
-          boundaryGap: false,
+          boundaryGap: chartType === "bar",
           axisLine: { lineStyle: { color: "#d6deea" } },
           axisTick: { show: false },
           axisLabel: { color: "#5f6b7a", fontSize: 11 },
@@ -3009,23 +3181,25 @@ class ZrnAnalyticsHubAction extends Component {
         },
         series: [
           {
-            type: "line",
-            smooth: 0.25,
-            symbol: "circle",
+            type: chartType,
+            smooth: chartType === "line" ? 0.25 : false,
+            symbol: chartType === "line" ? "circle" : "none",
             symbolSize: 8,
             data: series.map((item) => Number(item.value || 0)),
             lineStyle: { color: "#bd1730", width: 3 },
+            barWidth: chartType === "bar" ? 28 : undefined,
             itemStyle: {
               color: "#bd1730",
               borderColor: "#ffffff",
               borderWidth: 2,
+              borderRadius: chartType === "bar" ? [4, 4, 0, 0] : 0,
             },
-            areaStyle: {
+            areaStyle: chartType === "line" ? {
               color: new window.echarts.graphic.LinearGradient(0, 0, 0, 1, [
                 { offset: 0, color: "rgba(31, 78, 140, 0.22)" },
                 { offset: 1, color: "rgba(31, 78, 140, 0.04)" },
               ]),
-            },
+            } : undefined,
           },
         ],
       },
@@ -3045,6 +3219,7 @@ class ZrnAnalyticsHubAction extends Component {
     if (!chart) {
       return;
     }
+    const chartType = this.state.overviewBrandMixChartType || "doughnut";
     chart.setOption(
       {
         animationDuration: 700,
@@ -3067,7 +3242,7 @@ class ZrnAnalyticsHubAction extends Component {
         series: [
           {
             type: "pie",
-            radius: ["48%", "72%"],
+            radius: chartType === "pie" ? "72%" : ["48%", "72%"],
             center: ["32%", "50%"],
             avoidLabelOverlap: true,
             itemStyle: { borderColor: "#ffffff", borderWidth: 2 },
@@ -3096,30 +3271,36 @@ class ZrnAnalyticsHubAction extends Component {
     if (!chart) {
       return;
     }
+    const chartType = this.state.overviewCustomersChartType || "bar";
     const reversed = [...customers].reverse();
+    const values = reversed.map((item) => Number(item.total_amount || 0));
     chart.setOption(
       {
         animationDuration: 700,
         animationEasing: "cubicOut",
-        grid: { top: 8, right: 16, bottom: 8, left: 120, containLabel: false },
+        grid:
+          chartType === "line"
+            ? { top: 16, right: 18, bottom: 36, left: 24, containLabel: true }
+            : { top: 8, right: 16, bottom: 8, left: 120, containLabel: false },
         tooltip: {
           trigger: "axis",
-          axisPointer: { type: "shadow" },
+          axisPointer: { type: chartType === "line" ? "line" : "shadow" },
           valueFormatter: (value) =>
             `${this.commercialPayload.summary.currency_symbol} ${this.formatMoney(value)}`,
         },
         xAxis: {
-          type: "value",
+          type: chartType === "line" ? "category" : "value",
+          data: chartType === "line" ? reversed.map((item) => item.name) : undefined,
           splitLine: { lineStyle: { color: "#edf2f8" } },
           axisLabel: {
             color: "#5f6b7a",
             fontSize: 11,
-            formatter: (value) => this.formatMoney(value),
+            formatter: chartType === "line" ? undefined : (value) => this.formatMoney(value),
           },
         },
         yAxis: {
-          type: "category",
-          data: reversed.map((item) => item.name),
+          type: chartType === "line" ? "value" : "category",
+          data: chartType === "line" ? undefined : reversed.map((item) => item.name),
           axisTick: { show: false },
           axisLine: { show: false },
           axisLabel: {
@@ -3127,15 +3308,18 @@ class ZrnAnalyticsHubAction extends Component {
             fontSize: 11,
             width: 110,
             overflow: "truncate",
+            formatter: chartType === "line" ? (value) => this.formatMoney(value) : undefined,
           },
         },
         series: [
           {
-            type: "bar",
-            data: reversed.map((item) => Number(item.total_amount || 0)),
-            barWidth: 18,
+            type: chartType,
+            smooth: chartType === "line" ? 0.25 : false,
+            symbol: chartType === "line" ? "circle" : "none",
+            data: values,
+            barWidth: chartType === "bar" ? 18 : undefined,
             itemStyle: {
-              borderRadius: [0, 6, 6, 0],
+              borderRadius: chartType === "bar" ? [0, 6, 6, 0] : 0,
               color: new window.echarts.graphic.LinearGradient(1, 0, 0, 0, [
                 { offset: 0, color: "#e34c62" },
                 { offset: 1, color: "#bd1730" },
