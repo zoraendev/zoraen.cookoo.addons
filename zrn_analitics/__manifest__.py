@@ -62,7 +62,6 @@ Addon base para la capa analitica:
             'zrn_analitics/static/src/xml/hubs/financial/tab_canal.xml',
             'zrn_analitics/static/src/xml/hubs/financial/tab_marca.xml',
             'zrn_analitics/static/src/xml/hubs/financial/tab_portafolio.xml',
-            'zrn_analitics/static/src/xml/hubs/financial/tab_alertas.xml',
             'zrn_analitics/static/src/xml/hubs/financial/tab_precios.xml',
             'zrn_analitics/static/src/xml/hubs/financial/tab_cartera.xml',
             'zrn_analitics/static/src/xml/hubs/financial/tab_avanzado.xml',

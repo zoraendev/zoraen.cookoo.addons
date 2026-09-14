@@ -24,9 +24,6 @@
                                     <div class="zrn_analitics_financial_panel_head">
                                         <span>Margen % por producto</span>
                                         <span>Top 10 con costo matcheado</span>
-                                        <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-product-margin-pct', filename: 'zrn_financiero_margen_pct_producto' })" aria-label="Exportar margen porcentual por producto"><i class="fa fa-download"/></button>
-                                        </div>
                                     </div>
                                     <div class="zrn_analitics_financial_bar_list">
                                         <t t-if="sortedFinancialProducts.length &amp;&amp; hasEchartsLibrary">
@@ -44,9 +41,9 @@
                                     <span>Ranking de productos</span>
                                     <span>Click en la fila para abrir detalle</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_products', filename: 'zrn_financiero_ranking_productos' })" aria-label="Exportar ranking de productos"><i class="fa fa-download"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_products', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_products')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_products', filename: 'zrn_financiero_ranking_productos' })" aria-label="Exportar ranking de productos"><i class="fa fa-download"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_products', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>

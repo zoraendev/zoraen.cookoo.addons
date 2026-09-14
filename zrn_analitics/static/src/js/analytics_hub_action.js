@@ -45,7 +45,6 @@ const FINANCIAL_TABS = [
   { key: "canal", label: "Por Canal", icon: "fa-sitemap" },
   { key: "marca", label: "Por Marca", icon: "fa-tags" },
   { key: "portafolio", label: "Portafolio", icon: "fa-archive" },
-  { key: "alertas", label: "Alertas", icon: "fa-bell-o" },
 ];
 
 const OPERATIONS_TABS = [
@@ -445,6 +444,10 @@ class ZrnAnalyticsHubAction extends Component {
         financial_products: "table",
         financial_channels: "table",
         financial_brands: "table",
+        financial_product_channel: "table",
+        financial_portfolio_drill: "table",
+        financial_modal_channels: "table",
+        financial_modal_secondary: "table",
         operations_top_skus: "table",
         operations_demanda: "table",
         operations_abc: "table",
@@ -464,6 +467,10 @@ class ZrnAnalyticsHubAction extends Component {
         financial_products: { metric: "margin", type: "bar" },
         financial_channels: { metric: "margin_pct", type: "bar" },
         financial_brands: { metric: "margin", type: "bar" },
+        financial_product_channel: { metric: "margin", type: "bar" },
+        financial_portfolio_drill: { metric: "margin", type: "bar" },
+        financial_modal_channels: { metric: "revenue", type: "bar" },
+        financial_modal_secondary: { metric: "revenue", type: "bar" },
         operations_top_skus: { metric: "units", type: "bar" },
         operations_demanda: { metric: "units_per_month", type: "bar" },
         operations_abc: { metric: "revenue", type: "bar" },
@@ -3787,6 +3794,30 @@ class ZrnAnalyticsHubAction extends Component {
         { key: "margin_pct", label: "Margen %", format: "percent" },
         { key: "product_count", label: "Productos", format: "count" },
       ],
+      financial_product_channel: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "margin", label: "Margen", format: "money" },
+        { key: "margin_pct", label: "Margen %", format: "percent" },
+      ],
+      financial_portfolio_drill: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "matched_revenue", label: "Rev. matcheado", format: "money" },
+        { key: "cost", label: "Costo", format: "money" },
+        { key: "margin", label: "Margen", format: "money" },
+        { key: "margin_pct", label: "Margen %", format: "percent" },
+        { key: "sku_count", label: "SKUs", format: "count" },
+      ],
+      financial_modal_channels: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "units", label: "Unidades", format: "count" },
+        { key: "order_count", label: "Pedidos", format: "count" },
+        { key: "pdv_count", label: "PDVs", format: "count" },
+      ],
+      financial_modal_secondary: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "units", label: "Unidades", format: "count" },
+        { key: "order_count", label: "Pedidos", format: "count" },
+      ],
       operations_top_skus: [
         { key: "units", label: "Unidades", format: "count" },
         { key: "revenue", label: "Revenue", format: "money" },
@@ -3821,6 +3852,24 @@ class ZrnAnalyticsHubAction extends Component {
       financial_products: (this.sortedFinancialProducts || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
       financial_channels: (this.sortedFinancialChannels || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
       financial_brands: (this.sortedFinancialBrands || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      financial_product_channel: (this.sortedFinancialProductChannel || []).slice(0, 10).map((row) => ({
+        ...row,
+        label: `${row.channel} - ${row.product_name}`,
+      })),
+      financial_portfolio_drill: (this.financialPortfolio.rows || [])
+        .filter((row) => row.level === "unit" || this.isFinancialPortfolioRowVisible(row))
+        .slice(0, 12)
+        .map((row) => ({ ...row, label: row.label })),
+      financial_modal_channels: (this.state.analyticsDetailModal?.channel_rows || [])
+        .slice(0, 10)
+        .map((row) => ({ ...row, label: row.name })),
+      financial_modal_secondary: (
+        this.state.analyticsDetailModal?.secondary_rows ||
+        this.state.analyticsDetailModal?.customer_rows ||
+        []
+      )
+        .slice(0, 10)
+        .map((row) => ({ ...row, label: row.name })),
       operations_top_skus: (this.sortedOperationsTopSkus || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
       operations_demanda: (this.sortedOperationsDemanda || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
       operations_abc: (this.sortedOperationsAbc || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),

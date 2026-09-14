@@ -26,9 +26,9 @@
                                     <span>Detalle por canal</span>
                                     <span>Click en la fila para abrir detalle</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_channels', filename: 'zrn_financiero_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_channels', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_channels')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_channels', filename: 'zrn_financiero_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_channels', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
@@ -76,9 +76,18 @@
                                     <span>Producto × canal</span>
                                     <span>Top 30 por margen</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_financiero_producto_canal' })" aria-label="Exportar producto por canal"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_product_channel', filename: 'zrn_financiero_producto_canal' })" aria-label="Exportar producto por canal"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_product_channel', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_product_channel')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_product_channel', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
+                                <t t-if="getCommercialPanelView('financial_product_channel') === 'chart'">
+                                    <div class="zrn_analitics_financial_bar_list">
+                                        <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="analytics-panel-financial_product_channel"/>
+                                    </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('financial_product_channel') === 'table'">
                                 <div class="zrn_analitics_financial_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">
                                         <table class="o_list_table table table-sm position-relative mb-0 table-striped">
@@ -107,6 +116,7 @@
                                         </table>
                                     </div>
                                 </div>
+                                </t>
                             </section>
                         </t>
 

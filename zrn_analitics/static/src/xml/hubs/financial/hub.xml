@@ -96,8 +96,6 @@
 
                         <t t-call="zrn_analitics.HubFinancialTabPortafolio"/>
 
-                        <t t-call="zrn_analitics.HubFinancialTabAlertas"/>
-
                         <t t-call="zrn_analitics.HubFinancialTabPrecios"/>
                         <t t-call="zrn_analitics.HubFinancialTabCartera"/>
                         <t t-call="zrn_analitics.HubFinancialTabAvanzado"/>
@@ -133,8 +131,19 @@
                                                 <div class="zrn_analitics_financial_panel_head">
                                                     <span>Por canal</span>
                                                     <span>Base analítica</span>
-                                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_financiero_modal_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
+                                                    <div class="zrn_analitics_commercial_panel_actions">
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_modal_channels', filename: 'zrn_financiero_modal_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_modal_channels', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_modal_channels')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_modal_channels', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                                    </div>
                                                 </div>
+                                                <t t-if="getCommercialPanelView('financial_modal_channels') === 'chart'">
+                                                    <div class="zrn_analitics_financial_bar_list">
+                                                        <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="analytics-panel-financial_modal_channels"/>
+                                                    </div>
+                                                </t>
+                                                <t t-if="getCommercialPanelView('financial_modal_channels') === 'table'">
                                                 <div class="zrn_analitics_financial_table_wrap">
                                                     <table class="zrn_analitics_financial_table">
                                                         <thead>
@@ -159,14 +168,26 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                </t>
                                             </section>
 
                                             <section class="zrn_analitics_hub_panel">
                                                 <div class="zrn_analitics_financial_panel_head">
                                                     <span><t t-esc="state.analyticsDetailModal.secondary_title || 'Top PDVs'"/></span>
                                                     <span>Detalle del cálculo</span>
-                                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_financiero_modal_detalle_secundario' })" aria-label="Exportar detalle secundario"><i class="fa fa-download"/></button>
+                                                    <div class="zrn_analitics_commercial_panel_actions">
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_modal_secondary', filename: 'zrn_financiero_modal_detalle_secundario' })" aria-label="Exportar detalle secundario"><i class="fa fa-download"/></button>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_modal_secondary', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_modal_secondary')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_modal_secondary', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                                    </div>
                                                 </div>
+                                                <t t-if="getCommercialPanelView('financial_modal_secondary') === 'chart'">
+                                                    <div class="zrn_analitics_financial_bar_list">
+                                                        <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="analytics-panel-financial_modal_secondary"/>
+                                                    </div>
+                                                </t>
+                                                <t t-if="getCommercialPanelView('financial_modal_secondary') === 'table'">
                                                 <div class="zrn_analitics_financial_table_wrap">
                                                     <table class="zrn_analitics_financial_table">
                                                         <thead>
@@ -189,6 +210,7 @@
                                                         </tbody>
                                                     </table>
                                                 </div>
+                                                </t>
                                             </section>
                                         </div>
                                     </div>
