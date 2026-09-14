@@ -6,6 +6,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Unidades por unidad</span>
                                         <span>Drill operativo</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-portfolio-units', filename: 'zrn_operaciones_portafolio_unidades' })" aria-label="Exportar unidades por unidad"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_line_chart">
                                         <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-portfolio-units"/>
@@ -30,6 +31,7 @@
                                 <div class="zrn_analitics_operations_panel_head">
                                     <span>Drill UN → Marca → Linea → SKU</span>
                                     <span>Click en marca o SKU para abrir registro</span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_drill_portafolio' })" aria-label="Exportar drill operativo"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_operations_portfolio_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">

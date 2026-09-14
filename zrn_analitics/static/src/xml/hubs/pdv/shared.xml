@@ -1,41 +1,68 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve"><t t-name="zrn_analitics.HubPdvFilters">
-        <section class="zrn_analitics_hub_panel">
-            <div class="zrn_analitics_pdv_panel_head">
-                <span>Filtros PDV</span>
-                <span>Segmenta el centro PDV por periodo, canal, marca y categoria</span>
+        <div class="zrn_analitics_hub_toolbar zrn_analitics_commercial_toolbar">
+            <div class="zrn_analitics_hub_context zrn_analitics_commercial_context">
+                <strong><t t-esc="activePdvTab.label"/></strong>
+                <span><t t-esc="pdvPayload.summary.period_label"/></span>
             </div>
-            <div class="zrn_analitics_pdv_filters">
-                <div class="zrn_analitics_pdv_field">
-                    <label>Desde</label>
-                    <input type="date" class="form-control" t-att-value="state.pdvFilters.date_from" t-on-input="(ev) =&gt; this.onPdvDateFromInput(ev)"/>
-                </div>
-                <div class="zrn_analitics_pdv_field">
-                    <label>Hasta</label>
-                    <input type="date" class="form-control" t-att-value="state.pdvFilters.date_to" t-on-input="(ev) =&gt; this.onPdvDateToInput(ev)"/>
-                </div>
-                <div class="zrn_analitics_pdv_field">
-                    <label>Marca</label>
-                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.brands, state.pdvFilters.brand_ids)" domain="getOptionDomain(pdvPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onPdvBrandsChange"/>
-                </div>
-                <div class="zrn_analitics_pdv_field">
-                    <label>Categoria</label>
-                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.categories, state.pdvFilters.category_ids)" domain="getOptionDomain(pdvPayload.filter_options.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onPdvCategoriesChange"/>
-                </div>
-                <div class="zrn_analitics_pdv_field">
-                    <label>Canal</label>
-                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.channels, state.pdvFilters.channel_ids)" domain="getOptionDomain(pdvPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onPdvChannelsChange"/>
-                </div>
-                <div class="zrn_analitics_pdv_field zrn_analitics_pdv_field_search">
-                    <label>Buscar</label>
-                    <input type="text" class="form-control" placeholder="PDV, cliente, producto o codigo" t-att-value="state.pdvFilters.search" t-on-input="(ev) =&gt; this.updatePdvFilter('search', ev.target.value)" t-on-keydown="this.onPdvSearchKeydown"/>
+            <div class="zrn_analitics_hub_search zrn_analitics_commercial_search">
+                <input type="text" class="form-control" placeholder="PDV, cliente, producto o codigo" t-att-value="state.pdvFilters.search" t-on-input="(ev) =&gt; this.updatePdvFilter('search', ev.target.value)" t-on-keydown="this.onPdvSearchKeydown"/>
+                <button t-if="state.pdvFilters.search" type="button" class="btn zrn_analitics_commercial_search_clear" t-on-click="() =&gt; this.updatePdvFilter('search', '')" aria-label="Limpiar busqueda">
+                    <i class="fa fa-times"/>
+                </button>
+                <button type="button" class="btn btn-primary zrn_analitics_commercial_search_btn" t-on-click="this.applyPdvFilters" aria-label="Buscar">
+                    <i class="fa fa-search"/>
+                </button>
+            </div>
+            <button type="button" class="btn zrn_analitics_commercial_filter_btn zrn_analitics_commercial_filter_btn_icon" t-on-click="togglePdvFilters" aria-label="Abrir filtros PDV">
+                <i class="fa fa-sliders"/>
+            </button>
+        </div>
+
+        <t t-if="state.pdvFiltersOpen">
+            <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closePdvFilters"/>
+            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell zrn_analitics_filters_modal_shell" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content zrn_analitics_commercial_filters_modal" t-on-click.stop="() =&gt; {}">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title">Filtros PDV</h5>
+                                <div class="zrn_analitics_commercial_filters_scope"><t t-esc="activePdvTab.label"/></div>
+                            </div>
+                            <button type="button" class="btn-close" aria-label="Cerrar" t-on-click="closePdvFilters"/>
+                        </div>
+                        <div class="modal-body">
+                            <div class="zrn_analitics_pdv_filters zrn_analitics_commercial_filters_grid">
+                                <div class="zrn_analitics_pdv_field">
+                                    <label>Desde</label>
+                                    <input type="date" class="form-control" t-att-value="state.pdvFilters.date_from" t-on-input="(ev) =&gt; this.onPdvDateFromInput(ev)"/>
+                                </div>
+                                <div class="zrn_analitics_pdv_field">
+                                    <label>Hasta</label>
+                                    <input type="date" class="form-control" t-att-value="state.pdvFilters.date_to" t-on-input="(ev) =&gt; this.onPdvDateToInput(ev)"/>
+                                </div>
+                                <div class="zrn_analitics_pdv_field">
+                                    <label>Marca</label>
+                                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.brands, state.pdvFilters.brand_ids)" domain="getOptionDomain(pdvPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onPdvBrandsChange"/>
+                                </div>
+                                <div class="zrn_analitics_pdv_field">
+                                    <label>Categoria</label>
+                                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.categories, state.pdvFilters.category_ids)" domain="getOptionDomain(pdvPayload.filter_options.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onPdvCategoriesChange"/>
+                                </div>
+                                <div class="zrn_analitics_pdv_field">
+                                    <label>Canal</label>
+                                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.channels, state.pdvFilters.channel_ids)" domain="getOptionDomain(pdvPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onPdvChannelsChange"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" t-on-click="this.clearPdvFilters">Limpiar</button>
+                            <button type="button" class="btn btn-primary" t-on-click="this.applyPdvFilters">Aplicar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="zrn_analitics_pdv_actions">
-                <button type="button" class="btn btn-primary" t-on-click="this.applyPdvFilters">Aplicar</button>
-                <button type="button" class="btn btn-secondary" t-on-click="this.clearPdvFilters">Limpiar</button>
-            </div>
-        </section>
+        </t>
     </t>
 
     </templates>

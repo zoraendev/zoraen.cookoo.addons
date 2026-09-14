@@ -141,6 +141,99 @@
                         <t t-call="zrn_analitics.HubPdvTabOtros"/>
 
                         <t t-call="zrn_analitics.HubPdvTabAlertas"/>
+
+                        <t t-if="state.analyticsDetailModal">
+                            <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeAnalyticsDetailModal"/>
+                            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell" tabindex="-1" role="dialog">
+                                <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document" t-on-click.stop="() =&gt; {}">
+                                    <div class="modal-content zrn_analitics_commercial_modal" t-on-click.stop="() =&gt; {}">
+                                        <div class="modal-header">
+                                            <div>
+                                                <h4 class="modal-title"><t t-esc="state.analyticsDetailModal.title"/></h4>
+                                                <div class="zrn_analitics_commercial_table_sub">
+                                                    <t t-esc="state.analyticsDetailModal.subtitle"/>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close" aria-label="Close" t-on-click.stop="closeAnalyticsDetailModal"/>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="zrn_analitics_commercial_channel_modal_cards">
+                                                <t t-foreach="state.analyticsDetailModal.summary_cards || []" t-as="card" t-key="card.label">
+                                                    <div class="zrn_analitics_commercial_coverage_card">
+                                                        <span><t t-esc="card.label"/></span>
+                                                        <strong><t t-esc="formatDetailCard(state.analyticsDetailModal, card)"/></strong>
+                                                    </div>
+                                                </t>
+                                            </div>
+
+                                            <div class="zrn_analitics_commercial_channel_modal_grid">
+                                                <section class="zrn_analitics_hub_panel">
+                                                    <div class="zrn_analitics_commercial_panel_head">
+                                                        <span>Por canal</span>
+                                                        <span>Base analitica</span>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_pdv_modal_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
+                                                    </div>
+                                                    <div class="zrn_analitics_commercial_table_wrap">
+                                                        <table class="zrn_analitics_commercial_table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Canal</th>
+                                                                    <th>PDVs</th>
+                                                                    <th>Pedidos</th>
+                                                                    <th>Unidades</th>
+                                                                    <th>Revenue</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <t t-foreach="state.analyticsDetailModal.channel_rows || []" t-as="row" t-key="row.name">
+                                                                    <tr class="zrn_analitics_commercial_table_row">
+                                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                                        <td><t t-esc="formatCount(row.pdv_count)"/></td>
+                                                                        <td><t t-esc="formatCount(row.order_count)"/></td>
+                                                                        <td><t t-esc="formatCount(row.units)"/></td>
+                                                                        <td><t t-esc="state.analyticsDetailModal.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                                    </tr>
+                                                                </t>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </section>
+
+                                                <section class="zrn_analitics_hub_panel">
+                                                    <div class="zrn_analitics_commercial_panel_head">
+                                                        <span><t t-esc="state.analyticsDetailModal.secondary_title || 'Top PDVs'"/></span>
+                                                        <span>Detalle del calculo</span>
+                                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_pdv_modal_detalle_secundario' })" aria-label="Exportar detalle secundario"><i class="fa fa-download"/></button>
+                                                    </div>
+                                                    <div class="zrn_analitics_commercial_table_wrap">
+                                                        <table class="zrn_analitics_commercial_table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Nombre</th>
+                                                                    <th>Unidades</th>
+                                                                    <th>Pedidos</th>
+                                                                    <th>Revenue</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <t t-foreach="(state.analyticsDetailModal.secondary_rows || state.analyticsDetailModal.customer_rows || [])" t-as="row" t-key="row.name">
+                                                                    <tr class="zrn_analitics_commercial_table_row">
+                                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                                        <td><t t-esc="formatCount(row.units)"/></td>
+                                                                        <td><t t-esc="formatCount(row.order_count)"/></td>
+                                                                        <td><t t-esc="state.analyticsDetailModal.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                                    </tr>
+                                                                </t>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
                     </t>
                 </div>
             </div>

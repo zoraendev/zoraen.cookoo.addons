@@ -6,7 +6,13 @@
                                     <div class="zrn_analitics_financial_panel_head">
                                         <span>Evolución financiera</span>
                                         <span>Revenue, costo y margen</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-overview', filename: 'zrn_financiero_evolucion' })" aria-label="Exportar evolución financiera"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
+                                    <t t-if="getCommercialPanelView('financial_overview') === 'chart'">
                                     <div class="zrn_analitics_financial_line_chart">
                                         <t t-if="hasFinancialRevenueSeries &amp;&amp; hasEchartsLibrary">
                                             <div class="zrn_analitics_financial_echart" data-zrn-chart="financial-overview"/>
@@ -15,13 +21,35 @@
                                             <div class="zrn_analitics_financial_chart_empty">Sin serie financiera para graficar.</div>
                                         </t>
                                     </div>
+                                    </t>
+                                    <t t-if="getCommercialPanelView('financial_overview') === 'table'">
+                                        <div class="zrn_analitics_financial_table_wrap">
+                                            <table class="zrn_analitics_financial_table">
+                                                <thead><tr><th>Mes</th><th>Revenue</th><th>Costo</th><th>Margen</th></tr></thead>
+                                                <tbody>
+                                                    <tr t-foreach="financialPayload.revenue_series" t-as="row" t-key="row.label">
+                                                        <td><strong><t t-esc="row.label"/></strong></td>
+                                                        <td><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                        <td><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.cost)"/></td>
+                                                        <td><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.margin)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
                                 </section>
 
                                 <section class="zrn_analitics_hub_panel zrn_analitics_financial_panel_side">
                                     <div class="zrn_analitics_financial_panel_head">
                                         <span>Margen por marca</span>
                                         <span>Top del periodo</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brand_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-brand-overview', filename: 'zrn_financiero_margen_marca' })" aria-label="Exportar margen por marca"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brand_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
+                                    <t t-if="getCommercialPanelView('financial_brand_overview') === 'chart'">
                                     <div class="zrn_analitics_financial_donut_wrap">
                                         <t t-if="hasFinancialBrandMix &amp;&amp; hasEchartsLibrary">
                                             <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_donut" data-zrn-chart="financial-brand-overview"/>
@@ -30,6 +58,21 @@
                                             <div class="zrn_analitics_financial_chart_empty">Sin margen por marca para mostrar.</div>
                                         </t>
                                     </div>
+                                    </t>
+                                    <t t-if="getCommercialPanelView('financial_brand_overview') === 'table'">
+                                        <div class="zrn_analitics_financial_table_wrap">
+                                            <table class="zrn_analitics_financial_table">
+                                                <thead><tr><th>Marca</th><th>Margen</th><th>Mix</th></tr></thead>
+                                                <tbody>
+                                                    <tr t-foreach="financialPayload.brand_margin_mix" t-as="row" t-key="row.name">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.margin)"/></td>
+                                                        <td><t t-esc="formatPercent(row.mix_pct || row.value_pct || 0)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
                                 </section>
                             </div>
 
@@ -38,7 +81,13 @@
                                     <div class="zrn_analitics_financial_panel_head">
                                         <span>Margen % por canal</span>
                                         <span>Lectura rápida por segmento</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_channel_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-channel-overview', filename: 'zrn_financiero_margen_canal' })" aria-label="Exportar margen por canal"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_channel_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
+                                    <t t-if="getCommercialPanelView('financial_channel_overview') === 'chart'">
                                     <div class="zrn_analitics_financial_bar_list">
                                         <t t-if="hasFinancialChannels &amp;&amp; hasEchartsLibrary">
                                             <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="financial-channel-overview"/>
@@ -47,6 +96,21 @@
                                             <div class="zrn_analitics_financial_chart_empty">Sin canales con margen calculable.</div>
                                         </t>
                                     </div>
+                                    </t>
+                                    <t t-if="getCommercialPanelView('financial_channel_overview') === 'table'">
+                                        <div class="zrn_analitics_financial_table_wrap">
+                                            <table class="zrn_analitics_financial_table">
+                                                <thead><tr><th>Canal</th><th>Margen</th><th>Margen %</th></tr></thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedFinancialChannels" t-as="row" t-key="row.key">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.margin)"/></td>
+                                                        <td><t t-esc="formatPercent(row.margin_pct)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </t>
                                 </section>
 
                                 <section class="zrn_analitics_hub_panel">

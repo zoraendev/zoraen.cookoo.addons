@@ -6,6 +6,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Forecast mensual</span>
                                         <span>Actual vs proyectado</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-forecast', filename: 'zrn_operaciones_forecast_mensual' })" aria-label="Exportar forecast mensual"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_line_chart">
                                         <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-forecast"/>
@@ -39,6 +40,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Serie mensual</span>
                                         <span>Pace y proyeccion</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_serie_mensual_forecast' })" aria-label="Exportar serie mensual"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -69,6 +71,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Pace por canal</span>
                                         <span>Comparativo rapido</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_pace_canal' })" aria-label="Exportar pace por canal"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">

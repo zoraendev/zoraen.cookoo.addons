@@ -2,29 +2,32 @@
 <templates xml:space="preserve">
   <t t-name="zrn_analitics.HubPdvTabCanales"><t t-if="state.pdvTab === 'canales'">
                             <t t-set="channelComparePayload" t-value="pdvPayload.channel_compare"/>
-                            <div class="zrn_analitics_pdv_stats zrn_analitics_pdv_stats_chain">
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Sell-in</span>
-                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(channelComparePayload.summary.sellin_q)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Sell-out</span>
-                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(channelComparePayload.summary.sellout_q)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Sell-through</span>
-                                    <strong><t t-esc="formatPercent(channelComparePayload.summary.sellthrough_q_pct)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>PDVs con data</span>
-                                    <strong><t t-esc="formatCount(channelComparePayload.summary.pdvs_with_data)"/></strong>
-                                </div>
+                            <div class="zrn_analitics_commercial_summary_table_wrap">
+                                <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Sell-in</th>
+                                            <th>Sell-out</th>
+                                            <th>Sell-through</th>
+                                            <th>PDVs con data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(channelComparePayload.summary.sellin_q)"/></strong></td>
+                                            <td><strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(channelComparePayload.summary.sellout_q)"/></strong></td>
+                                            <td><strong><t t-esc="formatPercent(channelComparePayload.summary.sellthrough_q_pct)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(channelComparePayload.summary.pdvs_with_data)"/></strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
 
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_pdv_panel_head">
                                     <span>Sell-in vs Sell-out</span>
                                     <span><t t-esc="channelComparePayload.channel_labels.length ? channelComparePayload.channel_labels.join(', ') : 'Todos los canales'"/></span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-channel-monthly', filename: 'zrn_pdv_sellin_sellout_canales' })" aria-label="Exportar sell-in vs sell-out"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_pdv_chart_wrap">
                                     <t t-if="channelComparePayload.by_month.length and hasEchartsLibrary">
@@ -46,6 +49,7 @@
                                 <div class="zrn_analitics_pdv_panel_head">
                                     <span>Detalle por PDV</span>
                                     <span><t t-esc="channelComparePayload.supported_channel_labels.length ? 'Click para drill-down' : 'Vista filtrada por canal'"/></span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_pdv_detalle_canales' })" aria-label="Exportar detalle por PDV"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_pdv_table_wrap">
                                     <table class="zrn_analitics_pdv_table">

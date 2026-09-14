@@ -55,31 +55,29 @@
                     <t t-if="!state.financialLoading">
                         <t t-call="zrn_analitics.HubFinancialFilters"/>
 
-                        <div class="zrn_analitics_financial_stats">
-                            <div class="zrn_analitics_financial_stat_box">
-                                <span>Revenue</span>
-                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.revenue)"/></strong>
-                            </div>
-                            <div class="zrn_analitics_financial_stat_box">
-                                <span>Revenue matcheado</span>
-                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.matched_revenue)"/></strong>
-                            </div>
-                            <div class="zrn_analitics_financial_stat_box">
-                                <span>Cobertura</span>
-                                <strong><t t-esc="formatPercent(financialPayload.summary.coverage_pct)"/></strong>
-                            </div>
-                            <div class="zrn_analitics_financial_stat_box">
-                                <span>Costo teórico</span>
-                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.cost)"/></strong>
-                            </div>
-                            <div class="zrn_analitics_financial_stat_box">
-                                <span>Margen</span>
-                                <strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.margin)"/></strong>
-                            </div>
-                            <div class="zrn_analitics_financial_stat_box">
-                                <span>Margen %</span>
-                                <strong><t t-esc="formatPercent(financialPayload.summary.margin_pct)"/></strong>
-                            </div>
+                        <div class="zrn_analitics_commercial_summary_table_wrap">
+                            <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Ingreso</th>
+                                        <th>Revenue matcheado</th>
+                                        <th>Cobertura</th>
+                                        <th>Costo teorico</th>
+                                        <th>Margen</th>
+                                        <th>Margen %</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.revenue)"/></strong></td>
+                                        <td><strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.matched_revenue)"/></strong></td>
+                                        <td><strong><t t-esc="formatPercent(financialPayload.summary.coverage_pct)"/></strong></td>
+                                        <td><strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.cost)"/></strong></td>
+                                        <td><strong><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(financialPayload.summary.margin)"/></strong></td>
+                                        <td><strong><t t-esc="formatPercent(financialPayload.summary.margin_pct)"/></strong></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
                         <t t-if="financialPayload.empty_message">
@@ -135,6 +133,7 @@
                                                 <div class="zrn_analitics_financial_panel_head">
                                                     <span>Por canal</span>
                                                     <span>Base analítica</span>
+                                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_financiero_modal_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
                                                 </div>
                                                 <div class="zrn_analitics_financial_table_wrap">
                                                     <table class="zrn_analitics_financial_table">
@@ -166,6 +165,7 @@
                                                 <div class="zrn_analitics_financial_panel_head">
                                                     <span><t t-esc="state.analyticsDetailModal.secondary_title || 'Top PDVs'"/></span>
                                                     <span>Detalle del cálculo</span>
+                                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_financiero_modal_detalle_secundario' })" aria-label="Exportar detalle secundario"><i class="fa fa-download"/></button>
                                                 </div>
                                                 <div class="zrn_analitics_financial_table_wrap">
                                                     <table class="zrn_analitics_financial_table">

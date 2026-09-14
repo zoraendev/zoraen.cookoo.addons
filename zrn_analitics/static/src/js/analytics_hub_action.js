@@ -424,6 +424,9 @@ class ZrnAnalyticsHubAction extends Component {
       rrhhTab: "overview",
       commercialSidebarOpen: false,
       commercialFiltersOpen: false,
+      financialFiltersOpen: false,
+      operationsFiltersOpen: false,
+      pdvFiltersOpen: false,
       commercialExportMenu: null,
       hubMenuOpen: false,
       overviewRevenueChartType: "line",
@@ -439,6 +442,33 @@ class ZrnAnalyticsHubAction extends Component {
         trends_decliners: "table",
         insights_market_basket: "table",
         insights_ltv: "table",
+        financial_products: "table",
+        financial_channels: "table",
+        financial_brands: "table",
+        operations_top_skus: "table",
+        operations_demanda: "table",
+        operations_abc: "table",
+        operations_trends: "table",
+        pdv_ranking: "table",
+        financial_overview: "chart",
+        financial_brand_overview: "chart",
+        financial_channel_overview: "chart",
+        operations_overview_monthly: "chart",
+        operations_brand_mix: "chart",
+        pdv_overview_revenue: "chart",
+        pdv_overview_coverage: "chart",
+        pdv_overview_top: "chart",
+      },
+      analyticsChartConfigOpen: null,
+      analyticsChartSettings: {
+        financial_products: { metric: "margin", type: "bar" },
+        financial_channels: { metric: "margin_pct", type: "bar" },
+        financial_brands: { metric: "margin", type: "bar" },
+        operations_top_skus: { metric: "units", type: "bar" },
+        operations_demanda: { metric: "units_per_month", type: "bar" },
+        operations_abc: { metric: "revenue", type: "bar" },
+        operations_trends: { metric: "trend_pct", type: "bar" },
+        pdv_ranking: { metric: "rev", type: "bar" },
       },
       channelChartConfigOpen: false,
       channelChartMetric: "revenue",
@@ -979,6 +1009,16 @@ class ZrnAnalyticsHubAction extends Component {
 
   exportCommercialVisibleContent(ev, options = {}) {
     if (!options.format) {
+      const panel = ev?.currentTarget?.closest?.(".zrn_analitics_hub_panel") || this._commercialExportPanel;
+      const filename = options.filename || "zrn_comercial_export";
+      const chartKey = options.chartKey;
+      const chartEl = chartKey
+        ? panel?.querySelector?.(`[data-zrn-chart="${chartKey}"]`)
+        : panel?.querySelector?.("[data-zrn-chart]");
+      if (chartEl && this.isCommercialNodeVisible(chartEl)) {
+        this.downloadChartImage(chartKey || chartEl.dataset.zrnChart, filename);
+        return;
+      }
       this.openCommercialExportMenu(ev, options);
       return;
     }
@@ -1065,6 +1105,9 @@ class ZrnAnalyticsHubAction extends Component {
   getCommercialPanelTitle(panel) {
     return (
       panel?.querySelector?.(".zrn_analitics_commercial_panel_head span")?.textContent?.trim() ||
+      panel?.querySelector?.(".zrn_analitics_financial_panel_head span")?.textContent?.trim() ||
+      panel?.querySelector?.(".zrn_analitics_operations_panel_head span")?.textContent?.trim() ||
+      panel?.querySelector?.(".zrn_analitics_pdv_panel_head span")?.textContent?.trim() ||
       panel?.querySelector?.(".zrn_analitics_hub_panel_title")?.textContent?.trim() ||
       this.commercialTabs.find((tab) => tab.id === this.state.commercialTab)?.label ||
       ""
@@ -1651,6 +1694,9 @@ class ZrnAnalyticsHubAction extends Component {
     this.state.hubMenuOpen = false;
     this.state.channelModalRow = null;
     this.closeCommercialFilters();
+    this.closeFinancialFilters();
+    this.closeOperationsFilters();
+    this.closePdvFilters();
     this.clearAnalyticsDetailModals();
     if (hubKey === "pdv") {
       await this.loadPdvPayload();
@@ -1709,6 +1755,7 @@ class ZrnAnalyticsHubAction extends Component {
   async setFinancialTab(tabKey) {
     this.state.financialTab = tabKey;
     this.closeCommercialSidebar();
+    this.closeFinancialFilters();
     this.clearAnalyticsDetailModals();
     await this.loadFinancialPayload();
     this.queueChartRender();
@@ -1717,6 +1764,7 @@ class ZrnAnalyticsHubAction extends Component {
   async setOperationsTab(tabKey) {
     this.state.operationsTab = tabKey;
     this.closeCommercialSidebar();
+    this.closeOperationsFilters();
     this.clearAnalyticsDetailModals();
     await this.loadOperationsPayload();
     this.queueChartRender();
@@ -1725,6 +1773,7 @@ class ZrnAnalyticsHubAction extends Component {
   async setPdvTab(tabKey) {
     this.state.pdvTab = tabKey;
     this.closePdvSidebar();
+    this.closePdvFilters();
     this.clearAnalyticsDetailModals();
     await this.loadPdvPayload();
     this.queueChartRender();
@@ -1767,6 +1816,30 @@ class ZrnAnalyticsHubAction extends Component {
     this.state.commercialFiltersOpen = false;
   }
 
+  toggleFinancialFilters() {
+    this.state.financialFiltersOpen = !this.state.financialFiltersOpen;
+  }
+
+  closeFinancialFilters() {
+    this.state.financialFiltersOpen = false;
+  }
+
+  toggleOperationsFilters() {
+    this.state.operationsFiltersOpen = !this.state.operationsFiltersOpen;
+  }
+
+  closeOperationsFilters() {
+    this.state.operationsFiltersOpen = false;
+  }
+
+  togglePdvFilters() {
+    this.state.pdvFiltersOpen = !this.state.pdvFiltersOpen;
+  }
+
+  closePdvFilters() {
+    this.state.pdvFiltersOpen = false;
+  }
+
   async refreshCommercialFilterOptions() {
     const options = await this.orm.call(
       "zrn_analitics.home",
@@ -1806,6 +1879,47 @@ class ZrnAnalyticsHubAction extends Component {
     this.state.commercialPanelViews = {
       ...(this.state.commercialPanelViews || {}),
       [panelKey]: viewMode,
+    };
+    this.queueChartRender();
+  }
+
+  toggleAnalyticsChartConfig(panelKey) {
+    this.state.analyticsChartConfigOpen =
+      this.state.analyticsChartConfigOpen === panelKey ? null : panelKey;
+  }
+
+  closeAnalyticsChartConfig() {
+    this.state.analyticsChartConfigOpen = null;
+  }
+
+  getAnalyticsChartSetting(panelKey) {
+    const options = this.getAnalyticsChartMetricOptions(panelKey);
+    const fallbackMetric = options[0]?.key || "value";
+    return {
+      metric: fallbackMetric,
+      type: "bar",
+      ...(this.state.analyticsChartSettings?.[panelKey] || {}),
+    };
+  }
+
+  setAnalyticsChartMetric(panelKey, ev) {
+    this.state.analyticsChartSettings = {
+      ...(this.state.analyticsChartSettings || {}),
+      [panelKey]: {
+        ...this.getAnalyticsChartSetting(panelKey),
+        metric: ev.target.value,
+      },
+    };
+    this.queueChartRender();
+  }
+
+  setAnalyticsChartType(panelKey, type) {
+    this.state.analyticsChartSettings = {
+      ...(this.state.analyticsChartSettings || {}),
+      [panelKey]: {
+        ...this.getAnalyticsChartSetting(panelKey),
+        type: type || "bar",
+      },
     };
     this.queueChartRender();
   }
@@ -2526,14 +2640,17 @@ class ZrnAnalyticsHubAction extends Component {
 
   async applyFinancialFilters() {
     await this.loadFinancialPayload(true);
+    this.closeFinancialFilters();
   }
 
   async applyOperationsFilters() {
     await this.loadOperationsPayload(true);
+    this.closeOperationsFilters();
   }
 
   async applyPdvFilters() {
     await this.loadPdvPayload(true);
+    this.closePdvFilters();
   }
 
   async applyCommercialFilters() {
@@ -2572,16 +2689,19 @@ class ZrnAnalyticsHubAction extends Component {
   async clearFinancialFilters() {
     this.state.financialFilters = cloneDefaultFilters();
     await this.loadFinancialPayload(true);
+    this.closeFinancialFilters();
   }
 
   async clearOperationsFilters() {
     this.state.operationsFilters = cloneOperationsDefaultFilters();
     await this.loadOperationsPayload(true);
+    this.closeOperationsFilters();
   }
 
   async clearPdvFilters() {
     this.state.pdvFilters = cloneDefaultFilters();
     await this.loadPdvPayload(true);
+    this.closePdvFilters();
   }
 
   async clearCommercialFilters() {
@@ -2887,7 +3007,9 @@ class ZrnAnalyticsHubAction extends Component {
   }
 
   openOperationsProduct(row) {
-    if (row?.id) {
+    if (row?.detail) {
+      this.openAnalyticsDetailModal(row.detail);
+    } else if (row?.id) {
       this.openRecordModal("product.product", row.id);
     } else if (row?.resId) {
       this.openRecordModal("product.product", row.resId);
@@ -3639,6 +3761,83 @@ class ZrnAnalyticsHubAction extends Component {
     );
   }
 
+  getAnalyticsChartMetricOptions(panelKey) {
+    const metricSets = {
+      financial_products: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "matched_revenue", label: "Rev. matcheado", format: "money" },
+        { key: "cost", label: "Costo", format: "money" },
+        { key: "margin", label: "Margen", format: "money" },
+        { key: "margin_pct", label: "Margen %", format: "percent" },
+        { key: "channel_count", label: "Canales", format: "count" },
+      ],
+      financial_channels: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "matched_revenue", label: "Rev. matcheado", format: "money" },
+        { key: "cost", label: "Costo", format: "money" },
+        { key: "margin", label: "Margen", format: "money" },
+        { key: "margin_pct", label: "Margen %", format: "percent" },
+        { key: "product_count", label: "Productos", format: "count" },
+      ],
+      financial_brands: [
+        { key: "revenue", label: "Ingreso", format: "money" },
+        { key: "matched_revenue", label: "Rev. matcheado", format: "money" },
+        { key: "cost", label: "Costo", format: "money" },
+        { key: "margin", label: "Margen", format: "money" },
+        { key: "margin_pct", label: "Margen %", format: "percent" },
+        { key: "product_count", label: "Productos", format: "count" },
+      ],
+      operations_top_skus: [
+        { key: "units", label: "Unidades", format: "count" },
+        { key: "revenue", label: "Revenue", format: "money" },
+      ],
+      operations_demanda: [
+        { key: "units_per_month", label: "Unid/mes", format: "count" },
+        { key: "units_per_day", label: "Unid/dia", format: "count" },
+        { key: "weekly_suggestion", label: "Semanal", format: "count" },
+        { key: "biweekly_suggestion", label: "Quincenal", format: "count" },
+      ],
+      operations_abc: [
+        { key: "units", label: "Unidades", format: "count" },
+        { key: "revenue", label: "Revenue", format: "money" },
+        { key: "days_active", label: "Dias activos", format: "count" },
+      ],
+      operations_trends: [
+        { key: "trend_pct", label: "Trend %", format: "percent" },
+        { key: "revenue", label: "Revenue", format: "money" },
+      ],
+      pdv_ranking: [
+        { key: "rev", label: "Revenue", format: "money" },
+        { key: "invoices", label: "Pedidos", format: "count" },
+        { key: "avg_ticket", label: "Ticket", format: "money" },
+        { key: "days_since_last", label: "Recencia", format: "count" },
+      ],
+    };
+    return metricSets[panelKey] || [{ key: "value", label: "Valor", format: "count" }];
+  }
+
+  getAnalyticsChartRows(panelKey) {
+    const rowSets = {
+      financial_products: (this.sortedFinancialProducts || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      financial_channels: (this.sortedFinancialChannels || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      financial_brands: (this.sortedFinancialBrands || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      operations_top_skus: (this.sortedOperationsTopSkus || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      operations_demanda: (this.sortedOperationsDemanda || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      operations_abc: (this.sortedOperationsAbc || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      operations_trends: (this.sortedOperationsTrends || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
+      pdv_ranking: (this.sortedPdvRanking || []).slice(0, 12).map((row) => ({ ...row, label: row.name_short || row.client_full })),
+    };
+    return rowSets[panelKey] || [];
+  }
+
+  getAnalyticsChartMetric(panelKey) {
+    const setting = this.getAnalyticsChartSetting(panelKey);
+    return (
+      this.getAnalyticsChartMetricOptions(panelKey).find((metric) => metric.key === setting.metric) ||
+      this.getAnalyticsChartMetricOptions(panelKey)[0]
+    );
+  }
+
   get hasFinancialRevenueSeries() {
     return Boolean((this.financialPayload.revenue_series || []).length);
   }
@@ -4073,6 +4272,7 @@ class ZrnAnalyticsHubAction extends Component {
         this.renderFinancialProductMarginPctChart();
         this.renderFinancialPortfolioUnitChart();
         this.renderFinancialPortfolioBrandChart();
+        this.renderAnalyticsPanelCharts();
       } catch (error) {
         console.error("ZRN financial chart error", error);
       }
@@ -4090,6 +4290,7 @@ class ZrnAnalyticsHubAction extends Component {
         this.renderOperationsInventoryBrandMixChart();
         this.renderOperationsPurchaseSpendChart();
         this.renderOperationsPurchaseSupplierChart();
+        this.renderAnalyticsPanelCharts();
       } catch (error) {
         console.error("ZRN operations chart error", error);
       }
@@ -4101,6 +4302,7 @@ class ZrnAnalyticsHubAction extends Component {
         this.renderPdvOverviewTopPdvChart();
         this.renderPdvChannelChart();
         this.renderPdvOtrosChannelsChart();
+        this.renderAnalyticsPanelCharts();
       } catch (error) {
         console.error("ZRN pdv chart error", error);
       }
@@ -4150,6 +4352,133 @@ class ZrnAnalyticsHubAction extends Component {
     chart.resize({ width, height });
     this._charts.set(themeKey, chart);
     return chart;
+  }
+
+  renderAnalyticsPanelCharts() {
+    const panelKeys = Object.keys(this.state.analyticsChartSettings || {});
+    panelKeys.forEach((panelKey) => {
+      if (this.getCommercialPanelView(panelKey) !== "chart") {
+        return;
+      }
+      const rows = this.getAnalyticsChartRows(panelKey);
+      if (!rows.length) {
+        return;
+      }
+      const chartKey = `analytics-panel-${panelKey}`;
+      const chart = this.getChart(chartKey);
+      if (!chart) {
+        return;
+      }
+      const setting = this.getAnalyticsChartSetting(panelKey);
+      const metric = this.getAnalyticsChartMetric(panelKey);
+      const chartType = setting.type || "bar";
+      const currencySymbol =
+        this.state.activeHub === "financial"
+          ? this.financialPayload.summary.currency_symbol
+          : this.state.activeHub === "pdv"
+            ? this.pdvPayload.summary.currency_symbol
+            : this.operationsPayload.summary.currency_symbol;
+      const formatValue = (value) => {
+        if (metric.format === "money") {
+          return `${currencySymbol} ${this.formatMoney(value)}`;
+        }
+        if (metric.format === "percent") {
+          return `${Number(value || 0).toFixed(1)}%`;
+        }
+        return this.formatCount(value);
+      };
+      const orderedRows = chartType === "bar" ? [...rows].reverse() : rows;
+      const values = orderedRows.map((row) => Number(row[metric.key] || 0));
+      const labels = orderedRows.map((row) => row.label || row.name || "");
+
+      if (chartType === "pie") {
+        chart.setOption({
+          animationDuration: 650,
+          color: ["#1f4e8c", "#2f65ad", "#78a7df", "#a9c7eb", "#d6e6f8", "#bd1730", "#0f766e"],
+          tooltip: {
+            trigger: "item",
+            formatter: ({ name, value, percent }) => `${name}<br/>${formatValue(value)}<br/>${percent}%`,
+          },
+          legend: {
+            orient: "vertical",
+            right: 0,
+            top: "middle",
+            textStyle: { color: "#5f6b7a", fontSize: 11 },
+          },
+          series: [{
+            type: "pie",
+            radius: ["46%", "72%"],
+            center: ["34%", "50%"],
+            itemStyle: { borderColor: "#ffffff", borderWidth: 2 },
+            label: { show: false },
+            data: orderedRows.map((row) => ({
+              name: row.label || row.name || "",
+              value: Number(row[metric.key] || 0),
+            })),
+          }],
+        }, true);
+        return;
+      }
+
+      chart.setOption({
+        animationDuration: 650,
+        grid: chartType === "line"
+          ? { top: 18, right: 20, bottom: 34, left: 36, containLabel: true }
+          : { top: 12, right: 16, bottom: 12, left: 180, containLabel: false },
+        tooltip: {
+          trigger: "axis",
+          axisPointer: { type: chartType === "bar" ? "shadow" : "line" },
+          valueFormatter: formatValue,
+        },
+        xAxis: chartType === "line"
+          ? {
+              type: "category",
+              data: labels,
+              axisTick: { show: false },
+              axisLine: { lineStyle: { color: "#d6deea" } },
+              axisLabel: { color: "#5f6b7a", fontSize: 11, interval: 0, rotate: labels.length > 6 ? 20 : 0 },
+            }
+          : {
+              type: "value",
+              splitLine: { lineStyle: { color: "#edf2f8" } },
+              axisLabel: {
+                color: "#5f6b7a",
+                fontSize: 11,
+                formatter: metric.format === "percent" ? (value) => `${value}%` : undefined,
+              },
+            },
+        yAxis: chartType === "line"
+          ? {
+              type: "value",
+              splitLine: { lineStyle: { color: "#edf2f8" } },
+              axisLabel: {
+                color: "#5f6b7a",
+                fontSize: 11,
+                formatter: metric.format === "percent" ? (value) => `${value}%` : undefined,
+              },
+            }
+          : {
+              type: "category",
+              data: labels,
+              axisTick: { show: false },
+              axisLine: { show: false },
+              axisLabel: { color: "#334155", fontSize: 11, width: 170, overflow: "truncate" },
+            },
+        series: [{
+          name: metric.label,
+          type: chartType,
+          smooth: chartType === "line" ? 0.2 : false,
+          symbolSize: chartType === "line" ? 7 : undefined,
+          data: values,
+          barWidth: chartType === "bar" ? 18 : undefined,
+          lineStyle: { color: "#bd1730", width: 3 },
+          itemStyle: {
+            color: "#bd1730",
+            borderRadius: chartType === "bar" ? [0, 6, 6, 0] : 0,
+          },
+        }],
+      }, true);
+    });
   }
 
   renderOverviewLineChart() {

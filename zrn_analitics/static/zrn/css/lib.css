@@ -2174,6 +2174,7 @@
 
 .zrn_analitics_commercial_summary_table th {
   border-bottom-color: rgba(116, 132, 157, 0.22);
+  background: var(--zrn-analitics-header-bg);
   color: var(--zrn-analitics-brand-700);
   font-size: 11px;
   font-weight: 700;
@@ -4046,6 +4047,7 @@
 .zrn_analitics_pdv_table {
   width: 100%;
   border-collapse: collapse;
+  background: var(--zrn-analitics-surface);
 }
 
 .zrn_analitics_pdv_table th,
@@ -4059,6 +4061,7 @@
 }
 
 .zrn_analitics_pdv_table th {
+  background: var(--zrn-analitics-header-bg);
   color: var(--zrn-analitics-brand-700);
   font-size: 11px;
   font-weight: 700;
@@ -5074,8 +5077,8 @@
 .zrn_analitics_financial_line_chart {
   min-height: 300px;
   padding: 14px;
-  border: 1px solid var(--zrn-analitics-line);
-  border-radius: 8px;
+  border: 1px solid rgba(116, 132, 157, 0.3);
+  border-radius: 4px;
   background: var(--zrn-analitics-surface-soft);
 }
 
@@ -5118,6 +5121,15 @@
   gap: 12px;
 }
 
+.zrn_analitics_financial_bar_list,
+.zrn_analitics_financial_donut_wrap,
+.zrn_analitics_financial_coverage_chart {
+  padding: 12px;
+  border: 1px solid rgba(116, 132, 157, 0.3);
+  border-radius: 4px;
+  background: var(--zrn-analitics-surface-soft);
+}
+
 .zrn_analitics_financial_bar_row {
   display: grid;
   grid-template-columns: minmax(120px, 180px) minmax(0, 1fr) auto;
@@ -5146,7 +5158,44 @@
 
 .zrn_analitics_financial_table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_financial_table_wrap {
+  padding: 12px;
+  border: 1px solid rgba(116, 132, 157, 0.3);
+  border-radius: 4px;
+  background: var(--zrn-analitics-surface-soft);
+  overflow: hidden;
+}
+
+.zrn_analitics_financial_table_wrap .o_list_table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_financial_table_wrap .o_list_table thead th {
+  background: var(--zrn-analitics-header-bg);
+  color: var(--zrn-analitics-brand-700);
+}
+
+.zrn_analitics_financial_table_wrap .o_list_table thead th:first-child {
+  border-top-left-radius: 4px;
+}
+
+.zrn_analitics_financial_table_wrap .o_list_table thead th:last-child {
+  border-top-right-radius: 4px;
+}
+
+.zrn_analitics_financial_table_wrap .o_list_table tbody td {
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_financial_table_wrap .o_list_table tbody tr:nth-child(even) td {
+  background: var(--zrn-analitics-table-row-alt);
 }
 
 .zrn_analitics_financial_table th,
@@ -5160,11 +5209,28 @@
 }
 
 .zrn_analitics_financial_table th {
+  background: var(--zrn-analitics-header-bg);
   color: var(--zrn-analitics-brand-700);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.zrn_analitics_financial_table th:first-child {
+  border-top-left-radius: 4px;
+}
+
+.zrn_analitics_financial_table th:last-child {
+  border-top-right-radius: 4px;
+}
+
+.zrn_analitics_financial_table td {
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_financial_table tbody tr:nth-child(even) td {
+  background: var(--zrn-analitics-table-row-alt);
 }
 
 .zrn_analitics_financial_table td strong {
@@ -5179,6 +5245,14 @@
 
 .zrn_analitics_financial_table_row_clickable {
   cursor: pointer;
+}
+
+.zrn_analitics_pdv_table td {
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_pdv_table tbody tr:nth-child(even) td {
+  background: var(--zrn-analitics-table-row-alt);
 }
 
 .zrn_analitics_financial_table_row_clickable:hover td {
@@ -5476,6 +5550,14 @@
 .zrn_analitics_financial_portfolio_brand_mix .zrn_analitics_financial_echart,
 .zrn_analitics_financial_coverage_chart .zrn_analitics_financial_echart {
   min-height: 280px;
+}
+
+.zrn_analitics_financial_portfolio_chart > .zrn_analitics_financial_echart,
+.zrn_analitics_financial_portfolio_brand_mix > .zrn_analitics_financial_echart {
+  padding: 14px;
+  border: 1px solid var(--zrn-analitics-line);
+  border-radius: 8px;
+  background: var(--zrn-analitics-surface-soft);
 }
 
 .zrn_analitics_financial_portfolio_chart_row {
@@ -6297,8 +6379,8 @@
 .zrn_analitics_operations_line_chart {
   min-height: 300px;
   padding: 14px;
-  border: 1px solid var(--zrn-analitics-line);
-  border-radius: 8px;
+  border: 1px solid rgba(116, 132, 157, 0.3);
+  border-radius: 4px;
   background: var(--zrn-analitics-surface-soft);
 }
 
@@ -6324,7 +6406,7 @@
   justify-content: center;
   min-height: 220px;
   border: 1px dashed var(--zrn-analitics-line);
-  border-radius: 8px;
+  border-radius: 4px;
   color: var(--zrn-analitics-text-soft);
   font-size: 13px;
   text-align: center;
@@ -6338,6 +6420,50 @@
 .zrn_analitics_operations_coverage_universe_group {
   display: grid;
   gap: 12px;
+}
+
+.zrn_analitics_operations_donut_wrap,
+.zrn_analitics_operations_bar_list,
+.zrn_analitics_operations_table_wrap,
+.zrn_analitics_operations_portfolio_table_wrap {
+  padding: 12px;
+  border: 1px solid rgba(116, 132, 157, 0.3);
+  border-radius: 4px;
+  background: var(--zrn-analitics-surface-soft);
+  overflow: hidden;
+}
+
+.zrn_analitics_operations_table_wrap .o_list_table,
+.zrn_analitics_operations_portfolio_table_wrap .o_list_table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_operations_table_wrap .o_list_table thead th,
+.zrn_analitics_operations_portfolio_table_wrap .o_list_table thead th {
+  background: var(--zrn-analitics-header-bg);
+  color: var(--zrn-analitics-brand-700);
+}
+
+.zrn_analitics_operations_table_wrap .o_list_table thead th:first-child,
+.zrn_analitics_operations_portfolio_table_wrap .o_list_table thead th:first-child {
+  border-top-left-radius: 4px;
+}
+
+.zrn_analitics_operations_table_wrap .o_list_table thead th:last-child,
+.zrn_analitics_operations_portfolio_table_wrap .o_list_table thead th:last-child {
+  border-top-right-radius: 4px;
+}
+
+.zrn_analitics_operations_table_wrap .o_list_table tbody td,
+.zrn_analitics_operations_portfolio_table_wrap .o_list_table tbody td {
+  background: var(--zrn-analitics-surface);
+}
+
+.zrn_analitics_operations_table_wrap .o_list_table tbody tr:nth-child(even) td,
+.zrn_analitics_operations_portfolio_table_wrap .o_list_table tbody tr:nth-child(even) td {
+  background: var(--zrn-analitics-table-row-alt);
 }
 
 .zrn_analitics_operations_channel_filters,

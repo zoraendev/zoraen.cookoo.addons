@@ -6,6 +6,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Tendencias</span>
                                         <span>Variacion del ritmo reciente</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-trends', filename: 'zrn_operaciones_tendencias' })" aria-label="Exportar tendencias"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_bar_list">
                                         <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-trends"/>
@@ -15,6 +16,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Sin venta reciente</span>
                                         <span>Mas de 14 dias sin movimiento</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_sin_venta_reciente' })" aria-label="Exportar sin venta reciente"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -42,7 +44,19 @@
                                 <div class="zrn_analitics_operations_panel_head">
                                     <span>Detalle de tendencia</span>
                                     <span>Click para abrir producto</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_trends', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('operations_trends')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-operations_trends', filename: 'zrn_operaciones_detalle_tendencia' })" aria-label="Exportar detalle de tendencia"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_trends', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
+                                <t t-if="getCommercialPanelView('operations_trends') === 'chart'">
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="analytics-panel-operations_trends"/>
+                                    </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('operations_trends') === 'table'">
                                 <div class="zrn_analitics_operations_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">
                                         <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
@@ -67,6 +81,7 @@
                                         </table>
                                     </div>
                                 </div>
+                                </t>
                             </section>
                         </t>
 

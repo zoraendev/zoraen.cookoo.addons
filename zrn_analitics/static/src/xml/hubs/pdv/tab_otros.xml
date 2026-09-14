@@ -6,6 +6,7 @@
                                     <div class="zrn_analitics_pdv_panel_head">
                                         <span>Cadenas adicionales</span>
                                         <span>Revenue por canal</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-otros-channels', filename: 'zrn_pdv_cadenas_adicionales' })" aria-label="Exportar cadenas adicionales"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_pdv_chart_wrap">
                                         <t t-if="pdvPayload.otros.channels.length and hasEchartsLibrary">
@@ -46,6 +47,7 @@
                                 <div class="zrn_analitics_pdv_panel_head">
                                     <span>Detalle de PDVs</span>
                                     <span>Click para drill-down</span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_pdv_detalle_otras_cadenas' })" aria-label="Exportar detalle de PDVs"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_pdv_table_wrap">
                                     <table class="zrn_analitics_pdv_table">

@@ -1,37 +1,25 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve">
   <t t-name="zrn_analitics.HubOperationsTabCompras"><t t-if="state.operationsTab === 'compras'">
-                            <div class="zrn_analitics_operations_stats">
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Ordenes abiertas</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.purchases.summary.open_orders)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Monto abierto</span>
-                                    <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.purchases.summary.open_amount)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Spend periodo</span>
-                                    <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.purchases.summary.period_spend)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Lead time</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.purchases.summary.avg_lead_time_days)"/> d</strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Lineas atrasadas</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.purchases.summary.late_lines)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Concentracion top</span>
-                                    <strong><t t-esc="formatPercent(operationsPayload.purchases.summary.supplier_concentration_pct)"/></strong>
-                                </div>
+                            <div class="zrn_analitics_commercial_summary_table_wrap">
+                                <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                    <thead><tr><th>Ordenes abiertas</th><th>Monto abierto</th><th>Spend periodo</th><th>Lead time</th><th>Lineas atrasadas</th><th>Concentracion top</th></tr></thead>
+                                    <tbody><tr>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.purchases.summary.open_orders)"/></strong></td>
+                                        <td><strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.purchases.summary.open_amount)"/></strong></td>
+                                        <td><strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.purchases.summary.period_spend)"/></strong></td>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.purchases.summary.avg_lead_time_days)"/> d</strong></td>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.purchases.summary.late_lines)"/></strong></td>
+                                        <td><strong><t t-esc="formatPercent(operationsPayload.purchases.summary.supplier_concentration_pct)"/></strong></td>
+                                    </tr></tbody>
+                                </table>
                             </div>
                             <div class="zrn_analitics_operations_top_row">
                                 <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_main">
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Spend mensual</span>
                                         <span>Evolucion del gasto</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-purchases-spend', filename: 'zrn_operaciones_compras_spend_mensual' })" aria-label="Exportar spend mensual"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_line_chart">
                                         <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-purchases-spend"/>
@@ -41,6 +29,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Top proveedores</span>
                                         <span>Spend del periodo</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-purchases-suppliers', filename: 'zrn_operaciones_compras_top_proveedores' })" aria-label="Exportar top proveedores"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_bar_list">
                                         <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-purchases-suppliers"/>
@@ -52,6 +41,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Proveedores</span>
                                         <span>Click para abrir proveedor</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_compras_proveedores' })" aria-label="Exportar proveedores"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -82,6 +72,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Ordenes abiertas</span>
                                         <span>Click para abrir OC</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_compras_ordenes_abiertas' })" aria-label="Exportar órdenes abiertas"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -111,6 +102,7 @@
                                 <div class="zrn_analitics_operations_panel_head">
                                     <span>Backlog por SKU</span>
                                     <span>Lineas pendientes de recibir</span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_compras_backlog_sku' })" aria-label="Exportar backlog por SKU"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_operations_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">

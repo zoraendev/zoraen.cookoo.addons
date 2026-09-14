@@ -6,8 +6,13 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Demanda mensual</span>
                                         <span>Unidades proyectadas por mes</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_overview_monthly', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-overview-monthly', filename: 'zrn_operaciones_demanda_mensual' })" aria-label="Exportar demanda mensual"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_overview_monthly', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_operations_line_chart">
+                                    <div t-if="getCommercialPanelView('operations_overview_monthly') === 'chart'" class="zrn_analitics_operations_line_chart">
                                         <t t-if="hasOperationsMonthlySeries and hasEchartsLibrary">
                                             <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-overview-monthly"/>
                                         </t>
@@ -15,20 +20,63 @@
                                             <div class="zrn_analitics_operations_chart_empty">Sin demanda mensual para graficar.</div>
                                         </t>
                                     </div>
+                                    <div t-if="getCommercialPanelView('operations_overview_monthly') === 'table'" class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mes</th>
+                                                        <th class="text-end">Unidades</th>
+                                                        <th class="text-end">Proyectado</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="operationsPayload.monthly_demand_series" t-as="row" t-key="row.label">
+                                                        <td><strong><t t-esc="row.label"/></strong></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.units || 0)"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.projected_units || row.units || 0)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </section>
 
                                 <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_side">
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Mix por marca</span>
                                         <span>Participacion de unidades</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_brand_mix', 'chart')" aria-label="Ver grafica"><i class="fa fa-pie-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-overview-brand-mix', filename: 'zrn_operaciones_mix_marca' })" aria-label="Exportar mix por marca"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_brand_mix', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_operations_donut_wrap">
+                                    <div t-if="getCommercialPanelView('operations_brand_mix') === 'chart'" class="zrn_analitics_operations_donut_wrap">
                                         <t t-if="hasOperationsBrandMix and hasEchartsLibrary">
                                             <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_donut" data-zrn-chart="operations-overview-brand-mix"/>
                                         </t>
                                         <t t-else="">
                                             <div class="zrn_analitics_operations_chart_empty">Sin mix por marca para mostrar.</div>
                                         </t>
+                                    </div>
+                                    <div t-if="getCommercialPanelView('operations_brand_mix') === 'table'" class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Marca</th>
+                                                        <th class="text-end">Unidades</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="operationsPayload.brand_units_mix" t-as="row" t-key="row.name">
+                                                        <td><strong><t t-esc="row.name"/></strong></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.value || 0)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </section>
                             </div>
@@ -38,6 +86,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Distribucion ABC</span>
                                         <span>SKUs por clase</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-overview-abc', filename: 'zrn_operaciones_distribucion_abc' })" aria-label="Exportar distribución ABC"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_bar_list">
                                         <t t-if="hasEchartsLibrary">
@@ -53,6 +102,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Distribucion de rotacion</span>
                                         <span>Frecuencia de venta</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-overview-rotation', filename: 'zrn_operaciones_distribucion_rotacion' })" aria-label="Exportar distribución de rotación"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_bar_list">
                                         <t t-if="hasEchartsLibrary">
@@ -69,7 +119,19 @@
                                 <div class="zrn_analitics_operations_panel_head">
                                     <span>Top SKUs</span>
                                     <span>Ordenado por unidades vendidas</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_top_skus', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('operations_top_skus')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-operations_top_skus', filename: 'zrn_operaciones_top_skus' })" aria-label="Exportar top SKUs"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_top_skus', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
+                                <t t-if="getCommercialPanelView('operations_top_skus') === 'chart'">
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="analytics-panel-operations_top_skus"/>
+                                    </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('operations_top_skus') === 'table'">
                                 <div class="zrn_analitics_operations_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">
                                         <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
@@ -96,6 +158,7 @@
                                         </table>
                                     </div>
                                 </div>
+                                </t>
                             </section>
                         </t>
 

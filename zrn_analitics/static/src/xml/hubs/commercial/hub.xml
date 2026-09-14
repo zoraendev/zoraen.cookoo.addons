@@ -333,16 +333,6 @@
                 </div>
             </t>
 
-            <t t-if="state.commercialExportMenu">
-                <div class="zrn_analitics_commercial_export_backdrop" t-on-click="closeCommercialExportMenu"/>
-                <div class="zrn_analitics_commercial_export_menu" t-att-style="'left: ' + state.commercialExportMenu.left + 'px; top: ' + state.commercialExportMenu.top + 'px;'" role="menu">
-                    <div class="zrn_analitics_commercial_export_menu_title">Exportar como</div>
-                    <button t-foreach="state.commercialExportMenu.options" t-as="option" t-key="option.key" type="button" class="btn zrn_analitics_commercial_export_menu_item" t-on-click="() =&gt; this.selectCommercialExportFormat(option.key)" role="menuitem">
-                        <i t-att-class="'fa ' + option.icon"/>
-                        <span><t t-esc="option.label"/></span>
-                    </button>
-                </div>
-            </t>
         </div>
     </t>
 </templates>

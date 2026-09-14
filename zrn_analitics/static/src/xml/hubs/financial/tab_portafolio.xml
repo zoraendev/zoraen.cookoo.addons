@@ -1,27 +1,15 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve">
-  <t t-name="zrn_analitics.HubFinancialTabPortafolio"><t t-if="state.financialTab === 'portafolio'">
+                        <t t-name="zrn_analitics.HubFinancialTabPortafolio"><t t-if="state.financialTab === 'portafolio'">
                             <div class="zrn_analitics_financial_portfolio">
-                                <div class="zrn_analitics_financial_portfolio_note">
-                                    <strong>Portafolio financiero por unidad</strong>
-                                    <span>Lectura jerárquica UN → Marca → Línea → SKU usando el catálogo actual de Odoo y (ZRN) Manejo Comercial.</span>
-                                </div>
-
-                                <div class="zrn_analitics_financial_portfolio_cards">
-                                    <t t-foreach="financialPortfolio.units || []" t-as="unit" t-key="unit.key">
-                                        <button type="button" class="btn zrn_analitics_financial_portfolio_card" t-att-class="state.selectedFinancialUnit === unit.key ? 'is-active' : ''" t-on-click="() =&gt; this.selectFinancialUnit(unit.key)">
-                                            <span class="zrn_analitics_financial_portfolio_card_name"><t t-esc="unit.name"/></span>
-                                            <strong class="zrn_analitics_financial_portfolio_card_value"><t t-esc="financialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(unit.margin)"/></strong>
-                                            <span class="zrn_analitics_financial_portfolio_card_meta"><t t-esc="formatPercent(unit.margin_pct)"/> margen</span>
-                                        </button>
-                                    </t>
-                                </div>
-
                                 <div class="zrn_analitics_financial_portfolio_top">
                                     <section class="zrn_analitics_hub_panel zrn_analitics_financial_portfolio_chart">
                                         <div class="zrn_analitics_financial_panel_head">
                                             <span>Margen por unidad</span>
                                             <span>Vista consolidada</span>
+                                            <div class="zrn_analitics_commercial_panel_actions">
+                                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-portfolio-units', filename: 'zrn_financiero_portafolio_unidades' })" aria-label="Exportar margen por unidad"><i class="fa fa-download"/></button>
+                                            </div>
                                         </div>
                                         <div class="zrn_analitics_financial_echart" data-zrn-chart="financial-portfolio-units"/>
                                     </section>
@@ -30,6 +18,9 @@
                                         <div class="zrn_analitics_financial_panel_head">
                                             <span>Margen % por marca</span>
                                             <span>Unidad activa</span>
+                                            <div class="zrn_analitics_commercial_panel_actions">
+                                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-portfolio-brands', filename: 'zrn_financiero_portafolio_marcas' })" aria-label="Exportar margen por marca"><i class="fa fa-download"/></button>
+                                            </div>
                                         </div>
                                         <div class="zrn_analitics_financial_echart" data-zrn-chart="financial-portfolio-brands"/>
                                     </section>
@@ -39,6 +30,9 @@
                                     <div class="zrn_analitics_financial_panel_head">
                                         <span>Drill financiero</span>
                                         <span>Expande para ver marcas, líneas y productos</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_financiero_drill_portafolio' })" aria-label="Exportar drill financiero"><i class="fa fa-download"/></button>
+                                        </div>
                                     </div>
                                     <div class="zrn_analitics_financial_portfolio_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">

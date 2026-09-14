@@ -1,29 +1,32 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve">
   <t t-name="zrn_analitics.HubPdvTabAlertas"><t t-if="state.pdvTab === 'alertas'">
-                            <div class="zrn_analitics_pdv_stats zrn_analitics_pdv_stats_alerts">
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Dormantes</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.dormant_count)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Nuevos</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.new_count)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Low sell-through</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.low_st_count)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Total alertas</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.alert_count)"/></strong>
-                                </div>
+                            <div class="zrn_analitics_commercial_summary_table_wrap">
+                                <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Dormantes</th>
+                                            <th>Nuevos</th>
+                                            <th>Low sell-through</th>
+                                            <th>Total alertas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.dormant_count)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.new_count)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.low_st_count)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.alert_count)"/></strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
 
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_pdv_panel_head">
                                     <span>Alertas por PDV</span>
                                     <span>Click para drill-down</span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_pdv_alertas' })" aria-label="Exportar alertas por PDV"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_pdv_table_wrap">
                                     <table class="zrn_analitics_pdv_table">

@@ -6,6 +6,9 @@
                                     <div class="zrn_analitics_financial_panel_head">
                                         <span>Margen por marca</span>
                                         <span>Comparativo del periodo</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-brand-detail', filename: 'zrn_financiero_margen_marca_detalle' })" aria-label="Exportar margen por marca"><i class="fa fa-download"/></button>
+                                        </div>
                                     </div>
                                     <div class="zrn_analitics_financial_bar_list">
                                         <t t-if="sortedFinancialBrands.length &amp;&amp; hasEchartsLibrary">
@@ -22,7 +25,19 @@
                                 <div class="zrn_analitics_financial_panel_head">
                                     <span>Comparativo por marca</span>
                                     <span>Click en la fila para abrir detalle</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brands', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_brands')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_brands', filename: 'zrn_financiero_comparativo_marcas' })" aria-label="Exportar comparativo por marca"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brands', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
+                                <t t-if="getCommercialPanelView('financial_brands') === 'chart'">
+                                    <div class="zrn_analitics_financial_bar_list">
+                                        <div class="zrn_analitics_financial_echart zrn_analitics_financial_echart_bar" data-zrn-chart="analytics-panel-financial_brands"/>
+                                    </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('financial_brands') === 'table'">
                                 <div class="zrn_analitics_financial_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">
                                         <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
@@ -53,6 +68,7 @@
                                         </table>
                                     </div>
                                 </div>
+                                </t>
                             </section>
                         </t>
 

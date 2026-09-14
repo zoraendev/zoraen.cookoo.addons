@@ -82,6 +82,50 @@
                 <t t-if="activeHub.key === 'pdv'" t-call="zrn_analitics.HubPdv"/>
                 <t t-if="activeHub.key === 'rrhh'" t-call="zrn_analitics.HubRrhh"/>
             </div>
+
+            <t t-if="state.analyticsChartConfigOpen">
+                <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeAnalyticsChartConfig"/>
+                <div class="modal fade show d-block zrn_analitics_commercial_modal_shell" tabindex="-1" role="dialog">
+                    <div class="modal-dialog modal-dialog-centered" role="document" t-on-click.stop="">
+                        <div class="modal-content zrn_analitics_commercial_modal">
+                            <div class="zrn_analitics_commercial_modal_head">
+                                <strong>Configurar gráfica</strong>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="closeAnalyticsChartConfig" aria-label="Cerrar">
+                                    <i class="fa fa-times"/>
+                                </button>
+                            </div>
+                            <div class="zrn_analitics_commercial_modal_body">
+                                <label class="form-label">Métrica</label>
+                                <select class="form-select" t-att-value="getAnalyticsChartSetting(state.analyticsChartConfigOpen).metric" t-on-change="(ev) =&gt; this.setAnalyticsChartMetric(state.analyticsChartConfigOpen, ev)">
+                                    <t t-foreach="getAnalyticsChartMetricOptions(state.analyticsChartConfigOpen)" t-as="metric" t-key="metric.key">
+                                        <option t-att-value="metric.key"><t t-esc="metric.label"/></option>
+                                    </t>
+                                </select>
+                                <label class="form-label mt-3">Tipo de gráfica</label>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-outline-secondary" t-att-class="getAnalyticsChartSetting(state.analyticsChartConfigOpen).type === 'bar' ? 'active' : ''" t-on-click="() =&gt; this.setAnalyticsChartType(state.analyticsChartConfigOpen, 'bar')">Barras</button>
+                                    <button type="button" class="btn btn-outline-secondary" t-att-class="getAnalyticsChartSetting(state.analyticsChartConfigOpen).type === 'line' ? 'active' : ''" t-on-click="() =&gt; this.setAnalyticsChartType(state.analyticsChartConfigOpen, 'line')">Línea</button>
+                                    <button type="button" class="btn btn-outline-secondary" t-att-class="getAnalyticsChartSetting(state.analyticsChartConfigOpen).type === 'pie' ? 'active' : ''" t-on-click="() =&gt; this.setAnalyticsChartType(state.analyticsChartConfigOpen, 'pie')">Circular</button>
+                                </div>
+                            </div>
+                            <div class="zrn_analitics_commercial_modal_footer">
+                                <button type="button" class="btn btn-primary" t-on-click="closeAnalyticsChartConfig">Aplicar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+
+            <t t-if="state.commercialExportMenu">
+                <div class="zrn_analitics_commercial_export_backdrop" t-on-click="closeCommercialExportMenu"/>
+                <div class="zrn_analitics_commercial_export_menu" t-att-style="'left: ' + state.commercialExportMenu.left + 'px; top: ' + state.commercialExportMenu.top + 'px;'" role="menu">
+                    <div class="zrn_analitics_commercial_export_menu_title">Exportar como</div>
+                    <button t-foreach="state.commercialExportMenu.options" t-as="option" t-key="option.key" type="button" class="btn zrn_analitics_commercial_export_menu_item" t-on-click="() =&gt; this.selectCommercialExportFormat(option.key)" role="menuitem">
+                        <i t-att-class="'fa ' + option.icon"/>
+                        <span><t t-esc="option.label"/></span>
+                    </button>
+                </div>
+            </t>
         </div>
     </t>
 </templates>

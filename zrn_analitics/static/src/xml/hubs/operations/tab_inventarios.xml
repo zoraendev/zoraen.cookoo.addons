@@ -1,37 +1,25 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve">
   <t t-name="zrn_analitics.HubOperationsTabInventarios"><t t-if="state.operationsTab === 'inventarios'">
-                            <div class="zrn_analitics_operations_stats">
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>On hand</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.on_hand_units)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Disponible</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.available_units)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Reservado</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.reserved_units)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Valor inventario</span>
-                                    <strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.inventory.summary.inventory_value)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Riesgo</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.risk_count)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_operations_stat_box">
-                                    <span>Cobertura promedio</span>
-                                    <strong><t t-esc="formatCount(operationsPayload.inventory.summary.avg_coverage_days)"/> d</strong>
-                                </div>
+                            <div class="zrn_analitics_commercial_summary_table_wrap">
+                                <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                    <thead><tr><th>On hand</th><th>Disponible</th><th>Reservado</th><th>Valor inventario</th><th>Riesgo</th><th>Cobertura promedio</th></tr></thead>
+                                    <tbody><tr>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.inventory.summary.on_hand_units)"/></strong></td>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.inventory.summary.available_units)"/></strong></td>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.inventory.summary.reserved_units)"/></strong></td>
+                                        <td><strong><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(operationsPayload.inventory.summary.inventory_value)"/></strong></td>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.inventory.summary.risk_count)"/></strong></td>
+                                        <td><strong><t t-esc="formatCount(operationsPayload.inventory.summary.avg_coverage_days)"/> d</strong></td>
+                                    </tr></tbody>
+                                </table>
                             </div>
                             <div class="zrn_analitics_operations_top_row">
                                 <section class="zrn_analitics_hub_panel">
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Cobertura</span>
                                         <span>Distribucion de SKUs</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-inventory-coverage', filename: 'zrn_operaciones_inventario_cobertura' })" aria-label="Exportar cobertura de inventario"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_bar_list">
                                         <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-inventory-coverage"/>
@@ -41,6 +29,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Mix por marca</span>
                                         <span>On hand por marca</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-inventory-brand-mix', filename: 'zrn_operaciones_inventario_mix_marca' })" aria-label="Exportar mix de inventario por marca"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_donut_wrap">
                                         <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_donut" data-zrn-chart="operations-inventory-brand-mix"/>
@@ -52,6 +41,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Riesgo de quiebre</span>
                                         <span>Click para abrir producto</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_inventario_riesgo_quiebre' })" aria-label="Exportar riesgo de quiebre"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -84,6 +74,7 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Sobrestock</span>
                                         <span>Por encima del maximo</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_inventario_sobrestock' })" aria-label="Exportar sobrestock"><i class="fa fa-download"/></button>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -115,6 +106,7 @@
                                 <div class="zrn_analitics_operations_panel_head">
                                     <span>Baja rotacion con stock</span>
                                     <span>Inventario inmovilizado</span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_inventario_baja_rotacion' })" aria-label="Exportar baja rotación con stock"><i class="fa fa-download"/></button>
                                 </div>
                                 <div class="zrn_analitics_operations_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">

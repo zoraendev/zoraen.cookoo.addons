@@ -1,27 +1,27 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve">
   <t t-name="zrn_analitics.HubPdvTabOverview"><t t-if="state.pdvTab === 'overview'">
-                            <div class="zrn_analitics_pdv_stats">
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Revenue YTD</span>
-                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pdvPayload.summary.total_revenue)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>PDVs activos</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.total_pdvs)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>Ticket promedio</span>
-                                    <strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pdvPayload.summary.avg_ticket)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>PDVs nuevos</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.new_count)"/></strong>
-                                </div>
-                                <div class="zrn_analitics_pdv_stat_box">
-                                    <span>PDVs con alertas</span>
-                                    <strong><t t-esc="formatCount(pdvPayload.summary.alert_count)"/></strong>
-                                </div>
+                            <div class="zrn_analitics_commercial_summary_table_wrap">
+                                <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Revenue YTD</th>
+                                            <th>PDVs activos</th>
+                                            <th>Ticket promedio</th>
+                                            <th>PDVs nuevos</th>
+                                            <th>PDVs con alertas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pdvPayload.summary.total_revenue)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.total_pdvs)"/></strong></td>
+                                            <td><strong><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(pdvPayload.summary.avg_ticket)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.new_count)"/></strong></td>
+                                            <td><strong><t t-esc="formatCount(pdvPayload.summary.alert_count)"/></strong></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
 
                             <div class="zrn_analitics_pdv_grid_top">
@@ -29,8 +29,13 @@
                                     <div class="zrn_analitics_pdv_panel_head">
                                         <span>Revenue por mes</span>
                                         <span>Venta filtrada por PDV</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_revenue', 'chart')" aria-label="Ver grafica"><i class="fa fa-line-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-overview-revenue', filename: 'zrn_pdv_revenue_mes' })" aria-label="Exportar revenue por mes"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_revenue', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                    <div t-if="getCommercialPanelView('pdv_overview_revenue') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
                                         <t t-if="pdvPayload.revenue_series.length and hasEchartsLibrary">
                                             <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-overview-revenue"/>
                                         </t>
@@ -41,14 +46,35 @@
                                             <div class="zrn_analitics_pdv_chart_empty">Sin revenue para graficar.</div>
                                         </t>
                                     </div>
+                                    <div t-if="getCommercialPanelView('pdv_overview_revenue') === 'table'" class="zrn_analitics_pdv_table_wrap">
+                                        <table class="zrn_analitics_pdv_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Mes</th>
+                                                    <th class="text-end">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="pdvPayload.revenue_series" t-as="row" t-key="row.label">
+                                                    <td><strong><t t-esc="row.label"/></strong></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.value || 0)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </section>
 
                                 <section class="zrn_analitics_hub_panel">
                                     <div class="zrn_analitics_pdv_panel_head">
                                         <span>Cobertura por canal</span>
                                         <span>PDVs activos vs red total</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_coverage', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-overview-coverage', filename: 'zrn_pdv_cobertura_canal' })" aria-label="Exportar cobertura por canal"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_coverage', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                    <div t-if="getCommercialPanelView('pdv_overview_coverage') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
                                         <t t-if="pdvPayload.channel_coverage.length and hasEchartsLibrary">
                                             <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-overview-coverage"/>
                                         </t>
@@ -59,6 +85,24 @@
                                             <div class="zrn_analitics_pdv_chart_empty">Sin cobertura para mostrar.</div>
                                         </t>
                                     </div>
+                                    <div t-if="getCommercialPanelView('pdv_overview_coverage') === 'table'" class="zrn_analitics_pdv_table_wrap">
+                                        <table class="zrn_analitics_pdv_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Canal</th>
+                                                    <th class="text-end">Activos</th>
+                                                    <th class="text-end">Red total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="pdvPayload.channel_coverage" t-as="row" t-key="row.channel">
+                                                    <td><strong><t t-esc="row.channel"/></strong></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.active || 0)"/></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.network_total || 0)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </section>
                             </div>
 
@@ -67,8 +111,13 @@
                                     <div class="zrn_analitics_pdv_panel_head">
                                         <span>Top PDVs</span>
                                         <span>Revenue acumulado</span>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_top', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-overview-top', filename: 'zrn_pdv_top_pdvs' })" aria-label="Exportar top PDVs"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_top', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                    <div t-if="getCommercialPanelView('pdv_overview_top') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
                                         <t t-if="pdvPayload.top_pdvs.length and hasEchartsLibrary">
                                             <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-overview-top"/>
                                         </t>
@@ -78,6 +127,22 @@
                                         <t t-else="">
                                             <div class="zrn_analitics_pdv_chart_empty">Sin PDVs para mostrar.</div>
                                         </t>
+                                    </div>
+                                    <div t-if="getCommercialPanelView('pdv_overview_top') === 'table'" class="zrn_analitics_pdv_table_wrap">
+                                        <table class="zrn_analitics_pdv_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>PDV</th>
+                                                    <th class="text-end">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="pdvPayload.top_pdvs" t-as="row" t-key="row.partner_id || row.name_short">
+                                                    <td><strong><t t-esc="row.name_short"/></strong></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.rev || 0)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </section>
 

@@ -5,7 +5,19 @@
                                 <div class="zrn_analitics_operations_panel_head">
                                     <span>Plan de produccion sugerido</span>
                                     <span>Lotes base desde demanda promedio</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_demanda', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('operations_demanda')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-operations_demanda', filename: 'zrn_operaciones_plan_produccion' })" aria-label="Exportar plan de producción"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_demanda', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
+                                <t t-if="getCommercialPanelView('operations_demanda') === 'chart'">
+                                    <div class="zrn_analitics_operations_bar_list">
+                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="analytics-panel-operations_demanda"/>
+                                    </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('operations_demanda') === 'table'">
                                 <div class="zrn_analitics_operations_table_wrap">
                                     <div class="o_list_renderer o_list_view table-responsive">
                                         <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
@@ -36,6 +48,7 @@
                                         </table>
                                     </div>
                                 </div>
+                                </t>
                             </section>
                         </t>
 

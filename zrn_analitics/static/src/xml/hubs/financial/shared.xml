@@ -1,45 +1,68 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve"><t t-name="zrn_analitics.HubFinancialFilters">
-        <section class="zrn_analitics_hub_panel">
-            <div class="zrn_analitics_financial_panel_head">
-                <span>Filtros financieros</span>
-                <span>Revenue, costo teórico y margen por corte comercial</span>
+        <div class="zrn_analitics_hub_toolbar zrn_analitics_commercial_toolbar">
+            <div class="zrn_analitics_hub_context zrn_analitics_commercial_context">
+                <strong><t t-esc="activeFinancialTab.label"/></strong>
+                <span><t t-esc="financialPayload.summary.period_label"/></span>
             </div>
-            <div class="zrn_analitics_financial_channel_filters">
-                <div class="zrn_analitics_financial_field">
-                    <label>Desde</label>
-                    <input type="date" class="form-control" t-att-value="state.financialFilters.date_from" t-on-input="(ev) =&gt; this.onFinancialDateFromInput(ev)"/>
-                </div>
-                <div class="zrn_analitics_financial_field">
-                    <label>Hasta</label>
-                    <input type="date" class="form-control" t-att-value="state.financialFilters.date_to" t-on-input="(ev) =&gt; this.onFinancialDateToInput(ev)"/>
-                </div>
-                <div class="zrn_analitics_financial_field">
-                    <label>Marca</label>
-                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.brands, state.financialFilters.brand_ids)" domain="getOptionDomain(financialPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onFinancialBrandsChange"/>
-                </div>
-                <div class="zrn_analitics_financial_field">
-                    <label>Categoria</label>
-                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.categories, state.financialFilters.category_ids)" domain="getOptionDomain(financialPayload.filter_options.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onFinancialCategoriesChange"/>
-                </div>
-                <div class="zrn_analitics_financial_field">
-                    <label>Canal</label>
-                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.channels, state.financialFilters.channel_ids)" domain="getOptionDomain(financialPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onFinancialChannelsChange"/>
-                </div>
-                <div class="zrn_analitics_financial_field zrn_analitics_financial_field_search">
-                    <label>Buscar</label>
-                    <input type="text" class="form-control" placeholder="Producto, canal, marca o codigo" t-att-value="state.financialFilters.search" t-on-input="(ev) =&gt; this.updateFinancialFilter('search', ev.target.value)" t-on-keydown="onFinancialSearchKeydown"/>
+            <div class="zrn_analitics_hub_search zrn_analitics_commercial_search">
+                <input type="text" class="form-control" placeholder="Producto, canal, marca o codigo" t-att-value="state.financialFilters.search" t-on-input="(ev) =&gt; this.updateFinancialFilter('search', ev.target.value)" t-on-keydown="this.onFinancialSearchKeydown"/>
+                <button t-if="state.financialFilters.search" type="button" class="btn zrn_analitics_commercial_search_clear" t-on-click="() =&gt; this.updateFinancialFilter('search', '')" aria-label="Limpiar busqueda">
+                    <i class="fa fa-times"/>
+                </button>
+                <button type="button" class="btn btn-primary zrn_analitics_commercial_search_btn" t-on-click="this.applyFinancialFilters" aria-label="Buscar">
+                    <i class="fa fa-search"/>
+                </button>
+            </div>
+            <button type="button" class="btn zrn_analitics_commercial_filter_btn zrn_analitics_commercial_filter_btn_icon" t-on-click="toggleFinancialFilters" aria-label="Abrir filtros financieros">
+                <i class="fa fa-sliders"/>
+            </button>
+        </div>
+
+        <t t-if="state.financialFiltersOpen">
+            <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeFinancialFilters"/>
+            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell zrn_analitics_filters_modal_shell" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                    <div class="modal-content zrn_analitics_commercial_filters_modal" t-on-click.stop="() =&gt; {}">
+                        <div class="modal-header">
+                            <div>
+                                <h5 class="modal-title">Filtros financieros</h5>
+                                <div class="zrn_analitics_commercial_filters_scope"><t t-esc="activeFinancialTab.label"/></div>
+                            </div>
+                            <button type="button" class="btn-close" aria-label="Cerrar" t-on-click="closeFinancialFilters"/>
+                        </div>
+                        <div class="modal-body">
+                            <div class="zrn_analitics_financial_channel_filters zrn_analitics_commercial_filters_grid">
+                                <div class="zrn_analitics_financial_field">
+                                    <label>Desde</label>
+                                    <input type="date" class="form-control" t-att-value="state.financialFilters.date_from" t-on-input="(ev) =&gt; this.onFinancialDateFromInput(ev)"/>
+                                </div>
+                                <div class="zrn_analitics_financial_field">
+                                    <label>Hasta</label>
+                                    <input type="date" class="form-control" t-att-value="state.financialFilters.date_to" t-on-input="(ev) =&gt; this.onFinancialDateToInput(ev)"/>
+                                </div>
+                                <div class="zrn_analitics_financial_field">
+                                    <label>Marca</label>
+                                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.brands, state.financialFilters.brand_ids)" domain="getOptionDomain(financialPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onFinancialBrandsChange"/>
+                                </div>
+                                <div class="zrn_analitics_financial_field">
+                                    <label>Categoria</label>
+                                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.categories, state.financialFilters.category_ids)" domain="getOptionDomain(financialPayload.filter_options.categories)" resModel="'zrn_commercial.commercial.brand.category'" fieldString="'Categoria'" placeholder="'Todas las categorias'" onChange.bind="this.onFinancialCategoriesChange"/>
+                                </div>
+                                <div class="zrn_analitics_financial_field">
+                                    <label>Canal</label>
+                                    <ZrnRelationalMultiSelect records="getSelectedOptionRecords(financialPayload.filter_options.channels, state.financialFilters.channel_ids)" domain="getOptionDomain(financialPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onFinancialChannelsChange"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" t-on-click="this.clearFinancialFilters">Limpiar</button>
+                            <button type="button" class="btn btn-primary" t-on-click="this.applyFinancialFilters">Aplicar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="zrn_analitics_financial_channel_actions">
-                <button type="button" class="btn btn-primary" t-on-click="applyFinancialFilters">Aplicar</button>
-                <button type="button" class="btn btn-secondary" t-on-click="clearFinancialFilters">Limpiar</button>
-                <div class="zrn_analitics_financial_channel_period">
-                    <strong>Periodo:</strong>
-                    <span><t t-esc="financialPayload.summary.period_label"/></span>
-                </div>
-            </div>
-        </section>
+        </t>
     </t>
 
     </templates>
