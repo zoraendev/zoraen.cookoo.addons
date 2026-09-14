@@ -46,7 +46,7 @@ package.json
 /build/
 /dist/
 /include/
-/lib/
+/lib/   
 /man/
 /share/
 /src/
