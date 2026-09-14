@@ -55,4 +55,4 @@ package.json
 /venv
 installed.txt
 custom_addons
-/dark_mode_backend
+# /dark_mode_backend
