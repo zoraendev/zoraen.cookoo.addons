@@ -151,6 +151,24 @@
   font-size: 11px;
 }
 
+.zrn_planning_sort_header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.zrn_planning_sort_header i {
+  color: #6f85a2;
+  font-size: 10px;
+}
+
+.zrn_planning_sort_header:hover,
+.zrn_planning_sort_header:focus {
+  color: #123b6a;
+}
+
 .zrn_planning_home_table_surface td {
   padding: 8px 9px;
   border-bottom: 1px solid #d7e0ea;

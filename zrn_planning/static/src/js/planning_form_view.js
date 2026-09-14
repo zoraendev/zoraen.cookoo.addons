@@ -20,6 +20,7 @@ class ZrnPlanningFormController extends FormController {
     this._chartPayload = null;
     this._chartInstances = new Map();
     this._homePanelViews = { production: "table", supply: "table" };
+    this._homeTableSort = {};
     this._homeConfig = {};
     this._homeExportPanel = null;
     this._homeExportOptions = null;
@@ -151,6 +152,20 @@ class ZrnPlanningFormController extends FormController {
   }
 
   onHomeClick(event) {
+    const sortButton = event.target.closest?.("[data-zrn-planning-home-sort]");
+    if (sortButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      const key = sortButton.dataset.zrnPlanningHomeSort;
+      const field = sortButton.dataset.zrnPlanningHomeSortField;
+      const current = this._homeTableSort[key];
+      this._homeTableSort[key] = {
+        field,
+        direction: current?.field === field && current.direction === "asc" ? "desc" : "asc",
+      };
+      this.renderHomeDashboard();
+      return;
+    }
     const viewButton = event.target.closest?.("[data-zrn-planning-home-view]");
     if (viewButton) {
       event.preventDefault();
@@ -234,11 +249,36 @@ class ZrnPlanningFormController extends FormController {
     return rows.slice(0, config.limit || 7);
   }
 
+  getHomeTableRows(key) {
+    const rows = [...(this._chartPayload?.[key]?.rows || [])];
+    const sort = this._homeTableSort[key];
+    if (!sort) {
+      return rows;
+    }
+    rows.sort((left, right) => {
+      const leftNumber = Number(left[sort.field]);
+      const rightNumber = Number(right[sort.field]);
+      let result;
+      if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) {
+        result = leftNumber - rightNumber;
+      } else {
+        result = String(left[sort.field] ?? "").localeCompare(
+          String(right[sort.field] ?? ""),
+          undefined,
+          { numeric: true, sensitivity: "base" },
+        );
+      }
+      return sort.direction === "desc" ? -result : result;
+    });
+    return rows;
+  }
+
   renderHomeDashboard() {
     if (!this.isPlanningHome || !this.rootRef.el) return;
     ["production", "supply"].forEach((key) => {
       const payload = this._chartPayload?.[key] || {};
-      const rows = this.getHomeRows(key);
+      const chartRows = this.getHomeRows(key);
+      const tableRows = this.getHomeTableRows(key);
       const metrics = payload.metrics || {};
       const table = this.rootRef.el.querySelector(`[data-zrn-planning-home-table="${key}"]`);
       const metricsMount = this.rootRef.el.querySelector(`[data-zrn-planning-home-metrics="${key}"]`);
@@ -254,14 +294,21 @@ class ZrnPlanningFormController extends FormController {
         ].map(([label, value, icon]) => `<div class="zrn_planning_home_summary_cell"><span class="zrn_planning_home_summary_label"><i class="fa ${icon}"/>${this.escapeHtml(label)}</span><strong class="zrn_planning_home_summary_value">${this.escapeHtml(value)}</strong></div>`).join("");
       }
       if (table) {
+        const columns = [["Plan", "name"], ["Inicio", "date_start"], ["Fin", "date_end"], ["Estado", "state_label"], ["Generadas", "orders_generated"], ["Finalizadas", "orders_completed"], ["Avance", "progress"]];
+        const sort = this._homeTableSort[key];
+        const head = columns.map(([label, field]) => {
+          const active = sort?.field === field;
+          const icon = active ? (sort.direction === "asc" ? "fa-sort-asc" : "fa-sort-desc") : "fa-sort";
+          return `<th><span class="zrn_planning_sort_header" data-zrn-planning-home-sort="${key}" data-zrn-planning-home-sort-field="${field}" role="button" tabindex="0">${label}<i class="fa ${icon}" aria-hidden="true"></i></span></th>`;
+        }).join("");
         table.classList.toggle("d-none", this._homePanelViews[key] === "chart");
-        table.innerHTML = `<div class="zrn_planning_home_table_surface"><table><thead><tr><th>Plan</th><th>Inicio</th><th>Fin</th><th>Estado</th><th>Generadas</th><th>Finalizadas</th><th>Avance</th></tr></thead><tbody>${rows.length ? rows.map(row => `<tr><td>${this.escapeHtml(row.name)}</td><td>${this.escapeHtml(row.date_start)}</td><td>${this.escapeHtml(row.date_end)}</td><td>${this.escapeHtml(row.state_label)}</td><td>${row.orders_generated}</td><td>${row.orders_completed}</td><td>${row.progress}%</td></tr>`).join("") : `<tr><td colspan="7" class="zrn_planning_home_empty_cell">Sin registros.</td></tr>`}</tbody></table></div>`;
+        table.innerHTML = `<div class="zrn_planning_home_table_surface"><table><thead><tr>${head}</tr></thead><tbody>${tableRows.length ? tableRows.map(row => `<tr><td>${this.escapeHtml(row.name)}</td><td>${this.escapeHtml(row.date_start)}</td><td>${this.escapeHtml(row.date_end)}</td><td>${this.escapeHtml(row.state_label)}</td><td>${row.orders_generated}</td><td>${row.orders_completed}</td><td>${row.progress}%</td></tr>`).join("") : `<tr><td colspan="7" class="zrn_planning_home_empty_cell">Sin registros.</td></tr>`}</tbody></table></div>`;
       }
       if (!chart) return;
       const visible = this._homePanelViews[key] === "chart";
       chart.classList.toggle("d-none", !visible);
-      empty?.classList.toggle("d-none", !visible || rows.length > 0);
-      if (!visible || !rows.length || !window.echarts) {
+      empty?.classList.toggle("d-none", !visible || chartRows.length > 0);
+      if (!visible || !chartRows.length || !window.echarts) {
         this.disposeHomeChart(key);
         return;
       }
@@ -270,7 +317,7 @@ class ZrnPlanningFormController extends FormController {
         instance = window.echarts.init(chart);
         this._chartInstances.set(key, instance);
       }
-      instance.setOption(this.buildHomeChartOption(key, rows), true);
+      instance.setOption(this.buildHomeChartOption(key, chartRows), true);
       instance.resize();
     });
   }

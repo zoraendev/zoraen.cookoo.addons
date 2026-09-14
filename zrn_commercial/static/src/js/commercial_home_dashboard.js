@@ -47,6 +47,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
     this.payload = null;
     this.currentResId = null;
     this.charts = new Map();
+    this._tableSort = {};
     this._exportPanel = null;
     this._exportOptions = null;
     this._exportMenuEl = null;
@@ -88,6 +89,20 @@ class ZrnCommercialHomeDashboardController extends FormController {
   }
 
   handleRootClick(ev) {
+    const sortButton = ev.target.closest?.("[data-zrn-commercial-sort]");
+    if (sortButton) {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const key = sortButton.dataset.zrnCommercialSort;
+      const field = sortButton.dataset.zrnCommercialSortField;
+      const current = this._tableSort[key];
+      this._tableSort[key] = {
+        field,
+        direction: current?.field === field && current.direction === "asc" ? "desc" : "asc",
+      };
+      this.renderTables();
+      return;
+    }
     const viewButton = ev.target.closest?.("[data-zrn-commercial-view]");
     if (viewButton) {
       ev.preventDefault();
@@ -152,13 +167,37 @@ class ZrnCommercialHomeDashboardController extends FormController {
     }
   }
 
+  getTableRows(key) {
+    const rows = [...(this.getDataset(key).rows || [])];
+    const sort = this._tableSort[key];
+    if (!sort) {
+      return rows;
+    }
+    rows.sort((left, right) => {
+      const leftNumber = Number(left[sort.field]);
+      const rightNumber = Number(right[sort.field]);
+      let result;
+      if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber)) {
+        result = leftNumber - rightNumber;
+      } else {
+        result = String(left[sort.field] ?? "").localeCompare(
+          String(right[sort.field] ?? ""),
+          undefined,
+          { numeric: true, sensitivity: "base" },
+        );
+      }
+      return sort.direction === "desc" ? -result : result;
+    });
+    return rows;
+  }
+
   renderTables() {
     Object.keys(DATASETS).forEach((key) => {
       const mount = this.rootRef.el?.querySelector(`[data-zrn-commercial-table="${key}"]`);
       if (!mount) {
         return;
       }
-      const rows = this.getDataset(key).rows || [];
+      const rows = this.getTableRows(key);
       const columns = key === "channelRevenue"
         ? [["Canal", "name"], ["Ingresos", "revenue", "money"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]]
         : key === "channelCategoryRevenue"
@@ -166,7 +205,12 @@ class ZrnCommercialHomeDashboardController extends FormController {
           : key === "categoryProducts"
             ? [["Categoría", "name"], ["Marca", "brand"], ["Productos", "products"]]
             : [["Marca", "name"], ["Categorías", "categories"], ["Productos", "products"]];
-      const head = columns.map(([label]) => `<th>${label}</th>`).join("");
+      const sort = this._tableSort[key];
+      const head = columns.map(([label, field]) => {
+        const active = sort?.field === field;
+        const icon = active ? (sort.direction === "asc" ? "fa-sort-asc" : "fa-sort-desc") : "fa-sort";
+        return `<th><span class="zrn_commercial_sort_header" data-zrn-commercial-sort="${key}" data-zrn-commercial-sort-field="${field}" role="button" tabindex="0">${label}<i class="fa ${icon}" aria-hidden="true"></i></span></th>`;
+      }).join("");
       const body = rows.length
         ? rows.map((row) => `<tr>${columns.map(([, field, format]) => `<td>${format === "money" ? `${this.escapeHtml(this.payload?.currency || "")} ${Number(row[field] || 0).toLocaleString()}` : Number.isFinite(Number(row[field])) ? Number(row[field]).toLocaleString() : this.escapeHtml(row[field] || "")}</td>`).join("")}</tr>`).join("")
         : `<tr><td colspan="${columns.length}" class="zrn_commercial_table_empty">Sin datos para mostrar.</td></tr>`;

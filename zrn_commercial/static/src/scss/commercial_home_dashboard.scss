@@ -347,6 +347,24 @@ button.zrn_commercial_btn_orders:hover {
   text-transform: uppercase;
 }
 
+.o_action_manager .zrn_commercial_sort_header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.o_action_manager .zrn_commercial_sort_header i {
+  color: #6f85a2;
+  font-size: 10px;
+}
+
+.o_action_manager .zrn_commercial_sort_header:hover,
+.o_action_manager .zrn_commercial_sort_header:focus {
+  color: #163b6c;
+}
+
 .o_action_manager .zrn_commercial_table_surface td {
   color: #526b88;
 }
