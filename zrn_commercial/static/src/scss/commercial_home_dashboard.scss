@@ -170,3 +170,286 @@ button.zrn_commercial_btn_orders:hover {
     width: 100%;
   }
 }
+
+/* Dashboard comercial alineado con las vistas analiticas: estructura plana y acciones compactas. */
+.o_action_manager .zrn_commercial_home {
+  padding: 0 0 16px;
+}
+
+.o_action_manager .zrn_commercial_summary_table,
+.o_action_manager .zrn_commercial_panel {
+  border: 1px solid #d3dce8;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.o_action_manager .zrn_commercial_summary_table {
+  width: 100%;
+  margin-bottom: 12px;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+
+.o_action_manager .zrn_commercial_summary_table th,
+.o_action_manager .zrn_commercial_summary_table td {
+  width: 16.666%;
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid #d3dce8;
+}
+
+.o_action_manager .zrn_commercial_summary_table th {
+  color: #1f4e8c;
+  background: #f4f7fb;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.o_action_manager .zrn_commercial_summary_table td {
+  border-bottom: 0;
+}
+
+.o_action_manager .zrn_commercial_summary_link.btn {
+  padding: 0;
+  border: 0;
+  color: #1f4e8c;
+  font-size: 20px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.o_action_manager .zrn_commercial_dashboard_grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.o_action_manager .zrn_commercial_panel {
+  min-width: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.o_action_manager .zrn_commercial_panel_head {
+  min-height: 42px;
+  margin: 0;
+  padding: 8px 10px;
+  align-items: center;
+  border-bottom: 1px solid #d3dce8;
+  background: #f4f7fb;
+}
+
+.o_action_manager .zrn_commercial_panel_head strong {
+  color: #1f4e8c;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.o_action_manager .zrn_commercial_panel_actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+}
+
+.o_action_manager .zrn_commercial_icon_btn.btn {
+  min-width: 30px;
+  min-height: 30px;
+  padding: 4px 7px;
+  border: 1px solid #c9d5e3;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #1f4e8c;
+}
+
+.o_action_manager .zrn_commercial_icon_btn.btn:hover,
+.o_action_manager .zrn_commercial_icon_btn.btn:focus {
+  border-color: #8ea9c8;
+  background: #eef4fb;
+  color: #163b6c;
+}
+
+.o_action_manager .zrn_commercial_nav_btn.btn {
+  margin-left: 4px;
+  border-color: #1f4e8c;
+  background: #1f4e8c;
+  color: #ffffff;
+}
+
+.o_action_manager .zrn_commercial_nav_btn.btn:hover,
+.o_action_manager .zrn_commercial_nav_btn.btn:focus {
+  background: #163b6c;
+  color: #ffffff;
+}
+
+.o_action_manager .zrn_commercial_chart {
+  min-height: 280px;
+  padding: 10px;
+  background: #f7f9fc;
+}
+
+.o_action_manager .zrn_commercial_table_mount {
+  min-height: 280px;
+  padding: 10px;
+}
+
+.o_action_manager .zrn_commercial_table_surface {
+  overflow-x: auto;
+  background: #f7f9fc;
+}
+
+.o_action_manager .zrn_commercial_table_surface table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.o_action_manager .zrn_commercial_table_surface th,
+.o_action_manager .zrn_commercial_table_surface td {
+  padding: 8px 9px;
+  border-bottom: 1px solid #d3dce8;
+  white-space: nowrap;
+}
+
+.o_action_manager .zrn_commercial_table_surface th {
+  color: #1f4e8c;
+  background: #edf3f9;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.o_action_manager .zrn_commercial_table_surface td {
+  color: #526b88;
+}
+
+.o_action_manager .zrn_commercial_table_surface tbody tr:nth-child(even) td {
+  background: #fbfcfe;
+}
+
+.o_action_manager .zrn_commercial_table_empty,
+.o_action_manager .zrn_commercial_empty {
+  padding: 28px 10px;
+  color: #64748b;
+  text-align: center;
+}
+
+.o_action_manager .zrn_commercial_chart_config {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+}
+
+.o_action_manager .zrn_commercial_chart_config_backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.34);
+}
+
+.o_action_manager .zrn_commercial_chart_config_dialog {
+  position: relative;
+  width: min(520px, calc(100% - 32px));
+  margin: 10vh auto 0;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: #ffffff;
+}
+
+.o_action_manager .zrn_commercial_chart_config_head,
+.o_action_manager .zrn_commercial_chart_config_footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid #d3dce8;
+}
+
+.o_action_manager .zrn_commercial_chart_config_footer {
+  justify-content: flex-end;
+  border-top: 1px solid #d3dce8;
+  border-bottom: 0;
+}
+
+.o_action_manager .zrn_commercial_chart_config_body {
+  display: grid;
+  gap: 6px;
+  padding: 14px 12px;
+}
+
+.o_action_manager .zrn_commercial_chart_config_body label {
+  margin-top: 6px;
+  color: #1f4e8c;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.zrn_commercial_export_backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: transparent;
+}
+
+.zrn_commercial_export_menu {
+  position: fixed;
+  z-index: 2001;
+  width: 188px;
+  padding: 6px;
+  border: 1px solid #cbd5e1;
+  border-radius: 5px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.16);
+}
+
+.zrn_commercial_export_menu_title {
+  padding: 5px 8px 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.zrn_commercial_export_menu_item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  padding: 7px 8px;
+  color: #1f4e8c;
+  text-align: left;
+  border: 0;
+  border-radius: 3px;
+}
+
+.zrn_commercial_export_menu_item:hover,
+.zrn_commercial_export_menu_item:focus {
+  background: #eef4fb;
+  color: #163b6c;
+}
+
+@media (max-width: 767.98px) {
+  .o_action_manager .zrn_commercial_dashboard_grid {
+    grid-template-columns: 1fr;
+  }
+
+  .o_action_manager .zrn_commercial_summary_table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .o_action_manager .zrn_commercial_panel_head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .o_action_manager .zrn_commercial_panel_actions {
+    margin-left: 0;
+  }
+}

@@ -150,7 +150,19 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
         ], order='name')
         SaleOrder = self.env['sale.order'].sudo()
 
+        def order_metrics(orders):
+            revenue = sum(orders.mapped('amount_untaxed'))
+            units = sum(orders.mapped('order_line.product_uom_qty'))
+            count = len(orders)
+            return {
+                'revenue': revenue,
+                'orders': count,
+                'units': units,
+                'ticket': revenue / count if count else 0,
+            }
+
         channel_items = []
+        channel_category_items = []
         for channel in channels:
             partner_ids = channel.partner_link_ids.mapped('partner_id').ids
             domain = self._get_confirmed_sale_order_domain()
@@ -159,16 +171,58 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
             else:
                 domain.append(('id', '=', 0))
             orders = SaleOrder.search(domain)
+            metrics = order_metrics(orders)
             channel_items.append({
                 'name': channel.name,
-                'value': sum(orders.mapped('amount_untaxed')),
-                'count': len(orders),
+                'value': metrics['revenue'],
+                'revenue': metrics['revenue'],
+                'count': metrics['orders'],
+                'orders': metrics['orders'],
+                'units': metrics['units'],
+                'ticket': metrics['ticket'],
             })
+
+            assigned_partner_ids = set(partner_ids)
+            categorized_partner_ids = set()
+            for category in channel.category_ids:
+                category_partner_ids = list(
+                    set(category.partner_link_ids.mapped('partner_id').ids) & assigned_partner_ids
+                )
+                categorized_partner_ids.update(category_partner_ids)
+                category_domain = self._get_confirmed_sale_order_domain()
+                category_domain.append(
+                    ('partner_id', 'child_of', category_partner_ids)
+                    if category_partner_ids
+                    else ('id', '=', 0)
+                )
+                category_metrics = order_metrics(SaleOrder.search(category_domain))
+                channel_category_items.append({
+                    'name': category.name,
+                    'category': category.name,
+                    'channel': channel.name,
+                    'value': category_metrics['revenue'],
+                    **category_metrics,
+                })
+            uncategorized_partner_ids = list(assigned_partner_ids - categorized_partner_ids)
+            if uncategorized_partner_ids:
+                uncategorized_domain = self._get_confirmed_sale_order_domain()
+                uncategorized_domain.append(('partner_id', 'child_of', uncategorized_partner_ids))
+                uncategorized_metrics = order_metrics(SaleOrder.search(uncategorized_domain))
+                channel_category_items.append({
+                    'name': 'Sin categoria',
+                    'category': 'Sin categoria',
+                    'channel': channel.name,
+                    'value': uncategorized_metrics['revenue'],
+                    **uncategorized_metrics,
+                })
 
         category_items = [
             {
                 'name': '%s / %s' % (category.brand_id.name, category.name),
                 'value': len(category.product_ids),
+                'products': len(category.product_ids),
+                'brand': category.brand_id.name,
+                'category': category.name,
             }
             for category in categories
         ]
@@ -176,14 +230,37 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
             {
                 'name': brand.name,
                 'value': brand.product_count,
+                'products': brand.product_count,
+                'categories': brand.category_count,
             }
             for brand in self.env['zrn_commercial.commercial.brand'].sudo().search([
                 ('company_id', '=', company.id),
             ], order='name')
         ]
         channel_items = sorted(channel_items, key=lambda item: item['value'], reverse=True)[:8]
+        channel_category_items = sorted(
+            channel_category_items,
+            key=lambda item: item['value'],
+            reverse=True,
+        )[:24]
         category_items = sorted(category_items, key=lambda item: item['value'], reverse=True)[:10]
         brand_items = sorted(brand_items, key=lambda item: item['value'], reverse=True)[:8]
+
+        category_labels = sorted({item['category'] for item in channel_category_items})
+        channel_labels = sorted({item['channel'] for item in channel_category_items})
+        category_series = []
+        for channel_name in channel_labels:
+            values = []
+            for category_name in category_labels:
+                matching = next(
+                    (
+                        item for item in channel_category_items
+                        if item['channel'] == channel_name and item['category'] == category_name
+                    ),
+                    None,
+                )
+                values.append(matching['revenue'] if matching else 0)
+            category_series.append({'name': channel_name, 'values': values})
 
         return {
             'currency': company.currency_id.symbol or '',
@@ -191,13 +268,25 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
                 'labels': [item['name'] for item in channel_items],
                 'values': [item['value'] for item in channel_items],
                 'counts': [item['count'] for item in channel_items],
+                'rows': channel_items,
+            },
+            'channelCategoryRevenue': {
+                'labels': category_labels,
+                'values': [
+                    sum(item['revenue'] for item in channel_category_items if item['category'] == label)
+                    for label in category_labels
+                ],
+                'series': category_series,
+                'rows': channel_category_items,
             },
             'categoryProducts': {
                 'labels': [item['name'] for item in category_items],
                 'values': [item['value'] for item in category_items],
+                'rows': category_items,
             },
             'brandProducts': {
                 'labels': [item['name'] for item in brand_items],
                 'values': [item['value'] for item in brand_items],
+                'rows': brand_items,
             },
         }

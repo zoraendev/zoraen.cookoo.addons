@@ -103,12 +103,37 @@ class ZrnPlanningHome(ZrnPlanningNavigationMixin, models.Model):
             record.recent_supply_plan_ids = [(6, 0, supply_plans.ids)]
 
     def _build_home_chart_payload(self, plans, order_field, completed_field, order_label):
+        rows = []
+        for plan in plans:
+            generated = int(plan[order_field] or 0)
+            completed = int(plan[completed_field] or 0)
+            rows.append({
+                'name': plan.name or 'Sin nombre',
+                'date_start': fields.Date.to_string(plan.date_start) if plan.date_start else '',
+                'date_end': fields.Date.to_string(plan.date_end) if plan.date_end else '',
+                'state': plan.state or '',
+                'state_label': dict(plan._fields['state'].selection).get(plan.state, plan.state or ''),
+                'orders_generated': generated,
+                'orders_completed': completed,
+                'progress': round((completed / generated) * 100, 1) if generated else 0,
+                'lines': int(plan.line_count or 0),
+            })
+        generated_total = sum(row['orders_generated'] for row in rows)
+        completed_total = sum(row['orders_completed'] for row in rows)
         return {
-            'labels': plans.mapped('name'),
-            'plan_count': len(plans),
-            'orders_generated': [plan[order_field] for plan in plans],
-            'orders_completed': [plan[completed_field] for plan in plans],
+            'labels': [row['name'] for row in rows],
+            'plan_count': len(rows),
+            'orders_generated': [row['orders_generated'] for row in rows],
+            'orders_completed': [row['orders_completed'] for row in rows],
             'order_label': order_label,
+            'rows': rows,
+            'metrics': {
+                'plans': len(rows),
+                'orders_generated': generated_total,
+                'orders_completed': completed_total,
+                'progress': round((completed_total / generated_total) * 100, 1) if generated_total else 0,
+                'lines': sum(row['lines'] for row in rows),
+            },
         }
 
     def get_home_chart_payload(self):

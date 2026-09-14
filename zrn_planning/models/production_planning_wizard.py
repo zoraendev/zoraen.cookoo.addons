@@ -29,9 +29,32 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
         'res.partner',
         string='Puntos de venta',
     )
+    contact_ids = fields.Many2many(
+        'res.partner',
+        'zrn_planning_production_wizard_contact_rel',
+        'wizard_id',
+        'contact_id',
+        string='Personas y contactos',
+    )
     product_ids = fields.Many2many(
         'product.product',
         string='Productos',
+    )
+    product_categ_ids = fields.Many2many(
+        'product.category',
+        'zrn_planning_production_wizard_category_rel',
+        'wizard_id',
+        'category_id',
+        string='Categorias de producto',
+    )
+    order_state = fields.Selection(
+        [
+            ('sale', 'Confirmados'),
+            ('done', 'Bloqueados'),
+            ('sale_done', 'Confirmados y bloqueados'),
+        ],
+        string='Estado del pedido',
+        default='sale_done',
     )
     available_cliente_ids = fields.Many2many(
         'res.partner',
@@ -42,6 +65,18 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
     available_product_ids = fields.Many2many(
         'product.product',
         string='Productos disponibles',
+        compute='_compute_filter_data',
+        readonly=True,
+    )
+    available_contact_ids = fields.Many2many(
+        'res.partner',
+        string='Personas disponibles',
+        compute='_compute_filter_data',
+        readonly=True,
+    )
+    available_product_categ_ids = fields.Many2many(
+        'product.category',
+        string='Categorias disponibles',
         compute='_compute_filter_data',
         readonly=True,
     )

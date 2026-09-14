@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="zrn_commercial_home_default" model="zrn_commercial.home">
         <field name="name">(ZRN) Manejo Comercial</field>
         <field name="sequence">10</field>
@@ -19,74 +18,117 @@
                     <field name="currency_id" invisible="1"/>
 
                     <div class="zrn_commercial_home">
-                        <div class="zrn_commercial_kpis">
-                            <div class="zrn_commercial_kpi">
-                                <button name="action_open_business_units" type="object" string="Unidades de negocio" class="btn btn-link zrn_commercial_text_link"/>
-                                <strong><field name="business_unit_count" readonly="1" nolabel="1"/></strong>
-                            </div>
-                            <div class="zrn_commercial_kpi">
-                                <button name="action_open_brands" type="object" string="Marcas" class="btn btn-link zrn_commercial_text_link"/>
-                                <strong><field name="brand_count" readonly="1" nolabel="1"/></strong>
-                            </div>
-                            <div class="zrn_commercial_kpi">
-                                <button name="action_open_categories" type="object" string="Categorias" class="btn btn-link zrn_commercial_text_link"/>
-                                <strong><field name="category_count" readonly="1" nolabel="1"/></strong>
-                            </div>
-                            <div class="zrn_commercial_kpi">
-                                <button name="action_open_mapped_products" type="object" string="Productos mapeados" class="btn btn-link zrn_commercial_text_link"/>
-                                <strong><field name="mapped_product_count" readonly="1" nolabel="1"/></strong>
-                            </div>
-                            <div class="zrn_commercial_kpi">
-                                <button name="action_open_channels" type="object" string="Canales" class="btn btn-link zrn_commercial_text_link"/>
-                                <strong><field name="channel_count" readonly="1" nolabel="1"/></strong>
-                            </div>
-                            <div class="zrn_commercial_kpi zrn_commercial_kpi_wide">
-                                <button name="action_open_sales_orders" type="object" string="Ingresos confirmados" class="btn btn-link zrn_commercial_text_link"/>
-                                <strong><field name="confirmed_revenue" readonly="1" nolabel="1" widget="monetary"/></strong>
-                            </div>
-                        </div>
+                        <table class="zrn_commercial_summary_table">
+                            <thead>
+                                <tr>
+                                    <th>Unidades de negocio</th>
+                                    <th>Marcas</th>
+                                    <th>Categorías</th>
+                                    <th>Productos mapeados</th>
+                                    <th>Canales</th>
+                                    <th>Ingresos confirmados</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><button name="action_open_business_units" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="business_unit_count" readonly="1" nolabel="1"/></button></td>
+                                    <td><button name="action_open_brands" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="brand_count" readonly="1" nolabel="1"/></button></td>
+                                    <td><button name="action_open_categories" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="category_count" readonly="1" nolabel="1"/></button></td>
+                                    <td><button name="action_open_mapped_products" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="mapped_product_count" readonly="1" nolabel="1"/></button></td>
+                                    <td><button name="action_open_channels" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="channel_count" readonly="1" nolabel="1"/></button></td>
+                                    <td><button name="action_open_sales_orders" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="confirmed_revenue" readonly="1" nolabel="1" widget="monetary"/></button></td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                         <div class="zrn_commercial_dashboard_grid">
-                            <section class="zrn_commercial_panel zrn_commercial_panel_main">
+                            <section class="zrn_commercial_panel" data-zrn-commercial-panel="channelRevenue">
                                 <div class="zrn_commercial_panel_head">
-                                    <div>
-                                        <button name="action_open_sales_orders" type="object" string="Ingresos por canal" class="btn btn-link zrn_commercial_panel_link"/>
-                                        <span>Ordenes confirmadas por clientes asignados a canales</span>
+                                    <strong>Ingresos por canal</strong>
+                                    <div class="zrn_commercial_panel_actions">
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="channelRevenue" aria-label="Exportar"><i class="fa fa-download"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button name="action_open_sales_orders" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir órdenes"><i class="fa fa-arrow-right"/></button>
                                     </div>
-                                    <!-- Boton 'Ver ordenes' con clase zrn_commercial_btn_orders para garantizar estilos e intensidad de color blanco en texto -->
-                                    <button name="action_open_sales_orders" type="object" string="Ver ordenes" class="btn btn-primary zrn_commercial_btn_orders"/>
                                 </div>
-                                <div class="zrn_commercial_chart" data-zrn-commercial-chart="channelRevenue"></div>
-                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="channelRevenue">
-                                    Sin ingresos confirmados por canal.
-                                </div>
+                                <div class="zrn_commercial_chart d-none" data-zrn-commercial-chart="channelRevenue"/>
+                                <div class="zrn_commercial_table_mount" data-zrn-commercial-table="channelRevenue"/>
+                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="channelRevenue">Sin ingresos confirmados por canal.</div>
                             </section>
 
-                            <section class="zrn_commercial_panel">
+                            <section class="zrn_commercial_panel" data-zrn-commercial-panel="channelCategoryRevenue">
                                 <div class="zrn_commercial_panel_head">
-                                    <div>
-                                        <button name="action_open_categories" type="object" string="Productos por categoria" class="btn btn-link zrn_commercial_panel_link"/>
-                                        <span>Cobertura del mapeo comercial</span>
+                                    <strong>Ingresos por categoría de canal</strong>
+                                    <div class="zrn_commercial_panel_actions">
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelCategoryRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="channelCategoryRevenue" aria-label="Exportar"><i class="fa fa-download"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button name="action_open_channels" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir canales"><i class="fa fa-arrow-right"/></button>
                                     </div>
                                 </div>
-                                <div class="zrn_commercial_chart" data-zrn-commercial-chart="categoryProducts"></div>
-                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="categoryProducts">
-                                    Sin productos mapeados.
-                                </div>
+                                <div class="zrn_commercial_chart d-none" data-zrn-commercial-chart="channelCategoryRevenue"/>
+                                <div class="zrn_commercial_table_mount" data-zrn-commercial-table="channelCategoryRevenue"/>
+                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="channelCategoryRevenue">Sin ingresos por categoría de canal.</div>
                             </section>
 
-                            <section class="zrn_commercial_panel">
+                            <section class="zrn_commercial_panel" data-zrn-commercial-panel="categoryProducts">
                                 <div class="zrn_commercial_panel_head">
-                                    <div>
-                                        <button name="action_open_brands" type="object" string="Productos por marca" class="btn btn-link zrn_commercial_panel_link"/>
-                                        <span>Totales derivados de las categorias</span>
+                                    <strong>Productos por categoría</strong>
+                                    <div class="zrn_commercial_panel_actions">
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="categoryProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="categoryProducts" aria-label="Exportar"><i class="fa fa-download"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button name="action_open_categories" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir categorías"><i class="fa fa-arrow-right"/></button>
                                     </div>
                                 </div>
-                                <div class="zrn_commercial_chart" data-zrn-commercial-chart="brandProducts"></div>
-                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="brandProducts">
-                                    Sin marcas con productos.
-                                </div>
+                                <div class="zrn_commercial_chart d-none" data-zrn-commercial-chart="categoryProducts"/>
+                                <div class="zrn_commercial_table_mount" data-zrn-commercial-table="categoryProducts"/>
+                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="categoryProducts">Sin productos mapeados.</div>
                             </section>
+
+                            <section class="zrn_commercial_panel" data-zrn-commercial-panel="brandProducts">
+                                <div class="zrn_commercial_panel_head">
+                                    <strong>Productos por marca</strong>
+                                    <div class="zrn_commercial_panel_actions">
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="brandProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="brandProducts" aria-label="Exportar"><i class="fa fa-download"/></button>
+                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button name="action_open_brands" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir marcas"><i class="fa fa-arrow-right"/></button>
+                                    </div>
+                                </div>
+                                <div class="zrn_commercial_chart d-none" data-zrn-commercial-chart="brandProducts"/>
+                                <div class="zrn_commercial_table_mount" data-zrn-commercial-table="brandProducts"/>
+                                <div class="zrn_commercial_empty d-none" data-zrn-commercial-chart-empty="brandProducts">Sin marcas con productos.</div>
+                            </section>
+                        </div>
+
+                        <div class="zrn_commercial_chart_config d-none" data-zrn-commercial-config-modal="1">
+                            <div class="zrn_commercial_chart_config_backdrop" data-zrn-commercial-config-close="1"/>
+                            <div class="zrn_commercial_chart_config_dialog" role="dialog" aria-modal="true">
+                                <div class="zrn_commercial_chart_config_head"><strong>Configurar gráfica</strong><button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_commercial_chart_config_body">
+                                    <div class="o_form_label">Métrica</div>
+                                    <select class="form-select" data-zrn-commercial-config-field="metric"/>
+                                    <div class="o_form_label">Tipo de gráfica</div>
+                                    <select class="form-select" data-zrn-commercial-config-field="type">
+                                        <option value="bar">Barras</option>
+                                        <option value="line">Línea</option>
+                                        <option value="pie">Circular</option>
+                                    </select>
+                                    <div class="o_form_label">Límite de registros</div>
+                                    <input type="number" min="1" max="30" class="form-control" data-zrn-commercial-config-field="limit"/>
+                                    <div data-zrn-commercial-channel-filter-wrap="1">
+                                        <div class="o_form_label">Canal</div>
+                                        <select class="form-select" data-zrn-commercial-config-field="channel"/>
+                                    </div>
+                                </div>
+                                <div class="zrn_commercial_chart_config_footer"><button name="zrn_dashboard_control" type="button" class="btn btn-primary" data-zrn-commercial-config-apply="1">Aplicar</button></div>
+                            </div>
                         </div>
                     </div>
                 </sheet>
@@ -103,44 +145,9 @@
         <field name="target">current</field>
     </record>
 
-    <menuitem
-        id="menu_zrn_commercial_root"
-        name="(ZRN) Manejo Comercial"
-        sequence="70"
-        action="action_zrn_commercial_home"
-        web_icon="zrn_commercial,static/description/icon.png"
-    />
-
-    <menuitem
-        id="menu_zrn_commercial_home"
-        name="Inicio"
-        parent="menu_zrn_commercial_root"
-        action="action_zrn_commercial_home"
-        sequence="5"
-    />
-
-    <menuitem
-        id="menu_zrn_commercial_brands_sub"
-        name="Marcas"
-        parent="menu_zrn_commercial_root"
-        action="action_zrn_commercial_brands"
-        sequence="10"
-    />
-
-    <menuitem
-        id="menu_zrn_commercial_business_units_sub"
-        name="Unidades de negocio"
-        parent="menu_zrn_commercial_root"
-        action="action_zrn_commercial_business_units"
-        sequence="12"
-    />
-
-    <menuitem
-        id="menu_zrn_commercial_channels_sub"
-        name="Canales"
-        parent="menu_zrn_commercial_root"
-        action="action_zrn_commercial_channels"
-        sequence="15"
-    />
-
+    <menuitem id="menu_zrn_commercial_root" name="(ZRN) Manejo Comercial" sequence="70" action="action_zrn_commercial_home" web_icon="zrn_commercial,static/description/icon.png"/>
+    <menuitem id="menu_zrn_commercial_home" name="Inicio" parent="menu_zrn_commercial_root" action="action_zrn_commercial_home" sequence="5"/>
+    <menuitem id="menu_zrn_commercial_brands_sub" name="Marcas" parent="menu_zrn_commercial_root" action="action_zrn_commercial_brands" sequence="10"/>
+    <menuitem id="menu_zrn_commercial_business_units_sub" name="Unidades de negocio" parent="menu_zrn_commercial_root" action="action_zrn_commercial_business_units" sequence="12"/>
+    <menuitem id="menu_zrn_commercial_channels_sub" name="Canales" parent="menu_zrn_commercial_root" action="action_zrn_commercial_channels" sequence="15"/>
 </odoo>
