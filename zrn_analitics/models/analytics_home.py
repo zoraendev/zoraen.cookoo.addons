@@ -2040,6 +2040,12 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         channel_map = {}
         customer_map = {}
         product_map = {}
+        business_unit_names = {
+            unit.id: unit.name
+            for unit in self.env['zrn_commercial.business.unit'].search([
+                ('company_id', '=', self.env.company.id),
+            ])
+        }
 
         def _init_detail_bucket():
             """
@@ -2206,10 +2212,15 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             brand_amounts[brand_info['brand_name']] += amount
             brand_product_ids[brand_info['brand_name']].add(product.id)
 
+            business_unit_id = brand_info.get('business_unit_id') or False
+            business_unit_name = business_unit_names.get(business_unit_id) or 'Sin unidad de negocio'
+            portfolio_brand_key = '%s_%s' % (business_unit_id or 0, brand_info['brand_name'])
             portfolio_brand = portfolio_brand_map.setdefault(
-                brand_info['brand_name'],
+                portfolio_brand_key,
                 {
                     'name': brand_info['brand_name'],
+                    'business_unit_id': business_unit_id,
+                    'business_unit_name': business_unit_name,
                     'revenue': 0.0,
                     'quantity_sold': 0.0,
                     'product_ids': set(),
@@ -2221,7 +2232,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             portfolio_brand['quantity_sold'] += quantity
             portfolio_brand['product_ids'].add(product.id)
             _accumulate_detail(portfolio_brand['_detail'], channel_name, partner, order, amount, quantity, product)
-            category_key = product.categ_id.display_name or 'Sin categoria'
+            category_key = brand_info.get('category_name') or product.categ_id.display_name or 'Sin categoria'
             portfolio_category = portfolio_brand['categories'].setdefault(
                 category_key,
                 {
@@ -2385,7 +2396,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             reverse=True,
         )
         portfolio_rows = []
-        for brand_name, brand_row in sorted(
+        for brand_key, brand_row in sorted(
             portfolio_brand_map.items(),
             key=lambda item: item[1]['revenue'],
             reverse=True,
@@ -2426,7 +2437,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                     for item in products[:8]
                 ]
                 categories.append({
-                    'key': f"category_{brand_name}_{category_name}",
+                    'key': f"category_{brand_key}_{category_name}",
                     'name': category_name,
                     'revenue': round(category_row['revenue'], 2),
                     'quantity_sold': round(category_row['quantity_sold'], 2),
@@ -2434,7 +2445,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                     'products': products,
                     'detail': _build_detail_payload(
                         category_name,
-                        brand_name,
+                        brand_row['name'],
                         category_row['_detail'],
                         secondary_title='SKUs de la linea',
                         secondary_rows=category_secondary_rows,
@@ -2450,14 +2461,16 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 for item in categories[:8]
             ]
             portfolio_rows.append({
-                'key': f"brand_{brand_name}",
-                'name': brand_name,
+                'key': f"brand_{brand_key}",
+                'name': brand_row['name'],
+                'business_unit_id': brand_row.get('business_unit_id') or False,
+                'business_unit_name': brand_row.get('business_unit_name') or 'Sin unidad de negocio',
                 'revenue': round(brand_row['revenue'], 2),
                 'quantity_sold': round(brand_row['quantity_sold'], 2),
                 'product_count': len(brand_row['product_ids']),
                 'categories': categories,
                 'detail': _build_detail_payload(
-                    brand_name,
+                    brand_row['name'],
                     'Marca comercial',
                     brand_row['_detail'],
                     secondary_title='Lineas de portafolio',
@@ -5974,3 +5987,19 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         applicant = self._get_rrhh_applicant_or_raise(applicant_id)
         applicant._zrn_rrhh_recompute_pattern_records()
         return self.get_rrhh_hub_payload({'selected_applicant_id': applicant.id})
+
+
+class ZrnAnaliticsCommercialDrillExport(models.TransientModel):
+    _name = 'zrn_analitics.commercial.drill.export'
+    _description = 'Exportacion del drill comercial'
+
+    sequence = fields.Integer(default=10)
+    level = fields.Char(string='Nivel')
+    business_unit = fields.Char(string='Unidad de negocio')
+    brand = fields.Char(string='Marca')
+    category = fields.Char(string='Categoria de marca')
+    sku = fields.Char(string='SKU')
+    revenue = fields.Float(string='Ingreso')
+    mix_percentage = fields.Float(string='% Mix')
+    units = fields.Float(string='Unidades')
+    sku_count = fields.Integer(string='SKUs')

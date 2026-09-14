@@ -3,11 +3,6 @@
   <t t-name="zrn_analitics.HubCommercialTabCobertura"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'cobertura'">
                 <t t-call="zrn_analitics.HubCommercialFilters"/>
                 <div class="zrn_analitics_commercial_coverage">
-                    <div class="zrn_analitics_commercial_coverage_note">
-                        <strong>Cobertura y distribución</strong>
-                        <span>Universo PDV, cobertura por canal, white space, marcas por canal, holes de portafolio y clientes A/B en riesgo.</span>
-                    </div>
-
                     <t t-if="state.coverageLoading">
                         <div class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_hub_panel_text">Cargando tablero de cobertura...</div>
@@ -21,23 +16,29 @@
                             </div>
                         </t>
 
-                        <div class="zrn_analitics_commercial_coverage_cards">
-                            <t t-foreach="coveragePayload.summary_cards" t-as="card" t-key="card.label">
-                                <div class="zrn_analitics_commercial_coverage_card">
-                                    <span><t t-esc="card.label"/></span>
-                                    <strong><t t-esc="formatCount(card.value)"/></strong>
-                                    <small><t t-esc="card.note"/></small>
-                                </div>
-                            </t>
+                        <div class="zrn_analitics_commercial_summary_table_wrap">
+                            <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
+                                <thead><tr><t t-foreach="coveragePayload.summary_cards" t-as="card" t-key="card.label"><th><t t-esc="card.label"/></th></t></tr></thead>
+                                <tbody><tr><t t-foreach="coveragePayload.summary_cards" t-as="card" t-key="card.label"><td><strong><t t-esc="formatCount(card.value)"/></strong></td></t></tr></tbody>
+                            </table>
                         </div>
 
                         <div class="zrn_analitics_commercial_coverage_top">
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_commercial_panel_head">
                                     <span>Cobertura por canal</span>
-                                    <span>Activos vs red total</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <select class="form-select form-select-sm zrn_analitics_commercial_chart_type_select" t-att-value="state.coverageChannelChartType" t-on-change="(ev) =&gt; this.setCoverageChannelChartType(ev.target.value)">
+                                            <option value="bar">Barras</option>
+                                            <option value="line">Línea</option>
+                                        </select>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_channel', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'coverage-channel', filename: 'zrn_comercial_cobertura_canales' })" aria-label="Exportar cobertura"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_channel', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
-                                <div class="table-responsive">
+                                <t t-if="getCommercialPanelView('coverage_channel') === 'table'">
+                                <div class="zrn_analitics_commercial_table_surface table-responsive">
                                     <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
                                         <thead>
                                             <tr>
@@ -107,6 +108,8 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('coverage_channel') === 'chart'">
                                 <div class="zrn_analitics_commercial_coverage_chart">
                                     <t t-if="coveragePayload.coverage_by_channel.length and hasEchartsLibrary">
                                         <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="coverage-channel"/>
@@ -115,6 +118,7 @@
                                         <div class="zrn_analitics_commercial_chart_empty">Hay cobertura por canal, pero la libreria ECharts aun no esta cargada en assets.</div>
                                     </t>
                                 </div>
+                                </t>
                             </section>
 
                             <section class="zrn_analitics_hub_panel">
@@ -148,9 +152,12 @@
                         <section class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_commercial_panel_head">
                                 <span>Matriz canal × sub-marca</span>
-                                <span>Revenue por presencia</span>
+                                <div class="zrn_analitics_commercial_panel_actions">
+                                    <span>Revenue por presencia</span>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_matriz_canal_submarca' })" aria-label="Exportar matriz"><i class="fa fa-download"/></button>
+                                </div>
                             </div>
-                            <div class="table-responsive">
+                            <div class="zrn_analitics_commercial_table_surface table-responsive">
                                 <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped zrn_analitics_commercial_coverage_matrix">
                                     <thead>
                                         <tr>
@@ -181,9 +188,15 @@
                         <section class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_commercial_panel_head">
                                 <span>Distribución por SKU</span>
-                                <span>Penetración sobre PDVs activos</span>
+                                <div class="zrn_analitics_commercial_panel_actions">
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_sku', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="toggleCoverageSkuChartConfig" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'coverage-sku', filename: 'zrn_comercial_distribucion_sku' })" aria-label="Exportar distribución"><i class="fa fa-download"/></button>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_sku', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                </div>
                             </div>
-                            <div class="table-responsive">
+                            <t t-if="getCommercialPanelView('coverage_sku') === 'table'">
+                            <div class="zrn_analitics_commercial_table_surface table-responsive">
                                 <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
                                     <thead>
                                         <tr>
@@ -239,6 +252,8 @@
                                     </tbody>
                                 </table>
                             </div>
+                            </t>
+                            <t t-if="getCommercialPanelView('coverage_sku') === 'chart'">
                             <div class="zrn_analitics_commercial_coverage_chart">
                                 <t t-if="coveragePayload.sku_distribution.length and hasEchartsLibrary">
                                     <div class="zrn_analitics_commercial_echart zrn_analitics_commercial_echart_bar" data-zrn-chart="coverage-sku"/>
@@ -247,20 +262,24 @@
                                     <div class="zrn_analitics_commercial_chart_empty">Hay distribucion por SKU, pero la libreria ECharts aun no esta cargada en assets.</div>
                                 </t>
                             </div>
+                            </t>
                         </section>
 
                         <div class="zrn_analitics_commercial_coverage_bottom">
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_commercial_panel_head">
                                     <span>Holes de portafolio</span>
-                                    <span><t t-esc="coveragePayload.portfolio_holes.core_skus.length"/> SKUs core</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <span><t t-esc="coveragePayload.portfolio_holes.core_skus.length"/> SKUs core</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_holes_portafolio' })" aria-label="Exportar holes"><i class="fa fa-download"/></button>
+                                    </div>
                                 </div>
                                 <div class="zrn_analitics_commercial_coverage_tags">
                                     <t t-foreach="coveragePayload.portfolio_holes.core_skus" t-as="sku" t-key="sku">
                                         <span class="zrn_analitics_commercial_coverage_tag"><t t-esc="sku"/></span>
                                     </t>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="zrn_analitics_commercial_table_surface table-responsive">
                                     <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
                                         <thead>
                                             <tr>
@@ -314,9 +333,12 @@
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_commercial_panel_head">
                                     <span>Clientes A/B en riesgo</span>
-                                    <span>Recencia y cobertura</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <span>Recencia y cobertura</span>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_clientes_riesgo' })" aria-label="Exportar clientes en riesgo"><i class="fa fa-download"/></button>
+                                    </div>
                                 </div>
-                                <div class="table-responsive">
+                                <div class="zrn_analitics_commercial_table_surface table-responsive">
                                     <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
                                         <thead>
                                             <tr>
@@ -392,22 +414,33 @@
                             </section>
                         </div>
 
-                        <section class="zrn_analitics_hub_panel">
-                            <div class="zrn_analitics_commercial_panel_head">
-                                <span>Notas y fuentes</span>
-                                <span>Trazabilidad del dato</span>
-                            </div>
-                            <div class="zrn_analitics_commercial_coverage_notes">
-                                <t t-foreach="coveragePayload.notes_sources" t-as="note" t-key="note.label">
-                                    <div class="zrn_analitics_commercial_coverage_note_row">
-                                        <strong><t t-esc="note.label"/></strong>
-                                        <span><t t-esc="note.detail"/></span>
-                                    </div>
-                                </t>
-                            </div>
-                        </section>
                     </t>
                 </div>
+                <t t-if="state.coverageSkuChartConfigOpen">
+                    <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeCoverageSkuChartConfig"/>
+                    <div class="modal fade show d-block zrn_analitics_coverage_chart_modal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-dialog-centered" role="document" t-on-click.stop="">
+                            <div class="modal-content zrn_analitics_commercial_modal">
+                                <div class="zrn_analitics_commercial_modal_head"><strong>Configurar gráfica por SKU</strong><button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="closeCoverageSkuChartConfig" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_analitics_commercial_modal_body">
+                                    <label class="form-label">Métrica</label>
+                                    <select class="form-select" t-att-value="state.coverageSkuChartMetric" t-on-change="setCoverageSkuChartMetric">
+                                        <t t-foreach="coverageSkuChartMetricOptions" t-as="metric" t-key="metric.key">
+                                            <option t-att-value="metric.key"><t t-esc="metric.label"/></option>
+                                        </t>
+                                    </select>
+                                    <label class="form-label mt-3">Tipo de gráfica</label>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.coverageSkuChartType === 'bar' ? 'active' : ''" t-on-click="() =&gt; this.setCoverageSkuChartType('bar')">Barras</button>
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.coverageSkuChartType === 'line' ? 'active' : ''" t-on-click="() =&gt; this.setCoverageSkuChartType('line')">Línea</button>
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.coverageSkuChartType === 'pie' ? 'active' : ''" t-on-click="() =&gt; this.setCoverageSkuChartType('pie')">Circular</button>
+                                    </div>
+                                </div>
+                                <div class="zrn_analitics_commercial_modal_footer"><button type="button" class="btn btn-primary" t-on-click="closeCoverageSkuChartConfig">Aplicar</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
             </t>
 
             </t>

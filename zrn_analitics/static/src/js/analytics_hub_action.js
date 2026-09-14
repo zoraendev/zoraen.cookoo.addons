@@ -3,8 +3,10 @@
 import { TagsList } from "@web/core/tags_list/tags_list";
 import { SelectMenu } from "@web/core/select_menu/select_menu";
 import { registry } from "@web/core/registry";
+import { download } from "@web/core/network/download";
 import { useService } from "@web/core/utils/hooks";
 import { Many2XAutocomplete } from "@web/views/fields/relational_utils";
+import { ExportDataDialog } from "@web/views/view_dialogs/export_data_dialog";
 import {
   Component,
   onMounted,
@@ -214,7 +216,15 @@ class ZrnRelationalMultiSelect extends Component {
   }
 
   get activeActions() {
-    return {};
+    return {
+      type: "many2many",
+      create: false,
+      createEdit: false,
+      delete: false,
+      link: true,
+      unlink: true,
+      write: false,
+    };
   }
 
   get tags() {
@@ -383,7 +393,9 @@ ZrnRelationalSingleSelect.defaultProps = {
 class ZrnAnalyticsHubAction extends Component {
   setup() {
     this.actionService = useService("action");
+    this.dialogService = useService("dialog");
     this.orm = useService("orm");
+    this.rpc = useService("rpc");
     this.rootRef = useRef("hubRoot");
     this.hubs = HUBS;
     this.commercialTabs = COMMERCIAL_TABS;
@@ -416,6 +428,18 @@ class ZrnAnalyticsHubAction extends Component {
       overviewRevenueChartType: "line",
       overviewBrandMixChartType: "doughnut",
       overviewCustomersChartType: "bar",
+      commercialPanelViews: {
+        channel_main: "table",
+        coverage_channel: "table",
+        coverage_sku: "table",
+      },
+      channelChartConfigOpen: false,
+      channelChartMetric: "revenue",
+      channelChartType: "bar",
+      coverageChannelChartType: "bar",
+      coverageSkuChartConfigOpen: false,
+      coverageSkuChartMetric: "pdv_pct",
+      coverageSkuChartType: "bar",
       pdvSidebarOpen: false,
       commercialPayload: null,
       commercialFilterOptions: {},
@@ -576,6 +600,577 @@ class ZrnAnalyticsHubAction extends Component {
       return order === "asc" ? valA - valB : valB - valA;
     });
     return sorted;
+  }
+
+  downloadCsv(filename, columns, rows) {
+    const escapeCell = (value) => {
+      const text = value === undefined || value === null ? "" : String(value);
+      return `"${text.replace(/"/g, '""')}"`;
+    };
+    const csv = [
+      columns.map((column) => escapeCell(column.label)).join(","),
+      ...(rows || []).map((row) =>
+        columns.map((column) => escapeCell(row[column.key])).join(","),
+      ),
+    ].join("\r\n");
+    const blob = new Blob(["\ufeff", csv], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  exportCommercialDataset(datasetKey) {
+    this.openNativeCommercialExport(datasetKey);
+    return;
+    // Kept below as a fallback reference for the computed datasets while the
+    // native exporter resolves the model fields and formats.
+    const symbol = this.commercialPayload.summary?.currency_symbol || "$";
+    if (datasetKey === "overview_summary") {
+      const summary = this.commercialPayload.summary || {};
+      this.downloadCsv(
+        "zrn_comercial_resumen",
+        [
+          { key: "metric", label: "Metrica" },
+          { key: "value", label: "Valor" },
+        ],
+        [
+          { metric: "Venta total", value: `${symbol} ${this.formatMoney(summary.total_amount)}` },
+          { metric: "Pedidos", value: this.formatCount(summary.order_count) },
+          { metric: "Cuentas", value: this.formatCount(summary.customer_count) },
+          { metric: "PDVs", value: this.formatCount(summary.point_count) },
+          { metric: "Ticket promedio", value: `${symbol} ${this.formatMoney(summary.average_ticket)}` },
+        ],
+      );
+      return;
+    }
+    if (datasetKey === "revenue_series") {
+      this.downloadCsv(
+        "zrn_comercial_venta_por_mes",
+        [
+          { key: "period", label: "Periodo" },
+          { key: "revenue", label: "Venta" },
+        ],
+        (this.commercialPayload.revenue_series || []).map((row) => ({
+          period: row.label,
+          revenue: row.value,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "brand_mix") {
+      this.downloadCsv(
+        "zrn_comercial_mix_por_marca",
+        [
+          { key: "brand", label: "Marca" },
+          { key: "revenue", label: "Venta" },
+          { key: "percentage", label: "% Mix" },
+          { key: "products", label: "Productos" },
+        ],
+        (this.commercialPayload.brand_mix || []).map((row) => ({
+          brand: row.name,
+          revenue: row.value,
+          percentage: row.percentage,
+          products: row.product_count,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "top_customers") {
+      this.downloadCsv(
+        "zrn_comercial_top_clientes",
+        [
+          { key: "customer", label: "Cliente / PDV" },
+          { key: "orders", label: "Pedidos" },
+          { key: "revenue", label: "Venta" },
+        ],
+        (this.commercialPayload.top_customers || []).map((row) => ({
+          customer: row.name,
+          orders: row.order_count,
+          revenue: row.total_amount,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "top_products") {
+      this.downloadCsv(
+        "zrn_comercial_top_productos",
+        [
+          { key: "product", label: "Producto" },
+          { key: "code", label: "Codigo" },
+          { key: "category", label: "Categoria" },
+          { key: "units", label: "Unidades" },
+          { key: "revenue", label: "Venta" },
+        ],
+        this.sortedTopProducts.map((row) => ({
+          product: row.name,
+          code: row.default_code,
+          category: row.category_name,
+          units: row.quantity_sold,
+          revenue: row.sales_amount,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "portfolio_drill") {
+      this.downloadCsv(
+        "zrn_comercial_drill_portafolio",
+        [
+          { key: "level", label: "Nivel" },
+          { key: "business_unit", label: "Unidad de negocio" },
+          { key: "brand", label: "Marca" },
+          { key: "category", label: "Categoria de marca" },
+          { key: "sku", label: "SKU" },
+          { key: "revenue", label: "Ingreso" },
+          { key: "mix", label: "% Mix" },
+          { key: "units", label: "Unidades" },
+          { key: "skus", label: "SKUs" },
+        ],
+        (this.commercialPortfolio.drillRows || []).map((row) => ({
+          level: row.level_label || row.level,
+          business_unit: row.business_unit_name || "",
+          brand: row.brand_name || "",
+          category: row.category_name || "",
+          sku: row.sku_name || "",
+          revenue: row.revenue,
+          mix: row.mix_percentage,
+          units: row.units_sold,
+          skus: row.sku_count,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "all_products") {
+      this.downloadCsv(
+        "zrn_comercial_productos",
+        [
+          { key: "product", label: "Producto" },
+          { key: "brand", label: "Marca" },
+          { key: "category", label: "Categoria" },
+          { key: "revenue", label: "Venta" },
+          { key: "units", label: "Unidades" },
+          { key: "lines", label: "Lineas" },
+          { key: "channels", label: "Canales" },
+          { key: "avg_price", label: "Precio real prom." },
+        ],
+        this.sortedAllProducts.map((row) => ({
+          product: row.name,
+          brand: row.brand,
+          category: row.category,
+          revenue: row.rev,
+          units: row.units,
+          lines: row.n_lines,
+          channels: row.channels,
+          avg_price: row.avg_unit_price_real,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "all_clients") {
+      this.downloadCsv(
+        "zrn_comercial_clientes_pdv",
+        [
+          { key: "customer", label: "Cliente / PDV" },
+          { key: "channel", label: "Canal" },
+          { key: "revenue", label: "Facturado" },
+          { key: "units", label: "Unidades" },
+          { key: "invoices", label: "Facturas" },
+          { key: "first", label: "Primera compra" },
+          { key: "last", label: "Ultima compra" },
+          { key: "days_since", label: "Dias sin facturar" },
+        ],
+        this.sortedAllClients.map((row) => ({
+          customer: row.name,
+          channel: row.channel,
+          revenue: row.rev,
+          units: row.units,
+          invoices: row.invoices,
+          first: row.first,
+          last: row.last,
+          days_since: row.days_since,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "channels") {
+      this.downloadCsv(
+        "zrn_comercial_canales",
+        [
+          { key: "channel", label: "Canal" },
+          { key: "customers", label: "Clientes" },
+          { key: "pdvs", label: "PDVs" },
+          { key: "orders", label: "Pedidos" },
+          { key: "units", label: "Unidades" },
+          { key: "revenue", label: "Revenue" },
+          { key: "mix", label: "% Mix" },
+          { key: "ticket", label: "Ticket" },
+          { key: "brands", label: "Marcas" },
+          { key: "last_order", label: "Ultima venta" },
+        ],
+        (this.channelPayload.rows || []).map((row) => ({
+          channel: row.channel,
+          customers: row.customer_count,
+          pdvs: row.point_count,
+          orders: row.order_count,
+          units: row.units,
+          revenue: row.revenue,
+          mix: row.mix_pct,
+          ticket: row.average_ticket,
+          brands: row.brand_count,
+          last_order: row.last_order_label,
+        })),
+      );
+      return;
+    }
+    if (datasetKey === "trends") {
+      this.downloadCsv(
+        "zrn_comercial_tendencias",
+        [
+          { key: "type", label: "Tipo" },
+          { key: "product", label: "Producto" },
+          { key: "historic_pace", label: "Pace historico/dia" },
+          { key: "recent_pace", label: "Pace reciente/dia" },
+          { key: "trend", label: "Cambio %" },
+        ],
+        [
+          ...this.sortedGrowers.map((row) => ({
+            type: "Crecimiento",
+            product: row.name,
+            historic_pace: row.pace_q1_u,
+            recent_pace: row.pace_abr_u,
+            trend: row.trend,
+          })),
+          ...this.sortedDecliners.map((row) => ({
+            type: "Caida",
+            product: row.name,
+            historic_pace: row.pace_q1_u,
+            recent_pace: row.pace_abr_u,
+            trend: row.trend,
+          })),
+        ],
+      );
+      return;
+    }
+    if (datasetKey === "bcg") {
+      this.downloadCsv(
+        "zrn_comercial_bcg",
+        [
+          { key: "product", label: "Producto" },
+          { key: "quadrant", label: "Cuadrante" },
+          { key: "revenue", label: "Venta" },
+          { key: "margin", label: "Margen %" },
+        ],
+        (this.commercialPayload.bcg_data?.skus || []).map((row) => ({
+          product: row.n,
+          quadrant: row.q,
+          revenue: row.r,
+          margin: row.m,
+        })),
+      );
+    }
+  }
+
+  async openNativeCommercialExport(datasetKey) {
+    if (datasetKey === "portfolio_drill") {
+      return this.downloadCommercialPortfolioDrillExcel();
+    }
+    const config = {
+      channels: {
+        model: "zrn_commercial.commercial.channel",
+        ids: [],
+        names: (this.channelPayload.rows || []).map((row) => row.channel),
+      },
+      all_products: {
+        model: "product.product",
+        ids: this.sortedAllProducts.map((row) => row.product_id || row.id).filter(Boolean),
+      },
+      top_products: {
+        model: "product.product",
+        ids: this.sortedTopProducts.map((row) => row.product_id || row.id).filter(Boolean),
+      },
+      all_clients: {
+        model: "res.partner",
+        ids: this.sortedAllClients.map((row) => row.id || row.partner_id).filter(Boolean),
+      },
+      top_customers: {
+        model: "res.partner",
+        ids: (this.commercialPayload.top_customers || [])
+          .map((row) => row.partner_id)
+          .filter(Boolean),
+      },
+      brand_mix: {
+        model: "zrn_commercial.commercial.brand",
+        ids: (this.commercialPayload.brand_mix || [])
+          .map((row) => row.brand_id || row.id)
+          .filter(Boolean),
+      },
+      bcg: {
+        model: "product.product",
+        ids: (this.commercialPayload.bcg_data?.skus || [])
+          .map((row) => row.product_id || row.id)
+          .filter(Boolean),
+      },
+      revenue_series: { model: "sale.order.line", ids: [] },
+      trends: { model: "product.product", ids: [] },
+      overview_summary: { model: "sale.order", ids: [] },
+    }[datasetKey];
+    if (!config) {
+      return;
+    }
+    if (config.names?.length) {
+      config.ids = await this.orm.search(config.model, [["name", "in", config.names]]);
+    }
+    const root = {
+      resModel: config.model,
+      domain: config.ids.length ? [["id", "in", config.ids]] : [],
+      groupBy: [],
+      context: {},
+      ids: config.ids.length ? config.ids : false,
+    };
+    return this.openNativeExportDialog(config.model, root.ids, datasetKey, root);
+  }
+
+  async downloadCommercialPortfolioDrillExcel() {
+    const rows = (this.commercialPortfolio.drillRows || []).map((row) => ({
+      level: row.level || "",
+      level_label: row.level_label || "",
+      label: row.label || "",
+      business_unit_name: row.business_unit_name || "",
+      brand_name: row.brand_name || "",
+      category_name: row.category_name || "",
+      sku_name: row.sku_name || "",
+      revenue: Number(row.revenue || 0),
+      mix_percentage: Number(row.mix_percentage || 0),
+      units_sold: Number(row.units_sold || 0),
+      billed_lines: Number(row.billed_lines || 0),
+      sku_count: Number(row.sku_count || 0),
+      margin_amount: Number(row.margin_amount || 0),
+      margin_pct: Number(row.margin_pct || 0),
+    }));
+    if (!rows.length) {
+      return;
+    }
+    await download({
+      data: {
+        rows: JSON.stringify(rows),
+        currency_symbol: this.commercialPortfolio.currencySymbol || "$",
+      },
+      url: "/zrn_analitics/commercial/portfolio_drill/export_excel",
+    });
+  }
+
+  exportCommercialVisibleContent(ev, options = {}) {
+    const panel = ev?.currentTarget?.closest?.(".zrn_analitics_hub_panel");
+    const filename = options.filename || "zrn_comercial_export";
+    const chartKey = options.chartKey;
+    const chartEl = chartKey
+      ? panel?.querySelector?.(`[data-zrn-chart="${chartKey}"]`)
+      : panel?.querySelector?.("[data-zrn-chart]");
+    if (chartEl && this.isCommercialNodeVisible(chartEl)) {
+      this.downloadChartImage(chartKey || chartEl.dataset.zrnChart, filename);
+      return;
+    }
+    const tables = Array.from(panel?.querySelectorAll?.("table") || []).filter((table) =>
+      this.isCommercialNodeVisible(table),
+    );
+    if (tables.length) {
+      this.downloadCommercialTablesExcel(
+        filename,
+        options.title || this.getCommercialPanelTitle(panel) || "Exportacion comercial",
+        tables,
+      );
+    }
+  }
+
+  isCommercialNodeVisible(node) {
+    return Boolean(node && node.offsetParent !== null && node.getClientRects().length);
+  }
+
+  getCommercialPanelTitle(panel) {
+    return (
+      panel?.querySelector?.(".zrn_analitics_commercial_panel_head span")?.textContent?.trim() ||
+      panel?.querySelector?.(".zrn_analitics_hub_panel_title")?.textContent?.trim() ||
+      this.commercialTabs.find((tab) => tab.id === this.state.commercialTab)?.label ||
+      ""
+    );
+  }
+
+  downloadCommercialTablesExcel(filename, title, tables) {
+    const tableHtml = tables
+      .map((table, index) => {
+        const clone = table.cloneNode(true);
+        clone.querySelectorAll("button, .fa, .o_optional_columns_dropdown").forEach((node) =>
+          node.remove(),
+        );
+        clone.querySelectorAll("[style]").forEach((node) => {
+          const style = node.getAttribute("style") || "";
+          const keep = style
+            .split(";")
+            .map((rule) => rule.trim())
+            .filter((rule) => /^text-align/i.test(rule) || /^font-weight/i.test(rule))
+            .join("; ");
+          if (keep) {
+            node.setAttribute("style", keep);
+          } else {
+            node.removeAttribute("style");
+          }
+        });
+        const sectionTitle =
+          tables.length > 1
+            ? `<div class="zrn_sheet_section">Tabla ${index + 1}</div>`
+            : "";
+        return `${sectionTitle}${clone.outerHTML}`;
+      })
+      .join('<div class="zrn_sheet_gap"></div>');
+    const html = `<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+      xmlns:x="urn:schemas-microsoft-com:office:excel"
+      xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="ProgId" content="Excel.Sheet" />
+  <meta name="Generator" content="Odoo ZRN Analitica" />
+  <style>
+    body { font-family: Calibri, Arial, sans-serif; color: #1f2937; margin: 24px; }
+    .zrn_sheet_title { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+    .zrn_sheet_section { font-size: 13px; font-weight: 700; color: #1f4e8c; margin: 12px 0 6px; }
+    .zrn_sheet_gap { height: 18px; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 8px; }
+    th, td { border: 1px solid #d7d8ea; padding: 8px 10px; vertical-align: middle; }
+    thead th { background: #1f4e8c; color: #ffffff; font-weight: 700; }
+    tbody tr:nth-child(even) td { background: #f6f8fb; }
+    .is-unit td, .zrn_level_unit td { background: #eaf1fb !important; font-weight: 700; }
+    .is-brand td, .zrn_level_brand td { background: #f2f6fc !important; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="zrn_sheet_title">${this.escapeHtml(title)}</div>
+  ${tableHtml || '<div>No hay datos para exportar.</div>'}
+</body>
+</html>`;
+    const blob = new Blob(["\ufeff", html], {
+      type: "application/vnd.ms-excel;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${this.sanitizeCommercialFilename(filename)}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  sanitizeCommercialFilename(filename) {
+    return String(filename || "zrn_comercial_export")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9_-]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .toLowerCase();
+  }
+
+  escapeHtml(value) {
+    return String(value || "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  openNativeExportDialog(model, ids, filename, root = {}) {
+    const exportRoot = {
+      resModel: model,
+      domain: ids ? [["id", "in", ids]] : [],
+      groupBy: [],
+      context: {},
+      ids: ids || false,
+      ...root,
+    };
+    this.dialogService.add(ExportDataDialog, {
+      context: exportRoot.context,
+      defaultExportList: [],
+      download: (fields, importCompat, format) =>
+        this.downloadOdooExport(exportRoot, fields, importCompat, format),
+      getExportedFields: (model, importCompat, parentParams) =>
+        this.rpc("/web/export/get_fields", {
+          ...parentParams,
+          model,
+          import_compat: importCompat,
+        }),
+      root: exportRoot,
+    });
+  }
+
+  async downloadOdooExport(root, fields, importCompat, format) {
+    const exportedFields = fields.map((field) => ({
+      name: field.name || field.id,
+      label: field.label || field.string,
+      store: field.store,
+      type: field.field_type || field.type,
+    }));
+    if (importCompat) {
+      exportedFields.unshift({ name: "id", label: "External ID" });
+    }
+    await download({
+      data: {
+        data: JSON.stringify({
+          import_compat: importCompat,
+          context: root.context,
+          domain: root.domain,
+          fields: exportedFields,
+          groupby: root.groupBy,
+          ids: root.ids,
+          model: root.resModel,
+        }),
+      },
+      url: `/web/export/${format}`,
+    });
+  }
+
+  exportCommercialPanel(panelKey, datasetKey, chartKey, filename) {
+    if (this.getCommercialPanelView(panelKey) === "chart") {
+      this.downloadChartImage(chartKey, filename);
+      return;
+    }
+    const chart = document.querySelector(`[data-zrn-chart="${chartKey}"]`);
+    const panel = chart?.closest?.(".zrn_analitics_hub_panel");
+    const tables = Array.from(panel?.querySelectorAll?.("table") || []).filter((table) =>
+      this.isCommercialNodeVisible(table),
+    );
+    if (tables.length) {
+      this.downloadCommercialTablesExcel(
+        filename || datasetKey,
+        this.getCommercialPanelTitle(panel) || filename || datasetKey,
+        tables,
+      );
+      return;
+    }
+    this.exportCommercialDataset(datasetKey);
+  }
+
+  downloadChartImage(chartKey, filename) {
+    const chart = this._charts.get(chartKey) || this.getChart(chartKey);
+    if (!chart) {
+      return;
+    }
+    const link = document.createElement("a");
+    link.href = chart.getDataURL({
+      type: "png",
+      pixelRatio: 2,
+      backgroundColor: "#ffffff",
+    });
+    link.download = `${filename || chartKey}.png`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   get sortedTopProducts() {
@@ -1065,6 +1660,59 @@ class ZrnAnalyticsHubAction extends Component {
       this.state.overviewCustomersChartType =
         this.state.overviewCustomersChartType === "bar" ? "line" : "bar";
     }
+    this.queueChartRender();
+  }
+
+  getCommercialPanelView(panelKey) {
+    return this.state.commercialPanelViews?.[panelKey] || "table";
+  }
+
+  setCommercialPanelView(panelKey, viewMode) {
+    this.state.commercialPanelViews = {
+      ...(this.state.commercialPanelViews || {}),
+      [panelKey]: viewMode,
+    };
+    this.queueChartRender();
+  }
+
+  toggleChannelChartConfig() {
+    this.state.channelChartConfigOpen = !this.state.channelChartConfigOpen;
+  }
+
+  closeChannelChartConfig() {
+    this.state.channelChartConfigOpen = false;
+  }
+
+  setChannelChartMetric(ev) {
+    this.state.channelChartMetric = ev.target.value || "revenue";
+    this.queueChartRender();
+  }
+
+  setChannelChartType(chartType) {
+    this.state.channelChartType = chartType || "bar";
+    this.queueChartRender();
+  }
+
+  setCoverageChannelChartType(chartType) {
+    this.state.coverageChannelChartType = chartType || "bar";
+    this.queueChartRender();
+  }
+
+  toggleCoverageSkuChartConfig() {
+    this.state.coverageSkuChartConfigOpen = !this.state.coverageSkuChartConfigOpen;
+  }
+
+  closeCoverageSkuChartConfig() {
+    this.state.coverageSkuChartConfigOpen = false;
+  }
+
+  setCoverageSkuChartMetric(ev) {
+    this.state.coverageSkuChartMetric = ev.target.value || "pdv_pct";
+    this.queueChartRender();
+  }
+
+  setCoverageSkuChartType(chartType) {
+    this.state.coverageSkuChartType = chartType || "bar";
     this.queueChartRender();
   }
 
@@ -2753,6 +3401,43 @@ class ZrnAnalyticsHubAction extends Component {
     return Boolean((this.channelPayload.rows || []).length);
   }
 
+  get channelChartMetricOptions() {
+    return [
+      { key: "revenue", label: "Ingreso", format: "money" },
+      { key: "order_count", label: "Pedidos", format: "count" },
+      { key: "units", label: "Unidades", format: "count" },
+      { key: "average_ticket", label: "Ticket promedio", format: "money" },
+      { key: "customer_count", label: "Clientes", format: "count" },
+      { key: "point_count", label: "PDVs", format: "count" },
+      { key: "brand_count", label: "Marcas", format: "count" },
+    ];
+  }
+
+  get activeChannelChartMetric() {
+    return (
+      this.channelChartMetricOptions.find(
+        (metric) => metric.key === this.state.channelChartMetric,
+      ) || this.channelChartMetricOptions[0]
+    );
+  }
+
+  get coverageSkuChartMetricOptions() {
+    return [
+      { key: "pdv_pct", label: "% PDVs", format: "percent" },
+      { key: "pdv_count", label: "# PDVs", format: "count" },
+      { key: "revenue", label: "Ingreso", format: "money" },
+      { key: "channels", label: "Canales", format: "count" },
+    ];
+  }
+
+  get activeCoverageSkuChartMetric() {
+    return (
+      this.coverageSkuChartMetricOptions.find(
+        (metric) => metric.key === this.state.coverageSkuChartMetric,
+      ) || this.coverageSkuChartMetricOptions[0]
+    );
+  }
+
   get hasFinancialRevenueSeries() {
     return Boolean((this.financialPayload.revenue_series || []).length);
   }
@@ -2797,7 +3482,8 @@ class ZrnAnalyticsHubAction extends Component {
     const max = this.coverageMatrixMax || 1;
     const ratio = Number(value || 0) / max;
     const opacity = Math.min(0.9, Math.max(0.08, ratio));
-    return `background: rgba(31, 78, 140, ${opacity});`;
+    const color = opacity >= 0.45 ? "#ffffff" : "#12365f";
+    return `background: rgba(31, 78, 140, ${opacity}); color: ${color}; font-weight: 700;`;
   }
 
   get commercialPortfolio() {
@@ -2868,48 +3554,83 @@ class ZrnAnalyticsHubAction extends Component {
         margin_pct: 0,
         lines: categories,
         detail: brand.detail || null,
+        business_unit_id: brand.business_unit_id || false,
+        business_unit_name: brand.business_unit_name || "Sin unidad de negocio",
       };
     });
 
-    const unit = {
-      key: "portfolio_general",
-      name: "Portafolio Comercial",
-      color: "#1f4e8c",
-      brands,
-      revenue: totalRevenue,
-      mix_percentage: totalRevenue ? 100 : 0,
-      sku_count: brands.reduce((sum, brand) => sum + Number(brand.sku_count || 0), 0),
-      brand_count: brands.length,
-      billed_lines: 0,
-      margin_amount: 0,
-      margin_pct: 0,
-    };
+    const unitColors = ["#1f4e8c", "#bd1730", "#2f6f5e", "#7a5ea8", "#8a5a1f"];
+    const unitMap = new Map();
+    brands.forEach((brand) => {
+      const unitId = brand.business_unit_id || 0;
+      const unitKey = `unit_${unitId || brand.business_unit_name}`;
+      if (!unitMap.has(unitKey)) {
+        unitMap.set(unitKey, {
+          key: unitKey,
+          name: brand.business_unit_name,
+          business_unit_id: unitId,
+          color: unitColors[unitMap.size % unitColors.length],
+          brands: [],
+          revenue: 0,
+          mix_percentage: 0,
+          sku_count: 0,
+          brand_count: 0,
+          units_sold: 0,
+          billed_lines: 0,
+          margin_amount: 0,
+          margin_pct: 0,
+        });
+      }
+      const unit = unitMap.get(unitKey);
+      unit.brands.push(brand);
+      unit.revenue += Number(brand.revenue || 0);
+      unit.sku_count += Number(brand.sku_count || 0);
+      unit.units_sold += Number(brand.units_sold || 0);
+      unit.brand_count += 1;
+    });
+    const units = Array.from(unitMap.values()).map((unit) => ({
+      ...unit,
+      mix_percentage: totalRevenue ? (Number(unit.revenue || 0) / totalRevenue) * 100 : 0,
+    }));
 
-    const drillRows = [
-      {
+    const drillRows = [];
+
+    units.forEach((unit) => {
+      drillRows.push({
         key: unit.key,
         ancestor_keys: [],
         level: "unit",
+        level_label: "Unidad de negocio",
         label: unit.name,
+        business_unit_name: unit.name,
+        brand_name: "",
+        category_name: "",
+        sku_name: "",
         revenue: unit.revenue,
         mix_percentage: unit.mix_percentage,
-        units_sold: 0,
+        units_sold: unit.units_sold,
         billed_lines: unit.billed_lines,
         sku_count: unit.sku_count,
         margin_amount: 0,
         margin_pct: 0,
         color: unit.color,
         detail: null,
-      },
-    ];
+      });
+    });
 
-    brands.forEach((brand) => {
+    units.forEach((unit) => {
+      unit.brands.forEach((brand) => {
       drillRows.push({
         key: brand.key,
         resId: brand.resId,
         ancestor_keys: [unit.key],
         level: "brand",
+        level_label: "Marca",
         label: brand.name,
+        business_unit_name: unit.name,
+        brand_name: brand.name,
+        category_name: "",
+        sku_name: "",
         revenue: brand.revenue,
         mix_percentage: brand.mix_percentage,
         units_sold: brand.units_sold,
@@ -2924,7 +3645,12 @@ class ZrnAnalyticsHubAction extends Component {
           key: line.key,
           ancestor_keys: [unit.key, brand.key],
           level: "line",
+          level_label: "Categoria de marca",
           label: line.name,
+          business_unit_name: unit.name,
+          brand_name: brand.name,
+          category_name: line.name,
+          sku_name: "",
           revenue: line.revenue,
           mix_percentage: line.mix_percentage,
           units_sold: line.units_sold,
@@ -2940,7 +3666,12 @@ class ZrnAnalyticsHubAction extends Component {
             resId: sku.resId,
             ancestor_keys: [unit.key, brand.key, line.key],
             level: "sku",
+            level_label: "SKU",
             label: sku.name,
+            business_unit_name: unit.name,
+            brand_name: brand.name,
+            category_name: line.name,
+            sku_name: sku.name,
             revenue: sku.revenue,
             mix_percentage: sku.mix_percentage,
             units_sold: sku.units_sold,
@@ -2952,6 +3683,7 @@ class ZrnAnalyticsHubAction extends Component {
           });
         });
       });
+      });
     });
 
     return {
@@ -2959,7 +3691,7 @@ class ZrnAnalyticsHubAction extends Component {
       hasRevenue: totalRevenue > 0,
       currencySymbol,
       totalRevenue,
-      units: [unit],
+      units,
       drillRows,
     };
   }
@@ -3113,6 +3845,7 @@ class ZrnAnalyticsHubAction extends Component {
         this.renderOverviewLineChart();
         this.renderOverviewDonutChart();
         this.renderOverviewCustomersChart();
+        this.renderChannelChart();
         this.renderPortfolioUnitsChart();
         this.renderPortfolioBrandsChart();
         this.renderCoverageChannelChart();
@@ -3528,6 +4261,7 @@ class ZrnAnalyticsHubAction extends Component {
     if (!chart) {
       return;
     }
+    const chartType = this.state.coverageChannelChartType || "bar";
     chart.setOption(
       {
         animationDuration: 650,
@@ -3555,13 +4289,13 @@ class ZrnAnalyticsHubAction extends Component {
         series: [
           {
             name: "Activos",
-            type: "bar",
+            type: chartType,
             data: rows.map((row) => Number(row.active || 0)),
             itemStyle: { color: "#1f4e8c", borderRadius: [6, 6, 0, 0] },
           },
           {
             name: "Red total",
-            type: "bar",
+            type: chartType,
             data: rows.map((row) => Number(row.network_total || 0)),
             itemStyle: { color: "#a9c7eb", borderRadius: [6, 6, 0, 0] },
           },
@@ -3571,11 +4305,90 @@ class ZrnAnalyticsHubAction extends Component {
     );
   }
 
-  renderCoverageSkuChart() {
-    if (this.state.commercialTab !== "cobertura") {
+  renderChannelChart() {
+    if (
+      this.state.commercialTab !== "canal" ||
+      this.getCommercialPanelView("channel_main") !== "chart"
+    ) {
       return;
     }
-    const rows = (this.coveragePayload.sku_distribution || []).slice(0, 8);
+    const rows = this.channelPayload.rows || [];
+    const chart = this.getChart("channel-main");
+    if (!chart || !rows.length) {
+      return;
+    }
+    const metric = this.activeChannelChartMetric;
+    const values = rows.map((row) => Number(row[metric.key] || 0));
+    const chartType = this.state.channelChartType || "bar";
+    const formatter = (value) =>
+      metric.format === "money"
+        ? `${this.channelPayload.summary.currency_symbol} ${this.formatMoney(value)}`
+        : this.formatCount(value);
+    const common = {
+      animationDuration: 450,
+      tooltip: {
+        trigger: chartType === "pie" ? "item" : "axis",
+        valueFormatter: chartType === "pie" ? formatter : undefined,
+      },
+    };
+    if (chartType === "pie") {
+      chart.setOption(
+        {
+          ...common,
+          legend: { type: "scroll", bottom: 0, textStyle: { color: "#5f6b7a" } },
+          series: [
+            {
+              name: metric.label,
+              type: "pie",
+              radius: ["42%", "70%"],
+              data: rows.map((row, index) => ({ name: row.channel, value: values[index] })),
+              label: { color: "#334155" },
+            },
+          ],
+        },
+        true,
+      );
+      return;
+    }
+    chart.setOption(
+      {
+        ...common,
+        grid: { top: 24, right: 20, bottom: 42, left: 52, containLabel: true },
+        xAxis: {
+          type: "category",
+          data: rows.map((row) => row.channel),
+          axisTick: { show: false },
+          axisLine: { lineStyle: { color: "#d6deea" } },
+          axisLabel: { color: "#5f6b7a", fontSize: 11 },
+        },
+        yAxis: {
+          type: "value",
+          axisLabel: { color: "#5f6b7a", fontSize: 11 },
+          splitLine: { lineStyle: { color: "#edf2f8" } },
+        },
+        series: [
+          {
+            name: metric.label,
+            type: chartType,
+            data: values,
+            smooth: chartType === "line",
+            itemStyle: { color: "#1f4e8c" },
+            lineStyle: { color: "#1f4e8c", width: 3 },
+          },
+        ],
+      },
+      true,
+    );
+  }
+
+  renderCoverageSkuChart() {
+    if (
+      this.state.commercialTab !== "cobertura" ||
+      this.getCommercialPanelView("coverage_sku") !== "chart"
+    ) {
+      return;
+    }
+    const rows = (this.sortedSkuDistribution || []).slice(0, 10);
     if (!rows.length) {
       return;
     }
@@ -3583,24 +4396,96 @@ class ZrnAnalyticsHubAction extends Component {
     if (!chart) {
       return;
     }
+    const metric = this.activeCoverageSkuChartMetric;
+    const chartType = this.state.coverageSkuChartType || "bar";
+    const values = rows.map((row) => Number(row[metric.key] || 0));
+    const formatter = (value) => {
+      if (metric.format === "money") {
+        return `${this.commercialPayload.summary.currency_symbol} ${this.formatMoney(value)}`;
+      }
+      if (metric.format === "percent") {
+        return `${Number(value || 0).toFixed(1)}%`;
+      }
+      return this.formatCount(value);
+    };
+    const common = {
+      animationDuration: 650,
+      tooltip: {
+        trigger: chartType === "pie" ? "item" : "axis",
+        axisPointer: { type: "shadow" },
+        valueFormatter: chartType === "pie" ? undefined : formatter,
+      },
+    };
+    if (chartType === "pie") {
+      chart.setOption(
+        {
+          ...common,
+          legend: { type: "scroll", bottom: 0, textStyle: { color: "#5f6b7a" } },
+          series: [
+            {
+              name: metric.label,
+              type: "pie",
+              radius: ["42%", "70%"],
+              data: rows.map((row, index) => ({ name: row.sku, value: values[index] })),
+              label: { color: "#334155", formatter: "{b}" },
+            },
+          ],
+        },
+        true,
+      );
+      return;
+    }
     const reversed = [...rows].reverse();
+    const reversedValues = [...values].reverse();
+    if (chartType === "line") {
+      chart.setOption(
+        {
+          ...common,
+          grid: { top: 24, right: 20, bottom: 44, left: 54, containLabel: true },
+          xAxis: {
+            type: "category",
+            data: rows.map((row) => row.sku),
+            axisTick: { show: false },
+            axisLine: { lineStyle: { color: "#d6deea" } },
+            axisLabel: { color: "#5f6b7a", fontSize: 11, width: 110, overflow: "truncate" },
+          },
+          yAxis: {
+            type: "value",
+            max: metric.format === "percent" ? 100 : undefined,
+            splitLine: { lineStyle: { color: "#edf2f8" } },
+            axisLabel: {
+              color: "#5f6b7a",
+              fontSize: 11,
+              formatter: metric.format === "percent" ? (value) => `${value}%` : undefined,
+            },
+          },
+          series: [
+            {
+              name: metric.label,
+              type: "line",
+              smooth: true,
+              data: values,
+              itemStyle: { color: "#bd1730" },
+              lineStyle: { color: "#bd1730", width: 3 },
+            },
+          ],
+        },
+        true,
+      );
+      return;
+    }
     chart.setOption(
       {
-        animationDuration: 650,
+        ...common,
         grid: { top: 8, right: 16, bottom: 8, left: 180, containLabel: false },
-        tooltip: {
-          trigger: "axis",
-          axisPointer: { type: "shadow" },
-          valueFormatter: (value) => `${Number(value || 0).toFixed(1)}%`,
-        },
         xAxis: {
           type: "value",
-          max: 100,
+          max: metric.format === "percent" ? 100 : undefined,
           splitLine: { lineStyle: { color: "#edf2f8" } },
           axisLabel: {
             color: "#5f6b7a",
             fontSize: 11,
-            formatter: (value) => `${value}%`,
+            formatter: metric.format === "percent" ? (value) => `${value}%` : undefined,
           },
         },
         yAxis: {
@@ -3617,8 +4502,9 @@ class ZrnAnalyticsHubAction extends Component {
         },
         series: [
           {
+            name: metric.label,
             type: "bar",
-            data: reversed.map((row) => Number(row.pdv_pct || 0)),
+            data: reversedValues,
             barWidth: 18,
             itemStyle: { color: "#bd1730", borderRadius: [0, 6, 6, 0] },
           },

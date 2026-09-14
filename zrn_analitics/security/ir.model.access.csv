@@ -3,3 +3,4 @@ access_zrn_analitics_home,zrn_analitics.home,model_zrn_analitics_home,base.group
 access_zrn_rrhh_predictor,zrn.rrhh.predictor,model_zrn_rrhh_predictor,base.group_user,1,1,1,1
 access_zrn_rrhh_validated_pattern,zrn.rrhh.validated.pattern,model_zrn_rrhh_validated_pattern,base.group_user,1,1,1,1
 access_zrn_rrhh_interview_checklist,zrn.rrhh.interview.checklist,model_zrn_rrhh_interview_checklist,base.group_user,1,1,1,1
+access_zrn_analitics_commercial_drill_export,zrn.analitics.commercial.drill.export,model_zrn_analitics_commercial_drill_export,,1,1,1,1

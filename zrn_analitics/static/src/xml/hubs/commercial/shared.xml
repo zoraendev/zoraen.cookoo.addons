@@ -31,7 +31,7 @@
 
         <t t-if="state.commercialFiltersOpen">
             <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeCommercialFilters"/>
-            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell" tabindex="-1" role="dialog">
+            <div class="modal fade show d-block zrn_analitics_commercial_modal_shell zrn_analitics_filters_modal_shell" tabindex="-1" role="dialog">
                 <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
                     <div class="modal-content zrn_analitics_commercial_filters_modal" t-on-click.stop="() =&gt; {}">
                         <div class="modal-header">
@@ -73,13 +73,6 @@
                         </t>
                     </select>
                 </div>
-                <div t-if="activeCommercialFilters.order_type !== 'purchase'" class="zrn_analitics_commercial_field zrn_analitics_commercial_field_inline">
-                    <label>Facturacion</label>
-                    <label class="zrn_analitics_commercial_check">
-                        <input type="checkbox" class="form-check-input" t-att-checked="activeCommercialFilters.invoiced_only" t-on-change="(ev) =&gt; this.updateCommercialFilter('invoiced_only', ev.target.checked)"/>
-                        <span>Solo facturados</span>
-                    </label>
-                </div>
                 <div class="zrn_analitics_commercial_field">
                     <label>Unidad de negocio</label>
                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.business_units, activeCommercialFilters.business_unit_ids)" domain="getOptionDomain(activeCommercialFilterOptions.business_units)" resModel="'zrn_commercial.business.unit'" fieldString="'Unidad de negocio'" placeholder="'Todas las unidades'" onChange.bind="this.onCommercialBusinessUnitsChange"/>
@@ -107,6 +100,13 @@
                 <div t-if="state.commercialTab === 'cobertura' || state.commercialTab === 'canal' || state.commercialTab === 'cliente' || state.commercialTab === 'rfm' || state.commercialTab === 'insights'" class="zrn_analitics_commercial_field">
                     <label>Cliente / PDV</label>
                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(activeCommercialFilterOptions.partners, activeCommercialFilters.partner_ids)" domain="getOptionDomain(activeCommercialFilterOptions.partners)" resModel="'res.partner'" fieldString="'Cliente / PDV'" placeholder="'Todos los clientes'" onChange.bind="this.onCommercialPartnersChange"/>
+                </div>
+                <div t-if="activeCommercialFilters.order_type !== 'purchase'" class="zrn_analitics_commercial_field zrn_analitics_commercial_field_inline zrn_analitics_commercial_billing_filter">
+                    <label>Facturacion</label>
+                    <label class="zrn_analitics_commercial_check">
+                        <input type="checkbox" class="form-check-input" t-att-checked="activeCommercialFilters.invoiced_only" t-on-change="(ev) =&gt; this.updateCommercialFilter('invoiced_only', ev.target.checked)"/>
+                        <span>Solo facturados</span>
+                    </label>
                 </div>
             </div>
                         </div>

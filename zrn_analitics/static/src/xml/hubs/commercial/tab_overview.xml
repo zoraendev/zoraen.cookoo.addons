@@ -10,7 +10,7 @@
 
                 <t t-if="hasCommercialBrands">
                     <div class="zrn_analitics_commercial_summary_table_wrap">
-                        <table class="table table-sm o_list_table zrn_analitics_commercial_summary_table mb-0">
+                        <table class="table table-sm zrn_analitics_commercial_summary_table mb-0">
                             <thead>
                                 <tr>
                                     <th><i class="fa fa-line-chart me-1"/> Venta total</th>
@@ -46,13 +46,10 @@
                                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('tendencias')" aria-label="Ver tendencias">
                                     <i class="fa fa-arrow-right"/>
                                 </button>
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('revenue')" aria-label="Cambiar grafica">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('revenue')" aria-label="Cambiar tipo de gráfica">
                                     <i class="fa fa-bar-chart"/>
                                 </button>
                             </div>
-                        </div>
-                        <div class="zrn_analitics_commercial_chart_meta">
-                            <strong>Venta YTD de productos asociados a marcas</strong>
                         </div>
                         <div class="zrn_analitics_commercial_line_chart">
                             <t t-if="hasCommercialRevenueSeries and hasEchartsLibrary">
@@ -74,7 +71,7 @@
                                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('portafolio')" aria-label="Ver portafolio">
                                     <i class="fa fa-arrow-right"/>
                                 </button>
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('brandMix')" aria-label="Cambiar grafica">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('brandMix')" aria-label="Cambiar tipo de gráfica">
                                     <i class="fa fa-pie-chart"/>
                                 </button>
                             </div>
@@ -101,7 +98,7 @@
                                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('cliente')" aria-label="Ver clientes">
                                     <i class="fa fa-arrow-right"/>
                                 </button>
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('customers')" aria-label="Cambiar grafica">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleOverviewChart('customers')" aria-label="Cambiar tipo de gráfica">
                                     <i class="fa fa-bar-chart"/>
                                 </button>
                             </div>
@@ -126,7 +123,7 @@
                                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('producto')" aria-label="Ver productos">
                                     <i class="fa fa-arrow-right"/>
                                 </button>
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleSort('top_products', 'sales_amount')" aria-label="Ordenar tabla">
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleSort('top_products', 'sales_amount')" aria-label="Ordenar por venta">
                                     <i class="fa fa-sort-amount-desc"/>
                                 </button>
                             </div>

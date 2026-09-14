@@ -5,7 +5,14 @@
                 <section class="zrn_analitics_hub_panel">
                     <div class="zrn_analitics_commercial_panel_head">
                         <span>Ranking completo de clientes / PDVs</span>
-                        <span>Total: <t t-esc="formatCount(commercialPayload.all_clients.length)"/> clientes</span>
+                        <div class="zrn_analitics_commercial_panel_actions">
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('canal')" aria-label="Ver canales">
+                                <i class="fa fa-arrow-right"/>
+                            </button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_clientes_pdv' })" aria-label="Exportar clientes">
+                                <i class="fa fa-download"/>
+                            </button>
+                        </div>
                     </div>
                     <div class="zrn_analitics_commercial_table_wrap" style="max-height: 600px; overflow-y: auto;">
                         <table class="zrn_analitics_commercial_table">

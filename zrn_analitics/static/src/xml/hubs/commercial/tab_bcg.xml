@@ -5,7 +5,14 @@
                 <section class="zrn_analitics_hub_panel">
                     <div class="zrn_analitics_commercial_panel_head">
                         <span>Matriz BCG (Growth-Share Matrix)</span>
-                        <span>Mediana Venta YTD: <t t-esc="commercialPayload.summary.currency_symbol"/> <t t-esc="formatMoney(commercialPayload.bcg_data.mr)"/> · Mediana Margen: <t t-esc="commercialPayload.bcg_data.mm"/>%</span>
+                        <div class="zrn_analitics_commercial_panel_actions">
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('producto')" aria-label="Ver productos">
+                                <i class="fa fa-arrow-right"/>
+                            </button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_matriz_bcg' })" aria-label="Exportar matriz BCG">
+                                <i class="fa fa-download"/>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="row g-2 mb-3">

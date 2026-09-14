@@ -5,7 +5,14 @@
                 <section class="zrn_analitics_hub_panel">
                     <div class="zrn_analitics_commercial_panel_head">
                         <span>Tendencia y Crecimiento de Ventas</span>
-                        <span>Último mes vs promedio de meses anteriores (unidades/día)</span>
+                        <div class="zrn_analitics_commercial_panel_actions">
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('producto')" aria-label="Ver productos">
+                                <i class="fa fa-arrow-right"/>
+                            </button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_tendencias' })" aria-label="Exportar tendencias">
+                                <i class="fa fa-download"/>
+                            </button>
+                        </div>
                     </div>
                     <div class="row g-3">
                         <div class="col-12 col-md-6">

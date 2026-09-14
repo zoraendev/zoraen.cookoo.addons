@@ -3,11 +3,6 @@
   <t t-name="zrn_analitics.HubCommercialTabPortafolio"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'portafolio'">
                 <t t-call="zrn_analitics.HubCommercialFilters"/>
                 <div class="zrn_analitics_commercial_portfolio">
-                    <div class="zrn_analitics_commercial_portfolio_note">
-                        <strong>Portafolio oficial</strong>
-                        <span>UN → Marca Comercial → Línea → SKU.</span>
-                    </div>
-
                     <t t-if="!commercialPortfolio.hasBrands">
                         <div class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_hub_panel_title">Portafolio</div>
@@ -18,31 +13,18 @@
                     </t>
 
                     <t t-if="commercialPortfolio.hasBrands">
-                        <div class="zrn_analitics_commercial_portfolio_cards">
-                            <t t-foreach="commercialPortfolio.units" t-as="unit" t-key="unit.key">
-                                <button type="button" class="zrn_analitics_commercial_portfolio_card" t-att-class="activePortfolioUnit and activePortfolioUnit.key === unit.key ? 'is-active' : ''" t-att-style="'--zrn-unit-color: ' + unit.color" t-on-click="() =&gt; this.selectPortfolioUnit(unit.key)">
-                                    <div class="zrn_analitics_commercial_portfolio_card_name"><t t-esc="unit.name"/></div>
-                                    <div class="zrn_analitics_commercial_portfolio_card_value">
-                                        <t t-esc="commercialPortfolio.currencySymbol"/> <t t-esc="formatMoney(unit.revenue)"/>
-                                    </div>
-                                    <div class="zrn_analitics_commercial_portfolio_card_meta">
-                                        <t t-esc="formatPercent(unit.mix_percentage)"/> del mix · <t t-esc="formatCount(unit.sku_count)"/> SKU · <t t-esc="formatCount(unit.brand_count)"/> marcas
-                                    </div>
-                                    <div class="zrn_analitics_commercial_portfolio_card_footer">
-                                        <span>Margen real</span>
-                                        <strong>
-                                            <t t-esc="commercialPortfolio.currencySymbol"/> <t t-esc="formatMoney(unit.margin_amount)"/> (<t t-esc="formatPercent(unit.margin_pct)"/>)
-                                        </strong>
-                                    </div>
-                                </button>
-                            </t>
-                        </div>
-
                         <div class="zrn_analitics_commercial_portfolio_top">
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_commercial_panel_head">
-                                    <span>Revenue y margen por unidad</span>
-                                    <span>Vista inicial</span>
+                                    <span>Ingresos por unidad</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.selectPortfolioUnit(commercialPortfolio.units.length ? commercialPortfolio.units[0].key : '')" aria-label="Ver primera unidad">
+                                            <i class="fa fa-arrow-right"/>
+                                        </button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'portfolio-units', filename: 'zrn_comercial_ingresos_por_unidad' })" aria-label="Exportar portafolio">
+                                            <i class="fa fa-download"/>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="zrn_analitics_commercial_portfolio_chart">
                                     <t t-if="commercialPortfolio.hasRevenue and hasEchartsLibrary">
@@ -60,7 +42,14 @@
                             <section class="zrn_analitics_hub_panel">
                                 <div class="zrn_analitics_commercial_panel_head">
                                     <span>Marca comercial dentro de UN</span>
-                                    <span><t t-esc="activePortfolioUnit ? activePortfolioUnit.name : ''"/></span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('overview')" aria-label="Volver a overview">
+                                            <i class="fa fa-arrow-right"/>
+                                        </button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'portfolio-brands', filename: 'zrn_comercial_marcas_por_unidad' })" aria-label="Exportar marcas">
+                                            <i class="fa fa-download"/>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="zrn_analitics_commercial_portfolio_brand_mix">
                                     <t t-if="activePortfolioUnit and activePortfolioUnit.brands.length and commercialPortfolio.hasRevenue and hasEchartsLibrary">
@@ -78,8 +67,15 @@
 
                         <section class="zrn_analitics_hub_panel">
                             <div class="zrn_analitics_commercial_panel_head">
-                                <span>Drill UN → Marca → Línea → SKU</span>
-                                <span>Base preparada para jerarquía real</span>
+                                <span>Drill UN → marca → categoría → SKU</span>
+                                <div class="zrn_analitics_commercial_panel_actions">
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('producto')" aria-label="Ver productos">
+                                        <i class="fa fa-arrow-right"/>
+                                    </button>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_drill_portafolio' })" aria-label="Exportar drill">
+                                        <i class="fa fa-download"/>
+                                    </button>
+                                </div>
                             </div>
                             <div class="zrn_analitics_commercial_portfolio_table_wrap">
                                 <div class="o_list_renderer o_list_view table-responsive">
