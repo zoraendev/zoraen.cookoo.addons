@@ -137,10 +137,10 @@
                     </div>
 
                     <!-- Client List Table -->
-                    <div class="border rounded p-3 bg-white">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h6 class="font-weight-bold mb-0">Listado Completo de Segmentación y Pareto</h6>
-                            <div class="d-flex gap-2">
+                    <div class="zrn_analitics_hub_panel">
+                        <div class="zrn_analitics_commercial_panel_head mb-2">
+                            <span>Listado completo de segmentación y Pareto</span>
+                            <div class="zrn_analitics_commercial_panel_actions">
                                 <select class="form-select form-select-sm" style="width: auto;" t-on-change="onRfmFilterSegmentSelect">
                                     <option value="">Todos los segmentos</option>
                                     <t t-foreach="commercialPayload.clients_rfm.segments_order" t-as="seg" t-key="seg.key">
@@ -154,6 +154,7 @@
                                     <option value="C">Clase C (Venta 5%)</option>
                                 </select>
                                 <input type="text" class="form-control form-control-sm" placeholder="Buscar cliente..." style="width: 200px;" t-on-input="onRfmFilterSearchInput"/>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_rfm_clientes' })" aria-label="Exportar RFM"><i class="fa fa-download"/></button>
                             </div>
                         </div>
                         <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">

@@ -96,6 +96,7 @@
                                         <div class="zrn_analitics_commercial_panel_head">
                                             <span>Marcas</span>
                                             <span>Mix del canal</span>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_modal_marcas_canal' })" aria-label="Exportar marcas del canal"><i class="fa fa-download"/></button>
                                         </div>
                                         <div class="zrn_analitics_commercial_table_wrap">
                                             <table class="zrn_analitics_commercial_table">
@@ -123,6 +124,7 @@
                                         <div class="zrn_analitics_commercial_panel_head">
                                             <span>Categorias</span>
                                             <span>Participacion</span>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_modal_categorias_canal' })" aria-label="Exportar categorias del canal"><i class="fa fa-download"/></button>
                                         </div>
                                         <div class="zrn_analitics_commercial_table_wrap">
                                             <table class="zrn_analitics_commercial_table">
@@ -152,6 +154,7 @@
                                         <div class="zrn_analitics_commercial_panel_head">
                                             <span>Top clientes</span>
                                             <span>Cuentas comerciales</span>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_modal_clientes_canal' })" aria-label="Exportar clientes del canal"><i class="fa fa-download"/></button>
                                         </div>
                                         <div class="zrn_analitics_commercial_table_wrap">
                                             <table class="zrn_analitics_commercial_table">
@@ -181,6 +184,7 @@
                                         <div class="zrn_analitics_commercial_panel_head">
                                             <span>Top productos</span>
                                             <span>Dentro del canal</span>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_modal_productos_canal' })" aria-label="Exportar productos del canal"><i class="fa fa-download"/></button>
                                         </div>
                                         <div class="zrn_analitics_commercial_table_wrap">
                                             <table class="zrn_analitics_commercial_table">
@@ -263,6 +267,7 @@
                                         <div class="zrn_analitics_commercial_panel_head">
                                             <span>Por canal</span>
                                             <span>Base analitica</span>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_modal_detalle_canales' })" aria-label="Exportar detalle por canal"><i class="fa fa-download"/></button>
                                         </div>
                                         <div class="zrn_analitics_commercial_table_wrap">
                                             <table class="zrn_analitics_commercial_table">
@@ -294,6 +299,7 @@
                                         <div class="zrn_analitics_commercial_panel_head">
                                             <span><t t-esc="state.analyticsDetailModal.secondary_title || 'Top PDVs'"/></span>
                                             <span>Detalle del calculo</span>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_modal_detalle_secundario' })" aria-label="Exportar detalle secundario"><i class="fa fa-download"/></button>
                                         </div>
                                         <div class="zrn_analitics_commercial_table_wrap">
                                             <table class="zrn_analitics_commercial_table">
@@ -324,6 +330,17 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </t>
+
+            <t t-if="state.commercialExportMenu">
+                <div class="zrn_analitics_commercial_export_backdrop" t-on-click="closeCommercialExportMenu"/>
+                <div class="zrn_analitics_commercial_export_menu" t-att-style="'left: ' + state.commercialExportMenu.left + 'px; top: ' + state.commercialExportMenu.top + 'px;'" role="menu">
+                    <div class="zrn_analitics_commercial_export_menu_title">Exportar como</div>
+                    <button t-foreach="state.commercialExportMenu.options" t-as="option" t-key="option.key" type="button" class="btn zrn_analitics_commercial_export_menu_item" t-on-click="() =&gt; this.selectCommercialExportFormat(option.key)" role="menuitem">
+                        <i t-att-class="'fa ' + option.icon"/>
+                        <span><t t-esc="option.label"/></span>
+                    </button>
                 </div>
             </t>
         </div>

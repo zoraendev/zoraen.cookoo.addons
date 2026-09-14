@@ -9,15 +9,25 @@
                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('producto')" aria-label="Ver productos">
                                 <i class="fa fa-arrow-right"/>
                             </button>
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_tendencias' })" aria-label="Exportar tendencias">
-                                <i class="fa fa-download"/>
-                            </button>
                         </div>
                     </div>
                     <div class="row g-3">
                         <div class="col-12 col-md-6">
-                            <div class="border rounded p-3 bg-white">
-                                <h6 class="font-weight-bold mb-3 text-success">Productos en Crecimiento (Growers)</h6>
+                            <div class="zrn_analitics_hub_panel h-100">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Productos en crecimiento</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_growers', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'trends-growers', filename: 'zrn_comercial_productos_crecimiento' })" aria-label="Exportar crecimiento"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_growers', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
+                                </div>
+                                <t t-if="getCommercialPanelView('trends_growers') === 'chart'">
+                                <div class="zrn_analitics_commercial_chart_container zrn_analitics_commercial_table_surface" style="height: 280px;">
+                                    <div class="w-100 h-100" data-zrn-chart="trends-growers"/>
+                                </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('trends_growers') === 'table'">
                                 <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">
                                     <table class="zrn_analitics_commercial_table">
                                         <thead>
@@ -42,12 +52,26 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                </t>
                             </div>
                         </div>
 
                         <div class="col-12 col-md-6">
-                            <div class="border rounded p-3 bg-white">
-                                <h6 class="font-weight-bold mb-3 text-danger">Productos en Caída (Decliners)</h6>
+                            <div class="zrn_analitics_hub_panel h-100">
+                                <div class="zrn_analitics_commercial_panel_head">
+                                    <span>Productos en caída</span>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_decliners', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'trends-decliners', filename: 'zrn_comercial_productos_caida' })" aria-label="Exportar caída"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_decliners', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
+                                </div>
+                                <t t-if="getCommercialPanelView('trends_decliners') === 'chart'">
+                                <div class="zrn_analitics_commercial_chart_container zrn_analitics_commercial_table_surface" style="height: 280px;">
+                                    <div class="w-100 h-100" data-zrn-chart="trends-decliners"/>
+                                </div>
+                                </t>
+                                <t t-if="getCommercialPanelView('trends_decliners') === 'table'">
                                 <div class="zrn_analitics_commercial_table_wrap" style="max-height: 480px; overflow-y: auto;">
                                     <table class="zrn_analitics_commercial_table">
                                         <thead>
@@ -72,6 +96,7 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                </t>
                             </div>
                         </div>
                     </div>

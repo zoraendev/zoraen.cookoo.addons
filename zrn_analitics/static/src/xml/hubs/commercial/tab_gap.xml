@@ -56,7 +56,7 @@
                     <div class="row g-3 mb-4">
                         <div class="col-12 col-md-6">
                             <div class="border rounded p-3 bg-white">
-                                <h6 class="font-weight-bold mb-3 text-danger">⚠️ PDVs con Mayor Acumulación de Stock (Bajo Sell-through)</h6>
+                                <h6 class="font-weight-bold mb-3 text-danger">PDVs con mayor acumulación de stock (bajo sell-through)</h6>
                                 <div class="zrn_analitics_commercial_table_wrap" style="max-height: 320px; overflow-y: auto;">
                                     <table class="zrn_analitics_commercial_table">
                                         <thead>

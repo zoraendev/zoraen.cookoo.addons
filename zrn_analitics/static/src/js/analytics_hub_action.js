@@ -424,6 +424,7 @@ class ZrnAnalyticsHubAction extends Component {
       rrhhTab: "overview",
       commercialSidebarOpen: false,
       commercialFiltersOpen: false,
+      commercialExportMenu: null,
       hubMenuOpen: false,
       overviewRevenueChartType: "line",
       overviewBrandMixChartType: "doughnut",
@@ -432,10 +433,19 @@ class ZrnAnalyticsHubAction extends Component {
         channel_main: "table",
         coverage_channel: "table",
         coverage_sku: "table",
+        product_main: "table",
+        client_main: "table",
+        trends_growers: "table",
+        trends_decliners: "table",
+        insights_market_basket: "table",
+        insights_ltv: "table",
       },
       channelChartConfigOpen: false,
       channelChartMetric: "revenue",
       channelChartType: "bar",
+      clientChartConfigOpen: false,
+      clientChartMetric: "rev",
+      clientChartType: "bar",
       coverageChannelChartType: "bar",
       coverageSkuChartConfigOpen: false,
       coverageSkuChartMetric: "pdv_pct",
@@ -477,6 +487,8 @@ class ZrnAnalyticsHubAction extends Component {
       rfmFilterSearch: "",
       bcgFilter: "all",
       productChartType: "bar",
+      productChartMetric: "rev",
+      productChartConfigOpen: false,
       rrhhPredictorForm: cloneRrhhPredictorForm(),
       rrhhChecklistForm: cloneRrhhChecklistForm(),
       rrhhPredictorDirty: false,
@@ -966,9 +978,14 @@ class ZrnAnalyticsHubAction extends Component {
   }
 
   exportCommercialVisibleContent(ev, options = {}) {
-    const panel = ev?.currentTarget?.closest?.(".zrn_analitics_hub_panel");
+    if (!options.format) {
+      this.openCommercialExportMenu(ev, options);
+      return;
+    }
+    const panel = ev?.currentTarget?.closest?.(".zrn_analitics_hub_panel") || this._commercialExportPanel;
     const filename = options.filename || "zrn_comercial_export";
     const chartKey = options.chartKey;
+    const format = options.format || "xlsx";
     const chartEl = chartKey
       ? panel?.querySelector?.(`[data-zrn-chart="${chartKey}"]`)
       : panel?.querySelector?.("[data-zrn-chart]");
@@ -980,12 +997,65 @@ class ZrnAnalyticsHubAction extends Component {
       this.isCommercialNodeVisible(table),
     );
     if (tables.length) {
-      this.downloadCommercialTablesExcel(
-        filename,
-        options.title || this.getCommercialPanelTitle(panel) || "Exportacion comercial",
-        tables,
-      );
+      const title = options.title || this.getCommercialPanelTitle(panel) || "Exportacion comercial";
+      if (format === "xml") {
+        this.downloadCommercialTablesXml(filename, title, tables);
+      } else if (format === "csv") {
+        this.downloadCommercialTablesCsv(filename, title, tables);
+      } else if (format === "json") {
+        this.downloadCommercialTablesJson(filename, title, tables);
+      } else {
+        this.downloadCommercialTablesExcel(filename, title, tables);
+      }
     }
+  }
+
+  openCommercialExportMenu(ev, options = {}) {
+    ev?.stopPropagation?.();
+    const panel = ev?.currentTarget?.closest?.(".zrn_analitics_hub_panel");
+    if (!panel) {
+      return;
+    }
+    const chartKey = options.chartKey;
+    const chartEl = chartKey
+      ? panel.querySelector(`[data-zrn-chart="${chartKey}"]`)
+      : panel.querySelector("[data-zrn-chart]");
+    const hasVisibleChart = chartEl && this.isCommercialNodeVisible(chartEl);
+    const rect = ev.currentTarget.getBoundingClientRect();
+    const menuWidth = 188;
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - menuWidth - 8));
+    const top = Math.min(rect.bottom + 4, window.innerHeight - 180);
+    this._commercialExportPanel = panel;
+    this._commercialExportOptions = { ...options };
+    this.state.commercialExportMenu = {
+      left,
+      top,
+      options: hasVisibleChart
+        ? [{ key: "png", label: "Imagen PNG", icon: "fa-image" }]
+        : [
+            { key: "xlsx", label: "Excel (.xls)", icon: "fa-file-excel-o" },
+            { key: "xml", label: "XML", icon: "fa-code" },
+            { key: "csv", label: "CSV", icon: "fa-file-text-o" },
+            { key: "json", label: "JSON", icon: "fa-file-code-o" },
+          ],
+    };
+  }
+
+  closeCommercialExportMenu() {
+    this.state.commercialExportMenu = null;
+    this._commercialExportPanel = null;
+    this._commercialExportOptions = null;
+  }
+
+  selectCommercialExportFormat(format) {
+    const panel = this._commercialExportPanel;
+    const options = this._commercialExportOptions;
+    if (!panel || !options) {
+      this.closeCommercialExportMenu();
+      return;
+    }
+    this.closeCommercialExportMenu();
+    this.exportCommercialVisibleContent({ currentTarget: panel }, { ...options, format });
   }
 
   isCommercialNodeVisible(node) {
@@ -1061,6 +1131,71 @@ class ZrnAnalyticsHubAction extends Component {
     const link = document.createElement("a");
     link.href = url;
     link.download = `${this.sanitizeCommercialFilename(filename)}.xls`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
+  extractCommercialTables(tables) {
+    return tables.map((table) => {
+      const rows = Array.from(table.querySelectorAll("tr")).map((row) =>
+        Array.from(row.querySelectorAll("th, td")).map((cell) => cell.textContent.trim()),
+      );
+      return {
+        columns: rows.shift() || [],
+        rows,
+      };
+    });
+  }
+
+  downloadCommercialTablesCsv(filename, title, tables) {
+    const escapeCell = (value) => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const lines = [`"${String(title || "").replace(/"/g, '""')}"`];
+    this.extractCommercialTables(tables).forEach((table, index) => {
+      if (tables.length > 1) {
+        lines.push(`"Tabla ${index + 1}"`);
+      }
+      lines.push(table.columns.map(escapeCell).join(","));
+      table.rows.forEach((row) => lines.push(row.map(escapeCell).join(",")));
+      lines.push("");
+    });
+    this.downloadTextFile(filename, `\ufeff${lines.join("\r\n")}`, "text/csv;charset=utf-8;");
+  }
+
+  downloadCommercialTablesJson(filename, title, tables) {
+    const payload = {
+      title: title || "Exportacion comercial",
+      tables: this.extractCommercialTables(tables),
+    };
+    this.downloadTextFile(filename, JSON.stringify(payload, null, 2), "application/json;charset=utf-8;");
+  }
+
+  downloadCommercialTablesXml(filename, title, tables) {
+    const escapeXml = (value) => this.escapeHtml(value).replace(/`/g, "&#96;");
+    const sheets = this.extractCommercialTables(tables).map((table, index) => `
+      <Worksheet ss:Name="Tabla ${index + 1}">
+        <Table>
+          <Row>${table.columns.map((cell) => `<Cell><Data ss:Type="String">${escapeXml(cell)}</Data></Cell>`).join("")}</Row>
+          ${table.rows.map((row) => `<Row>${row.map((cell) => `<Cell><Data ss:Type="String">${escapeXml(cell)}</Data></Cell>`).join("")}</Row>`).join("")}
+        </Table>
+      </Worksheet>`).join("");
+    const xml = `<?xml version="1.0"?>
+      <?mso-application progid="Excel.Sheet"?>
+      <Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+        xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+        <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office"><Title>${escapeXml(title)}</Title></DocumentProperties>
+        ${sheets}
+      </Workbook>`;
+    this.downloadTextFile(filename, xml, "application/xml;charset=utf-8;");
+  }
+
+  downloadTextFile(filename, content, type) {
+    const blob = new Blob([content], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${this.sanitizeCommercialFilename(filename)}.${type.includes("json") ? "json" : type.includes("xml") ? "xml" : "csv"}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -1693,6 +1828,24 @@ class ZrnAnalyticsHubAction extends Component {
     this.queueChartRender();
   }
 
+  toggleClientChartConfig() {
+    this.state.clientChartConfigOpen = !this.state.clientChartConfigOpen;
+  }
+
+  closeClientChartConfig() {
+    this.state.clientChartConfigOpen = false;
+  }
+
+  setClientChartMetric(ev) {
+    this.state.clientChartMetric = ev.target.value || "rev";
+    this.queueChartRender();
+  }
+
+  setClientChartType(chartType) {
+    this.state.clientChartType = chartType || "bar";
+    this.queueChartRender();
+  }
+
   setCoverageChannelChartType(chartType) {
     this.state.coverageChannelChartType = chartType || "bar";
     this.queueChartRender();
@@ -1713,6 +1866,19 @@ class ZrnAnalyticsHubAction extends Component {
 
   setCoverageSkuChartType(chartType) {
     this.state.coverageSkuChartType = chartType || "bar";
+    this.queueChartRender();
+  }
+
+  toggleProductChartConfig() {
+    this.state.productChartConfigOpen = !this.state.productChartConfigOpen;
+  }
+
+  closeProductChartConfig() {
+    this.state.productChartConfigOpen = false;
+  }
+
+  setProductChartMetric(ev) {
+    this.state.productChartMetric = ev.target.value || "rev";
     this.queueChartRender();
   }
 
@@ -2917,15 +3083,15 @@ class ZrnAnalyticsHubAction extends Component {
 
   getDefaultCommercialPayload() {
     const rfmSegments = [
-      { key: "champion", name: "Campeon", emoji: "" },
-      { key: "loyal", name: "Leal", emoji: "" },
-      { key: "cant_lose", name: "No perderlo", emoji: "" },
-      { key: "at_risk", name: "En riesgo", emoji: "" },
-      { key: "promising", name: "Prometedor", emoji: "" },
-      { key: "need_attention", name: "Atender", emoji: "" },
-      { key: "new", name: "Nuevo", emoji: "" },
-      { key: "hibernating", name: "Hibernando", emoji: "" },
-      { key: "sporadic", name: "Esporadico", emoji: "" },
+      { key: "champion", name: "Campeon" },
+      { key: "loyal", name: "Leal" },
+      { key: "cant_lose", name: "No perderlo" },
+      { key: "at_risk", name: "En riesgo" },
+      { key: "promising", name: "Prometedor" },
+      { key: "need_attention", name: "Atender" },
+      { key: "new", name: "Nuevo" },
+      { key: "hibernating", name: "Hibernando" },
+      { key: "sporadic", name: "Esporadico" },
     ];
     const segments = Object.fromEntries(
       rfmSegments.map((segment) => [
@@ -3421,6 +3587,41 @@ class ZrnAnalyticsHubAction extends Component {
     );
   }
 
+  get clientChartMetricOptions() {
+    return [
+      { key: "rev", label: "Facturado", format: "money" },
+      { key: "units", label: "Unidades", format: "count" },
+      { key: "invoices", label: "Facturas", format: "count" },
+      { key: "days_since", label: "Dias sin facturar", format: "count" },
+    ];
+  }
+
+  get activeClientChartMetric() {
+    return (
+      this.clientChartMetricOptions.find(
+        (metric) => metric.key === this.state.clientChartMetric,
+      ) || this.clientChartMetricOptions[0]
+    );
+  }
+
+  get productChartMetricOptions() {
+    return [
+      { key: "rev", label: "Venta", format: "money" },
+      { key: "units", label: "Unidades", format: "count" },
+      { key: "n_lines", label: "Lineas", format: "count" },
+      { key: "channels", label: "Canales", format: "count" },
+      { key: "avg_unit_price_real", label: "Precio real prom.", format: "money" },
+    ];
+  }
+
+  get activeProductChartMetric() {
+    return (
+      this.productChartMetricOptions.find(
+        (metric) => metric.key === this.state.productChartMetric,
+      ) || this.productChartMetricOptions[0]
+    );
+  }
+
   get coverageSkuChartMetricOptions() {
     return [
       { key: "pdv_pct", label: "% PDVs", format: "percent" },
@@ -3852,8 +4053,13 @@ class ZrnAnalyticsHubAction extends Component {
         this.renderCoverageSkuChart();
         this.renderRfmParetoChart();
         this.renderInsightsCadenceChart();
+        this.renderInsightsMarketBasketChart();
+        this.renderInsightsLtvChart();
         this.renderSellinSelloutChart();
+        this.renderClientChart();
         this.renderProductChart();
+        this.renderTrendsGrowersChart();
+        this.renderTrendsDeclinersChart();
       } catch (error) {
         console.error("ZRN commercial chart error", error);
       }
@@ -4156,7 +4362,7 @@ class ZrnAnalyticsHubAction extends Component {
     chart.setOption(
       {
         animationDuration: 650,
-        grid: { top: 18, right: 20, bottom: 30, left: 24, containLabel: true },
+        grid: { top: 30, right: 20, bottom: 54, left: 24, containLabel: true },
         tooltip: {
           trigger: "axis",
           axisPointer: { type: "shadow" },
@@ -4272,6 +4478,7 @@ class ZrnAnalyticsHubAction extends Component {
         },
         legend: {
           data: ["Activos", "Red total"],
+          bottom: 0,
           textStyle: { color: "#5f6b7a", fontSize: 11 },
         },
         xAxis: {
@@ -5860,13 +6067,185 @@ class ZrnAnalyticsHubAction extends Component {
     });
   }
 
+  renderClientChart() {
+    if (
+      this.state.commercialTab !== "cliente" ||
+      this.getCommercialPanelView("client_main") !== "chart"
+    ) {
+      return;
+    }
+    const rows = (this.sortedAllClients || []).slice(0, 12);
+    const chart = this.getChart("client-main");
+    if (!chart || !rows.length) {
+      return;
+    }
+    const metric = this.activeClientChartMetric;
+    const type = this.state.clientChartType || "bar";
+    const symbol = this.commercialPayload.summary?.currency_symbol || "$";
+    const values = rows.map((row) => Number(row[metric.key] || 0));
+    const formatter = (value) =>
+      metric.format === "money" ? `${symbol} ${this.formatMoney(value)}` : this.formatCount(value);
+    if (type === "pie") {
+      chart.setOption(
+        {
+          tooltip: { trigger: "item", valueFormatter: formatter },
+          legend: { type: "scroll", bottom: 0, textStyle: { color: "#5f6b7a", fontSize: 11 } },
+          series: [
+            {
+              name: metric.label,
+              type: "pie",
+              radius: ["42%", "70%"],
+              data: rows.map((row, index) => ({ name: row.name, value: values[index] })),
+              label: { show: false },
+            },
+          ],
+        },
+        true,
+      );
+      return;
+    }
+    chart.setOption(
+      {
+        animationDuration: 600,
+        grid: { top: 24, right: 24, bottom: 50, left: 62, containLabel: true },
+        tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: formatter },
+        xAxis: {
+          type: "category",
+          data: rows.map((row) => row.name),
+          axisTick: { show: false },
+          axisLine: { lineStyle: { color: "#d6deea" } },
+          axisLabel: { color: "#5f6b7a", fontSize: 10, interval: 0, rotate: 18, width: 110, overflow: "truncate" },
+        },
+        yAxis: {
+          type: "value",
+          splitLine: { lineStyle: { color: "#edf2f8" } },
+          axisLabel: { color: "#5f6b7a", fontSize: 11, formatter: metric.format === "money" ? (val) => this.formatMoney(val) : undefined },
+        },
+        series: [
+          {
+            name: metric.label,
+            type,
+            smooth: type === "line",
+            data: values,
+            barMaxWidth: 30,
+            itemStyle: { color: "#1f4e8c", borderRadius: [4, 4, 0, 0] },
+            lineStyle: { color: "#1f4e8c", width: 3 },
+          },
+        ],
+      },
+      true,
+    );
+  }
+
+  renderTrendsGrowersChart() {
+    this.renderTrendChart("trends-growers", this.sortedGrowers || [], "Crecimiento", "#16a34a");
+  }
+
+  renderTrendsDeclinersChart() {
+    this.renderTrendChart("trends-decliners", this.sortedDecliners || [], "Caida", "#bd1730");
+  }
+
+  renderTrendChart(chartKey, rows, label, color) {
+    const panelKey = chartKey === "trends-growers" ? "trends_growers" : "trends_decliners";
+    if (
+      this.state.commercialTab !== "tendencias" ||
+      this.getCommercialPanelView(panelKey) !== "chart"
+    ) {
+      return;
+    }
+    const chart = this.getChart(chartKey);
+    const data = (rows || []).slice(0, 10);
+    if (!chart || !data.length) {
+      return;
+    }
+    chart.setOption(
+      {
+        animationDuration: 600,
+        grid: { top: 22, right: 18, bottom: 42, left: 46, containLabel: true },
+        tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: (val) => `${val}%` },
+        xAxis: {
+          type: "category",
+          data: data.map((row) => row.name),
+          axisTick: { show: false },
+          axisLine: { lineStyle: { color: "#d6deea" } },
+          axisLabel: { color: "#5f6b7a", fontSize: 10, interval: 0, rotate: 18, width: 110, overflow: "truncate" },
+        },
+        yAxis: { type: "value", splitLine: { lineStyle: { color: "#edf2f8" } }, axisLabel: { color: "#5f6b7a", fontSize: 11, formatter: (val) => `${val}%` } },
+        series: [{ name: label, type: "bar", data: data.map((row) => Number(row.trend || 0)), barMaxWidth: 30, itemStyle: { color, borderRadius: [4, 4, 0, 0] } }],
+      },
+      true,
+    );
+  }
+
+  renderInsightsMarketBasketChart() {
+    if (
+      this.state.commercialTab !== "insights" ||
+      this.getCommercialPanelView("insights_market_basket") !== "chart"
+    ) {
+      return;
+    }
+    const rows = (this.sortedMarketBasket || []).slice(0, 10);
+    const chart = this.getChart("insights-market-basket");
+    if (!chart || !rows.length) {
+      return;
+    }
+    chart.setOption(
+      {
+        animationDuration: 600,
+        grid: { top: 20, right: 18, bottom: 8, left: 220, containLabel: false },
+        tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
+        xAxis: { type: "value", splitLine: { lineStyle: { color: "#edf2f8" } }, axisLabel: { color: "#5f6b7a" } },
+        yAxis: {
+          type: "category",
+          data: [...rows].reverse().map((row) => `${row.a} + ${row.b}`),
+          axisTick: { show: false },
+          axisLine: { show: false },
+          axisLabel: { color: "#334155", fontSize: 10, width: 210, overflow: "truncate" },
+        },
+        series: [{ name: "Lift", type: "bar", data: [...rows].reverse().map((row) => Number(row.lift || 0)), barMaxWidth: 22, itemStyle: { color: "#1f4e8c", borderRadius: [0, 4, 4, 0] } }],
+      },
+      true,
+    );
+  }
+
+  renderInsightsLtvChart() {
+    if (
+      this.state.commercialTab !== "insights" ||
+      this.getCommercialPanelView("insights_ltv") !== "chart"
+    ) {
+      return;
+    }
+    const rows = (this.sortedLtvForecast || []).slice(0, 8);
+    const chart = this.getChart("insights-ltv");
+    if (!chart || !rows.length) {
+      return;
+    }
+    const months = this.commercialPayload.ltv_forecast?.project_months || ["M+1", "M+2", "M+3"];
+    const symbol = this.commercialPayload.summary?.currency_symbol || "$";
+    chart.setOption(
+      {
+        animationDuration: 600,
+        tooltip: { trigger: "axis", valueFormatter: (val) => `${symbol} ${this.formatMoney(val)}` },
+        legend: { type: "scroll", bottom: 0, textStyle: { color: "#5f6b7a", fontSize: 11 } },
+        grid: { top: 24, right: 20, bottom: 56, left: 64, containLabel: true },
+        xAxis: { type: "category", data: months, axisTick: { show: false }, axisLine: { lineStyle: { color: "#d6deea" } }, axisLabel: { color: "#5f6b7a" } },
+        yAxis: { type: "value", splitLine: { lineStyle: { color: "#edf2f8" } }, axisLabel: { color: "#5f6b7a", formatter: (val) => this.formatMoney(val) } },
+        series: rows.map((row) => ({ name: row.client, type: "line", smooth: true, data: row.forecast || [], symbolSize: 5 })),
+      },
+      true,
+    );
+  }
+
   setProductChartType(type) {
     this.state.productChartType = type;
     this.queueChartRender();
   }
 
   renderProductChart() {
-    if (this.state.commercialTab !== "producto") {
+    if (
+      this.state.commercialTab !== "producto" ||
+      this.getCommercialPanelView("product_main") !== "chart"
+    ) {
       return;
     }
     const products = this.commercialPayload?.all_products || [];
@@ -5880,19 +6259,22 @@ class ZrnAnalyticsHubAction extends Component {
     // Take top 10 products
     const top10 = products.slice(0, 10);
     const chartType = this.state.productChartType || "bar";
+    const metric = this.activeProductChartMetric;
     const symbol = this.commercialPayload.summary?.currency_symbol || "$";
+    const valueFormatter = (value) =>
+      metric.format === "money" ? `${symbol} ${this.formatMoney(value)}` : this.formatCount(value);
 
     if (chartType === "pie") {
       const pieData = top10.map((p) => ({
         name: p.name,
-        value: p.rev,
+        value: Number(p[metric.key] || 0),
       }));
       chart.setOption({
         animationDuration: 600,
         tooltip: {
           trigger: "item",
           formatter: ({ name, value, percent }) =>
-            `${name}<br/>${symbol} ${this.formatMoney(value)}<br/>${percent}% del Top 10`,
+            `${name}<br/>${valueFormatter(value)}<br/>${percent}% del Top 10`,
         },
         legend: {
           orient: "vertical",
@@ -5918,7 +6300,7 @@ class ZrnAnalyticsHubAction extends Component {
     } else {
       // Bar or Line
       const categories = top10.map((p) => p.name);
-      const data = top10.map((p) => p.rev);
+      const data = top10.map((p) => Number(p[metric.key] || 0));
 
       chart.setOption({
         animationDuration: 600,
@@ -5926,7 +6308,7 @@ class ZrnAnalyticsHubAction extends Component {
         tooltip: {
           trigger: "axis",
           axisPointer: { type: "shadow" },
-          valueFormatter: (val) => `${symbol} ${this.formatMoney(val)}`
+          valueFormatter,
         },
         xAxis: {
           type: "category",
@@ -5948,12 +6330,12 @@ class ZrnAnalyticsHubAction extends Component {
           axisLabel: {
             color: "#5f6b7a",
             fontSize: 10,
-            formatter: (val) => this.formatMoney(val)
+            formatter: metric.format === "money" ? (val) => this.formatMoney(val) : undefined
           },
         },
         series: [
           {
-            name: "Revenue",
+            name: metric.label,
             type: chartType,
             data: data,
             barMaxWidth: 30,

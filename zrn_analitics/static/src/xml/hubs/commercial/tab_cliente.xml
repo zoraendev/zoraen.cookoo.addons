@@ -6,14 +6,28 @@
                     <div class="zrn_analitics_commercial_panel_head">
                         <span>Ranking completo de clientes / PDVs</span>
                         <div class="zrn_analitics_commercial_panel_actions">
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('client_main', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="toggleClientChartConfig" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'client-main', filename: 'zrn_comercial_clientes_pdv' })" aria-label="Exportar clientes">
+                                <i class="fa fa-download"/>
+                            </button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('client_main', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('canal')" aria-label="Ver canales">
                                 <i class="fa fa-arrow-right"/>
                             </button>
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_clientes_pdv' })" aria-label="Exportar clientes">
-                                <i class="fa fa-download"/>
-                            </button>
                         </div>
                     </div>
+                    <t t-if="getCommercialPanelView('client_main') === 'chart'">
+                    <div class="zrn_analitics_commercial_chart_container zrn_analitics_commercial_table_surface" style="height: 340px;">
+                        <t t-if="hasEchartsLibrary">
+                            <div class="w-100 h-100" data-zrn-chart="client-main"/>
+                        </t>
+                        <t t-else="">
+                            <div class="zrn_analitics_commercial_chart_empty">Librería ECharts no disponible.</div>
+                        </t>
+                    </div>
+                    </t>
+                    <t t-if="getCommercialPanelView('client_main') === 'table'">
                     <div class="zrn_analitics_commercial_table_wrap" style="max-height: 600px; overflow-y: auto;">
                         <table class="zrn_analitics_commercial_table">
                             <thead>
@@ -48,7 +62,31 @@
                             </tbody>
                         </table>
                     </div>
+                    </t>
                 </section>
+                <t t-if="state.clientChartConfigOpen">
+                    <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeClientChartConfig"/>
+                    <div class="modal fade show d-block zrn_analitics_client_chart_modal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-dialog-centered" role="document" t-on-click.stop="">
+                            <div class="modal-content zrn_analitics_commercial_modal">
+                                <div class="zrn_analitics_commercial_modal_head"><strong>Configurar gráfica por cliente</strong><button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="closeClientChartConfig" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_analitics_commercial_modal_body">
+                                    <label class="form-label">Métrica</label>
+                                    <select class="form-select" t-att-value="state.clientChartMetric" t-on-change="setClientChartMetric">
+                                        <t t-foreach="clientChartMetricOptions" t-as="metric" t-key="metric.key"><option t-att-value="metric.key"><t t-esc="metric.label"/></option></t>
+                                    </select>
+                                    <label class="form-label mt-3">Tipo de gráfica</label>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.clientChartType === 'bar' ? 'active' : ''" t-on-click="() =&gt; this.setClientChartType('bar')">Barras</button>
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.clientChartType === 'line' ? 'active' : ''" t-on-click="() =&gt; this.setClientChartType('line')">Línea</button>
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.clientChartType === 'pie' ? 'active' : ''" t-on-click="() =&gt; this.setClientChartType('pie')">Circular</button>
+                                    </div>
+                                </div>
+                                <div class="zrn_analitics_commercial_modal_footer"><button type="button" class="btn btn-primary" t-on-click="closeClientChartConfig">Aplicar</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
             </t>
 
             </t>

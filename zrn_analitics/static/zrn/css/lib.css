@@ -2169,9 +2169,11 @@
   padding: 10px 12px;
   vertical-align: middle;
   line-height: 1.25;
+  text-align: center;
 }
 
 .zrn_analitics_commercial_summary_table th {
+  border-bottom-color: rgba(116, 132, 157, 0.22);
   color: var(--zrn-analitics-brand-700);
   font-size: 11px;
   font-weight: 700;
@@ -2182,6 +2184,7 @@
 .zrn_analitics_commercial_summary_table td {
   color: var(--zrn-analitics-stat-accent);
   font-size: 18px;
+  background: var(--zrn-analitics-surface);
 }
 
 .zrn_analitics_commercial_stat_box {
@@ -3069,6 +3072,56 @@
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
 }
 
+.zrn_analitics_commercial_coverage_matrix tbody tr:hover,
+.zrn_analitics_commercial_coverage_matrix tbody tr:hover td {
+  background-color: inherit !important;
+}
+
+.zrn_analitics_commercial_export_backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: transparent;
+}
+
+.zrn_analitics_commercial_export_menu {
+  position: fixed;
+  z-index: 1051;
+  width: 188px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.16);
+}
+
+.zrn_analitics_commercial_export_menu_title {
+  padding: 5px 8px 6px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.zrn_analitics_commercial_export_menu_item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+  padding: 7px 8px;
+  color: #1f4e8c;
+  text-align: left;
+  border: 0;
+  border-radius: 4px;
+}
+
+.zrn_analitics_commercial_export_menu_item:hover,
+.zrn_analitics_commercial_export_menu_item:focus {
+  color: #163b6c;
+  background: #eef4fb;
+}
+
 .zrn_analitics_commercial_coverage_matrix td:first-child {
   text-align: left;
 }
@@ -3418,7 +3471,9 @@
 }
 
 .zrn_analitics_channel_chart_modal .modal-dialog,
-.zrn_analitics_coverage_chart_modal .modal-dialog {
+.zrn_analitics_coverage_chart_modal .modal-dialog,
+.zrn_analitics_product_chart_modal .modal-dialog,
+.zrn_analitics_client_chart_modal .modal-dialog {
   max-width: 520px;
 }
 

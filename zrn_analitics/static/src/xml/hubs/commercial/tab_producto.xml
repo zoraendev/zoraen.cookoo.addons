@@ -3,20 +3,21 @@
   <t t-name="zrn_analitics.HubCommercialTabProducto"><t t-if="!state.commercialLoading &amp;&amp; state.commercialTab === 'producto'">
                 <t t-call="zrn_analitics.HubCommercialFilters"/>
                 
-                <!-- Product Revenue Chart and Selectors -->
                 <section class="zrn_analitics_hub_panel">
                     <div class="zrn_analitics_commercial_panel_head">
-                        <span>Top 10 Productos por Venta YTD</span>
+                        <span>Catálogo completo de productos y marcas</span>
                         <div class="zrn_analitics_commercial_panel_actions">
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setProductChartType(state.productChartType === 'bar' ? 'line' : 'bar')" aria-label="Cambiar grafica">
-                                <i class="fa fa-bar-chart"/>
-                            </button>
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'product-chart', filename: 'zrn_comercial_top_productos' })" aria-label="Exportar productos">
-                                <i class="fa fa-download"/>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('product_main', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="toggleProductChartConfig" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'product-chart', filename: 'zrn_comercial_productos' })" aria-label="Exportar productos"><i class="fa fa-download"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('product_main', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('portafolio')" aria-label="Ver portafolio">
+                                <i class="fa fa-arrow-right"/>
                             </button>
                         </div>
                     </div>
-                    <div class="zrn_analitics_commercial_chart_container" style="height: 320px;">
+                    <t t-if="getCommercialPanelView('product_main') === 'chart'">
+                    <div class="zrn_analitics_commercial_chart_container zrn_analitics_commercial_table_surface" style="height: 340px;">
                         <t t-if="hasEchartsLibrary">
                             <div class="w-100 h-100" data-zrn-chart="product-chart"/>
                         </t>
@@ -24,20 +25,8 @@
                             <div class="zrn_analitics_commercial_chart_empty">Librería ECharts no disponible.</div>
                         </t>
                     </div>
-                </section>
-
-                <section class="zrn_analitics_hub_panel">
-                    <div class="zrn_analitics_commercial_panel_head">
-                        <span>Catálogo completo de productos y marcas</span>
-                        <div class="zrn_analitics_commercial_panel_actions">
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('portafolio')" aria-label="Ver portafolio">
-                                <i class="fa fa-arrow-right"/>
-                            </button>
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_comercial_catalogo_productos' })" aria-label="Exportar catalogo">
-                                <i class="fa fa-download"/>
-                            </button>
-                        </div>
-                    </div>
+                    </t>
+                    <t t-if="getCommercialPanelView('product_main') === 'table'">
                     <div class="zrn_analitics_commercial_table_wrap" style="max-height: 600px; overflow-y: auto;">
                         <table class="zrn_analitics_commercial_table">
                             <thead>
@@ -70,7 +59,31 @@
                             </tbody>
                         </table>
                     </div>
+                    </t>
                 </section>
+                <t t-if="state.productChartConfigOpen">
+                    <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeProductChartConfig"/>
+                    <div class="modal fade show d-block zrn_analitics_product_chart_modal" tabindex="-1" role="dialog">
+                        <div class="modal-dialog modal-dialog-centered" role="document" t-on-click.stop="">
+                            <div class="modal-content zrn_analitics_commercial_modal">
+                                <div class="zrn_analitics_commercial_modal_head"><strong>Configurar gráfica por producto</strong><button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="closeProductChartConfig" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_analitics_commercial_modal_body">
+                                    <label class="form-label">Métrica</label>
+                                    <select class="form-select" t-att-value="state.productChartMetric" t-on-change="setProductChartMetric">
+                                        <t t-foreach="productChartMetricOptions" t-as="metric" t-key="metric.key"><option t-att-value="metric.key"><t t-esc="metric.label"/></option></t>
+                                    </select>
+                                    <label class="form-label mt-3">Tipo de gráfica</label>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.productChartType === 'bar' ? 'active' : ''" t-on-click="() =&gt; this.setProductChartType('bar')">Barras</button>
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.productChartType === 'line' ? 'active' : ''" t-on-click="() =&gt; this.setProductChartType('line')">Línea</button>
+                                        <button type="button" class="btn btn-outline-secondary" t-att-class="state.productChartType === 'pie' ? 'active' : ''" t-on-click="() =&gt; this.setProductChartType('pie')">Circular</button>
+                                    </div>
+                                </div>
+                                <div class="zrn_analitics_commercial_modal_footer"><button type="button" class="btn btn-primary" t-on-click="closeProductChartConfig">Aplicar</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </t>
             </t>
 
             </t>
