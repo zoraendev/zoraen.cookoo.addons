@@ -213,12 +213,26 @@ button.zrn_commercial_btn_orders:hover {
 }
 
 .o_action_manager .zrn_commercial_summary_link.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   padding: 0;
   border: 0;
   color: #1f4e8c;
   font-size: 20px;
   font-weight: 700;
   text-decoration: none;
+}
+
+.o_action_manager .zrn_commercial_summary_icon {
+  color: #5f78a1;
+  font-size: 14px;
+}
+
+.o_action_manager .zrn_commercial_summary_value {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .o_action_manager .zrn_commercial_dashboard_grid {

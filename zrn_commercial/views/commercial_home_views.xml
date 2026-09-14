@@ -31,12 +31,12 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><button name="action_open_business_units" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="business_unit_count" readonly="1" nolabel="1"/></button></td>
-                                    <td><button name="action_open_brands" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="brand_count" readonly="1" nolabel="1"/></button></td>
-                                    <td><button name="action_open_categories" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="category_count" readonly="1" nolabel="1"/></button></td>
-                                    <td><button name="action_open_mapped_products" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="mapped_product_count" readonly="1" nolabel="1"/></button></td>
-                                    <td><button name="action_open_channels" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="channel_count" readonly="1" nolabel="1"/></button></td>
-                                    <td><button name="action_open_sales_orders" type="object" class="btn btn-link zrn_commercial_summary_link"><field name="confirmed_revenue" readonly="1" nolabel="1" widget="monetary"/></button></td>
+                                    <td><button name="action_open_business_units" type="object" class="btn btn-link zrn_commercial_summary_link"><i class="fa fa-building-o zrn_commercial_summary_icon"/><span class="zrn_commercial_summary_value"><field name="business_unit_count" readonly="1" nolabel="1"/></span></button></td>
+                                    <td><button name="action_open_brands" type="object" class="btn btn-link zrn_commercial_summary_link"><i class="fa fa-tags zrn_commercial_summary_icon"/><span class="zrn_commercial_summary_value"><field name="brand_count" readonly="1" nolabel="1"/></span></button></td>
+                                    <td><button name="action_open_categories" type="object" class="btn btn-link zrn_commercial_summary_link"><i class="fa fa-sitemap zrn_commercial_summary_icon"/><span class="zrn_commercial_summary_value"><field name="category_count" readonly="1" nolabel="1"/></span></button></td>
+                                    <td><button name="action_open_mapped_products" type="object" class="btn btn-link zrn_commercial_summary_link"><i class="fa fa-cubes zrn_commercial_summary_icon"/><span class="zrn_commercial_summary_value"><field name="mapped_product_count" readonly="1" nolabel="1"/></span></button></td>
+                                    <td><button name="action_open_channels" type="object" class="btn btn-link zrn_commercial_summary_link"><i class="fa fa-share-alt zrn_commercial_summary_icon"/><span class="zrn_commercial_summary_value"><field name="channel_count" readonly="1" nolabel="1"/></span></button></td>
+                                    <td><button name="action_open_sales_orders" type="object" class="btn btn-link zrn_commercial_summary_link"><i class="fa fa-line-chart zrn_commercial_summary_icon"/><span class="zrn_commercial_summary_value"><field name="confirmed_revenue" readonly="1" nolabel="1" widget="monetary"/></span></button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -46,10 +46,10 @@
                                 <div class="zrn_commercial_panel_head">
                                     <strong>Ingresos por canal</strong>
                                     <div class="zrn_commercial_panel_actions">
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="channelRevenue" aria-label="Exportar"><i class="fa fa-download"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="channelRevenue" aria-label="Exportar"><i class="fa fa-download"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
                                         <button name="action_open_sales_orders" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir órdenes"><i class="fa fa-arrow-right"/></button>
                                     </div>
                                 </div>
@@ -62,10 +62,10 @@
                                 <div class="zrn_commercial_panel_head">
                                     <strong>Ingresos por categoría de canal</strong>
                                     <div class="zrn_commercial_panel_actions">
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelCategoryRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="channelCategoryRevenue" aria-label="Exportar"><i class="fa fa-download"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelCategoryRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="channelCategoryRevenue" aria-label="Exportar"><i class="fa fa-download"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
                                         <button name="action_open_channels" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir canales"><i class="fa fa-arrow-right"/></button>
                                     </div>
                                 </div>
@@ -78,10 +78,10 @@
                                 <div class="zrn_commercial_panel_head">
                                     <strong>Productos por categoría</strong>
                                     <div class="zrn_commercial_panel_actions">
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="categoryProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="categoryProducts" aria-label="Exportar"><i class="fa fa-download"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="categoryProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="categoryProducts" aria-label="Exportar"><i class="fa fa-download"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
                                         <button name="action_open_categories" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir categorías"><i class="fa fa-arrow-right"/></button>
                                     </div>
                                 </div>
@@ -94,10 +94,10 @@
                                 <div class="zrn_commercial_panel_head">
                                     <strong>Productos por marca</strong>
                                     <div class="zrn_commercial_panel_actions">
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="brandProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="brandProducts" aria-label="Exportar"><i class="fa fa-download"/></button>
-                                        <button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:table" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="brandProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-export="brandProducts" aria-label="Exportar"><i class="fa fa-download"/></div>
+                                        <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
                                         <button name="action_open_brands" type="object" class="btn zrn_commercial_icon_btn zrn_commercial_nav_btn" aria-label="Abrir marcas"><i class="fa fa-arrow-right"/></button>
                                     </div>
                                 </div>
@@ -110,7 +110,7 @@
                         <div class="zrn_commercial_chart_config d-none" data-zrn-commercial-config-modal="1">
                             <div class="zrn_commercial_chart_config_backdrop" data-zrn-commercial-config-close="1"/>
                             <div class="zrn_commercial_chart_config_dialog" role="dialog" aria-modal="true">
-                                <div class="zrn_commercial_chart_config_head"><strong>Configurar gráfica</strong><button name="zrn_dashboard_control" type="button" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_commercial_chart_config_head"><strong>Configurar gráfica</strong><div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></div></div>
                                 <div class="zrn_commercial_chart_config_body">
                                     <div class="o_form_label">Métrica</div>
                                     <select class="form-select" data-zrn-commercial-config-field="metric"/>
@@ -127,7 +127,7 @@
                                         <select class="form-select" data-zrn-commercial-config-field="channel"/>
                                     </div>
                                 </div>
-                                <div class="zrn_commercial_chart_config_footer"><button name="zrn_dashboard_control" type="button" class="btn btn-primary" data-zrn-commercial-config-apply="1">Aplicar</button></div>
+                                <div class="zrn_commercial_chart_config_footer"><div role="button" tabindex="0" class="btn btn-primary" data-zrn-commercial-config-apply="1">Aplicar</div></div>
                             </div>
                         </div>
                     </div>
