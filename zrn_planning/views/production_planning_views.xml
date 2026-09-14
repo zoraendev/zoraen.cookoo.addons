@@ -692,11 +692,12 @@
                             </div>
                             <div class="zrn_planning_filter_footer_end">
                                 <button
-                                    name="action_clear_filters"
-                                    type="object"
-                                    string="Limpiar"
-                                    icon="fa-eraser"
+                                    name="zrn_planning_filter_control"
+                                    type="button"
+                                    icon="fa-sliders"
                                     class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"
+                                    data-zrn-planning-filter-toggle="1"
+                                    aria-label="Configurar filtros"
                                 />
                                 <button
                                     name="action_continue"
@@ -719,46 +720,17 @@
                         <field name="name"/>
                         <field name="available_cliente_ids"/>
                         <field name="available_product_ids"/>
+                        <field name="available_contact_ids"/>
+                        <field name="available_product_categ_ids"/>
                         <field name="planning_record_count"/>
+                        <field name="contact_ids"/>
+                        <field name="product_categ_ids"/>
+                        <field name="order_state"/>
                     </group>
 
 
                     <div class="zrn_planning_filter_page">
                         <div class="zrn_planning_filter_bar">
-                            <div class="zrn_planning_filter_fields">
-                                <div class="zrn_planning_filter_field_item">
-                                    <span class="zrn_planning_filter_field_label">Entrega desde</span>
-                                    <field name="fecha_entrega_desde" nolabel="1"/>
-                                </div>
-                                <div class="zrn_planning_filter_field_item">
-                                    <span class="zrn_planning_filter_field_label">Entrega hasta</span>
-                                    <field name="fecha_entrega_hasta" nolabel="1"/>
-                                </div>
-                                <div class="zrn_planning_filter_field_item zrn_planning_filter_field_item_wide">
-                                    <span class="zrn_planning_filter_field_label">Puntos de venta</span>
-                                    <field
-                                        name="cliente_ids"
-                                        widget="many2many_tags"
-                                        nolabel="1"
-                                        domain="[('id', 'in', available_cliente_ids)]"
-                                        context="{'show_address': 1, 'show_vat': True}"
-                                        options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
-                                        placeholder="Selecciona puntos de venta"
-                                    />
-                                </div>
-                                <div class="zrn_planning_filter_field_item zrn_planning_filter_field_item_wide">
-                                    <span class="zrn_planning_filter_field_label">Productos</span>
-                                    <field
-                                        name="product_ids"
-                                        widget="many2many_tags"
-                                        nolabel="1"
-                                        domain="[('id', 'in', available_product_ids)]"
-                                        options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
-                                        placeholder="Selecciona productos"
-                                    />
-                                </div>
-                            </div>
-
                             <div class="zrn_planning_filter_summary_inline">
                                 <div class="zrn_planning_filter_summary_item">
                                     <span>OVs:</span>
@@ -774,6 +746,23 @@
                                     <span>Productos:</span>
                                     <field name="preview_product_count" readonly="1" nolabel="1"/>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="zrn_planning_filter_modal d-none" data-zrn-planning-filter-modal="1">
+                            <div class="zrn_planning_filter_modal_backdrop" data-zrn-planning-filter-close="1"/>
+                            <div class="zrn_planning_filter_modal_dialog" role="dialog" aria-modal="true">
+                                <div class="zrn_planning_filter_modal_head"><strong>Filtros de planeacion</strong><button name="zrn_planning_filter_control" type="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_planning_filter_modal_body">
+                                    <div class="zrn_planning_filter_modal_field"><span>Entrega desde</span><field name="fecha_entrega_desde" nolabel="1"/></div>
+                                    <div class="zrn_planning_filter_modal_field"><span>Entrega hasta</span><field name="fecha_entrega_hasta" nolabel="1"/></div>
+                                    <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Clientes y puntos de venta</span><field name="cliente_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_cliente_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona clientes o puntos de venta"/></div>
+                                    <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Personas y contactos</span><field name="contact_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_contact_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona personas o contactos"/></div>
+                                    <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Productos</span><field name="product_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona productos"/></div>
+                                    <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Categorias de producto</span><field name="product_categ_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_categ_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona categorias"/></div>
+                                    <div class="zrn_planning_filter_modal_field"><span>Estado del pedido</span><field name="order_state" nolabel="1"/></div>
+                                </div>
+                                <div class="zrn_planning_filter_modal_footer"><button name="action_clear_filters" type="object" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary">Limpiar</button><button name="zrn_planning_filter_control" type="button" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary" data-zrn-planning-filter-close="1">Aplicar</button></div>
                             </div>
                         </div>
 
@@ -820,6 +809,11 @@
                         <field name="report_date_range_mode"/>
                         <field name="report_date_from_label"/>
                         <field name="report_date_to_label"/>
+                        <field name="report_total_units"/>
+                        <field name="report_delivered_units"/>
+                        <field name="report_pending_units"/>
+                        <field name="report_completion_pct"/>
+                        <field name="report_chart_data"/>
                     </group>
                     <div class="zrn_planning_production_report_screen">
                         <div class="zrn_planning_production_report_header_shell">
@@ -832,12 +826,6 @@
                                         icon="fa-arrow-left"
                                         class="btn zrn_planning_back_btn zrn_planning_report_back_inline"
                                     />
-                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_title_tab" invisible="report_active_tab != 'overview'">
-                                        Detalle operativo de fabricacion
-                                    </button>
-                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_title_tab zrn_planning_production_report_title_tab_inactive" invisible="report_active_tab == 'overview'">
-                                        Detalle operativo de fabricacion
-                                    </button>
                                 </div>
                                 <div class="zrn_planning_production_report_header_range">
                                     <span>Rango consultado:</span>
@@ -864,6 +852,12 @@
                                     <span><field name="report_row_count" readonly="1" nolabel="1"/></span>
                                 </div>
                                 <div class="zrn_planning_production_report_actions">
+                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_action_btn" invisible="report_active_tab != 'overview'">
+                                        <i class="fa fa-table"/><span>Detalle operativo</span>
+                                    </button>
+                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_action_btn zrn_planning_production_report_action_btn_inactive" invisible="report_active_tab == 'overview'">
+                                        <i class="fa fa-table"/><span>Detalle operativo</span>
+                                    </button>
                                     <button name="action_open_report_customers_list" type="object" class="btn zrn_planning_production_report_action_btn" invisible="report_active_tab != 'customers'">
                                         <i class="fa fa-users"/>
                                         <span>Clientes:</span>
@@ -900,8 +894,15 @@
                         <div class="zrn_planning_production_report_table_panel">
                             <div class="zrn_planning_production_report_table_toolbar">
                             </div>
-                            <div class="zrn_planning_production_report_table_placeholder">
+                                <div class="zrn_planning_production_report_table_placeholder">
                                 <div class="zrn_planning_production_report_html_wrap" invisible="report_active_tab != 'overview'">
+                                    <div class="zrn_planning_report_metric_strip">
+                                        <div><span>Unidades demandadas</span><strong><field name="report_total_units" readonly="1" nolabel="1"/></strong></div>
+                                        <div><span>Entregadas</span><strong><field name="report_delivered_units" readonly="1" nolabel="1"/></strong></div>
+                                        <div><span>Pendientes</span><strong><field name="report_pending_units" readonly="1" nolabel="1"/></strong></div>
+                                        <div><span>Avance</span><strong><field name="report_completion_pct" readonly="1" nolabel="1"/>%</strong></div>
+                                    </div>
+                                    <div class="zrn_planning_report_chart_canvas" data-zrn-planning-report-chart="1"/>
                                     <field name="report_html" widget="html" nolabel="1" readonly="1"/>
                                 </div>
                                 <div invisible="report_active_tab != 'customers'">

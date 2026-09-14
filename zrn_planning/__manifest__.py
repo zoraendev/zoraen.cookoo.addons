@@ -34,6 +34,7 @@ Addon dedicado a planeacion operativa:
             'zrn_analitics/static/lib/echarts/echarts.min.js',
             'zrn_analitics/static/src/js/dark_mode_bridge.js',
             'zrn_planning/static/src/js/planning_form_view.js',
+            'zrn_planning/static/src/scss/planning_dashboard.scss',
             'zrn_planning/static/src/js/production_report_form_view.js',
             'zrn_planning/static/src/xml/planning_form_view.xml',
             'zrn_planning/static/src/xml/production_report_form_view.xml',

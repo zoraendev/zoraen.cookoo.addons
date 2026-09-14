@@ -1,3 +1,4 @@
+import json
 from collections import OrderedDict
 from datetime import datetime, timedelta
 
@@ -137,6 +138,11 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
     report_order_count = fields.Integer(string='Ordenes consideradas', readonly=True)
     report_customer_count = fields.Integer(string='Clientes en reporte', readonly=True)
     report_product_count = fields.Integer(string='Productos en reporte', readonly=True)
+    report_total_units = fields.Float(string='Unidades demandadas', readonly=True)
+    report_delivered_units = fields.Float(string='Unidades entregadas', readonly=True)
+    report_pending_units = fields.Float(string='Unidades pendientes', readonly=True)
+    report_completion_pct = fields.Float(string='Avance de entrega', readonly=True)
+    report_chart_data = fields.Text(string='Datos de avance', readonly=True)
     report_date_range_label = fields.Char(string='Rango consultado', readonly=True)
     report_html = fields.Html(
         string='Detalle del reporte',
@@ -203,7 +209,10 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
         if include_selected:
             values.update({
                 'cliente_ids': self.cliente_ids.ids,
+                'contact_ids': self.contact_ids.ids,
                 'product_ids': self.product_ids.ids,
+                'product_categ_ids': self.product_categ_ids.ids,
+                'order_state': self.order_state or 'sale_done',
             })
         return values
 
@@ -216,18 +225,26 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
         fecha_desde = self._coerce_to_date(filters.get('fecha_entrega_desde'))
         fecha_hasta = self._coerce_to_date(filters.get('fecha_entrega_hasta'))
         cliente_ids = [int(partner_id) for partner_id in filters.get('cliente_ids') or [] if partner_id]
+        contact_ids = [int(partner_id) for partner_id in filters.get('contact_ids') or [] if partner_id]
         product_ids = [int(product_id) for product_id in filters.get('product_ids') or [] if product_id]
+        product_categ_ids = [int(category_id) for category_id in filters.get('product_categ_ids') or [] if category_id]
+        order_state = filters.get('order_state') or 'sale_done'
+        order_states = ['sale', 'done'] if order_state == 'sale_done' else [order_state]
 
         domain = [
-            ('order_id.state', '=', 'sale'),
+            ('order_id.state', 'in', order_states),
             ('display_type', '=', False),
             ('product_id', '!=', False),
         ]
 
         if cliente_ids:
             domain.append(('order_id.partner_id', 'in', cliente_ids))
+        if contact_ids:
+            domain.append(('order_id.partner_id', 'in', contact_ids))
         if product_ids:
             domain.append(('product_id', 'in', product_ids))
+        if product_categ_ids:
+            domain.append(('product_id.categ_id', 'child_of', product_categ_ids))
 
         sale_lines = self.env['sale.order.line'].search(domain, order='id asc')
         sale_lines = sale_lines.filtered(
@@ -245,7 +262,10 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
         safe_limit = min(limit or 10000, 10000)
         return sale_lines[:safe_limit]
 
-    @api.depends('fecha_entrega_desde', 'fecha_entrega_hasta', 'cliente_ids', 'product_ids')
+    @api.depends(
+        'fecha_entrega_desde', 'fecha_entrega_hasta', 'cliente_ids', 'contact_ids',
+        'product_ids', 'product_categ_ids', 'order_state',
+    )
     def _compute_filter_data(self):
         for wizard in self:
             available_lines = wizard._search_sale_lines_from_filters(
@@ -263,11 +283,16 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
             ]
             wizard.available_cliente_ids = [(6, 0, available_partner_ids)]
             wizard.available_product_ids = [(6, 0, available_lines.mapped('product_id').ids)]
+            wizard.available_contact_ids = [(6, 0, available_partner_ids)]
+            wizard.available_product_categ_ids = [(6, 0, available_lines.mapped('product_id.categ_id').ids)]
             wizard.preview_cliente_count = len(set(candidate_partner_ids))
             wizard.preview_product_count = len(candidate_lines.mapped('product_id'))
             wizard.preview_order_count = len(candidate_lines.mapped('order_id'))
 
-    @api.onchange('fecha_entrega_desde', 'fecha_entrega_hasta', 'cliente_ids', 'product_ids')
+    @api.onchange(
+        'fecha_entrega_desde', 'fecha_entrega_hasta', 'cliente_ids', 'contact_ids',
+        'product_ids', 'product_categ_ids', 'order_state',
+    )
     def _onchange_filters_refresh_data(self):
         self._compute_filter_data()
 
@@ -313,7 +338,10 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
             'fecha_entrega_desde': False,
             'fecha_entrega_hasta': False,
             'cliente_ids': [(5, 0, 0)],
+            'contact_ids': [(5, 0, 0)],
             'product_ids': [(5, 0, 0)],
+            'product_categ_ids': [(5, 0, 0)],
+            'order_state': 'sale_done',
         })
         self._reset_report_payload()
         self._compute_filter_data()
@@ -350,6 +378,11 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
             wizard.report_order_count = 0
             wizard.report_customer_count = 0
             wizard.report_product_count = 0
+            wizard.report_total_units = 0
+            wizard.report_delivered_units = 0
+            wizard.report_pending_units = 0
+            wizard.report_completion_pct = 0
+            wizard.report_chart_data = False
             wizard.report_date_range_label = False
             wizard.report_date_from_label = False
             wizard.report_date_to_label = False
@@ -1172,6 +1205,30 @@ class ZrnPlanningProductionPlanningWizard(models.TransientModel):
                 if partner
             )),
             'report_product_count': len(candidate_lines.mapped('product_id')),
+            'report_total_units': sum(candidate_lines.mapped('product_uom_qty')),
+            'report_delivered_units': sum(candidate_lines.mapped('qty_delivered')),
+            'report_pending_units': sum(
+                max(float(line.product_uom_qty or 0.0) - float(line.qty_delivered or 0.0), 0.0)
+                for line in candidate_lines
+            ),
+            'report_completion_pct': (
+                sum(candidate_lines.mapped('qty_delivered'))
+                / sum(candidate_lines.mapped('product_uom_qty'))
+                * 100
+                if sum(candidate_lines.mapped('product_uom_qty'))
+                else 0
+            ),
+            'report_chart_data': json.dumps([
+                {
+                    'name': line.product_id.display_name or 'Sin producto',
+                    'units': line.total_units,
+                    'pending': max(line.total_units - line.stock_free, 0.0),
+                }
+                for line in self.report_product_line_ids.sorted(
+                    key=lambda item: item.total_units,
+                    reverse=True,
+                )[:12]
+            ]),
             'report_html': self._build_report_html(candidate_lines),
         })
         date_range_payload = self._get_report_date_range_payload(candidate_lines)

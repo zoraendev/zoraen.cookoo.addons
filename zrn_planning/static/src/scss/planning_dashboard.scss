@@ -1,0 +1,337 @@
+.o_form_view.zrn_planning_home_form .o_form_sheet_bg > .o_form_sheet,
+.o_form_view.zrn_planning_filter_form .o_form_sheet_bg > .o_form_sheet {
+  max-width: none;
+  padding: 0 16px 20px;
+}
+
+.zrn_planning_home_dashboard {
+  background: #f4f6f9;
+  min-height: 620px;
+  padding: 16px;
+}
+
+.zrn_planning_home_grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.zrn_planning_home_panel {
+  min-width: 0;
+  border: 1px solid #cfd9e6;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.zrn_planning_home_panel_head,
+.zrn_planning_filter_table_head,
+.zrn_planning_production_report_header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  padding: 7px 10px;
+  border-bottom: 1px solid #cfd9e6;
+  background: #edf3f9;
+  color: #174b86;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+  font-size: 12px;
+}
+
+.zrn_planning_home_panel_actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zrn_planning_home_icon_btn {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #c7d4e2;
+  border-radius: 4px;
+  background: #fff;
+  color: #174b86;
+}
+
+.zrn_planning_home_icon_btn:hover,
+.zrn_planning_home_icon_btn:focus {
+  background: #e5edf6;
+  color: #123b6a;
+}
+
+.zrn_planning_home_nav_btn {
+  margin-left: 4px;
+  border-color: #174b86;
+  background: #174b86;
+  color: #fff;
+}
+
+.zrn_planning_home_nav_btn:hover,
+.zrn_planning_home_nav_btn:focus {
+  background: #123b6a;
+  color: #fff;
+}
+
+.zrn_planning_home_metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin: 10px;
+  border: 1px solid #d7e0ea;
+  background: #d7e0ea;
+}
+
+.zrn_planning_home_metrics > div {
+  min-width: 0;
+  padding: 8px 9px;
+  background: #fff;
+}
+
+.zrn_planning_home_metrics span,
+.zrn_planning_home_metrics strong {
+  display: block;
+}
+
+.zrn_planning_home_metrics span {
+  color: #65768b;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.zrn_planning_home_metrics strong {
+  margin-top: 4px;
+  color: #173b62;
+  font-size: 16px;
+}
+
+.zrn_planning_home_table_mount,
+.zrn_planning_home_chart_canvas {
+  min-height: 290px;
+  margin: 10px;
+  background: #f7f9fc;
+}
+
+.zrn_planning_home_table_surface {
+  overflow-x: auto;
+  background: #f7f9fc;
+}
+
+.zrn_planning_home_table_surface table {
+  width: 100%;
+  border-collapse: collapse;
+  color: #526b88;
+  font-size: 12px;
+}
+
+.zrn_planning_home_table_surface th {
+  padding: 9px 8px;
+  border-bottom: 1px solid #cfd9e6;
+  background: #e9f0f7;
+  color: #174b86;
+  text-align: left;
+  text-transform: uppercase;
+  font-size: 10px;
+}
+
+.zrn_planning_home_table_surface td {
+  padding: 9px 8px;
+  border-bottom: 1px solid #d7e0ea;
+  background: #f7f9fc;
+  white-space: nowrap;
+}
+
+.zrn_planning_home_table_surface td:first-child {
+  color: #173b62;
+  font-weight: 600;
+}
+
+.zrn_planning_home_empty_cell,
+.zrn_planning_home_chart_empty {
+  color: #778699;
+  text-align: center;
+}
+
+.zrn_planning_home_chart_empty {
+  min-height: 290px;
+  padding: 28px;
+}
+
+.zrn_planning_home_chart_config,
+.zrn_planning_filter_modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1055;
+}
+
+.zrn_planning_home_chart_config_backdrop,
+.zrn_planning_filter_modal_backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 35, 52, .42);
+}
+
+.zrn_planning_home_chart_config_dialog,
+.zrn_planning_filter_modal_dialog {
+  position: relative;
+  z-index: 1;
+  width: min(560px, calc(100vw - 32px));
+  margin: 8vh auto 0;
+  border: 1px solid #c7d4e2;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.zrn_planning_home_chart_config_head,
+.zrn_planning_filter_modal_head,
+.zrn_planning_home_chart_config_footer,
+.zrn_planning_filter_modal_footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #d7e0ea;
+}
+
+.zrn_planning_home_chart_config_footer,
+.zrn_planning_filter_modal_footer {
+  justify-content: flex-end;
+  border-top: 1px solid #d7e0ea;
+  border-bottom: 0;
+}
+
+.zrn_planning_home_chart_config_body,
+.zrn_planning_filter_modal_body {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 12px;
+  padding: 14px;
+}
+
+.zrn_planning_home_chart_config_body select,
+.zrn_planning_home_chart_config_body input {
+  grid-column: 1 / -1;
+}
+
+.zrn_planning_filter_modal_field {
+  min-width: 0;
+}
+
+.zrn_planning_filter_modal_field_wide {
+  grid-column: 1 / -1;
+}
+
+.zrn_planning_filter_modal_field > span {
+  display: block;
+  margin-bottom: 4px;
+  color: #174b86;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.zrn_planning_filter_modal_close {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #c7d4e2;
+  border-radius: 4px;
+  background: #fff;
+  color: #526b88;
+}
+
+.zrn_planning_filter_page {
+  padding: 12px 0;
+}
+
+.zrn_planning_filter_bar {
+  min-height: 52px;
+  padding: 10px 12px;
+  border: 1px solid #cfd9e6;
+  border-radius: 4px;
+  background: #f7f9fc;
+}
+
+.zrn_planning_filter_summary_inline {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  color: #526b88;
+  font-size: 12px;
+}
+
+.zrn_planning_filter_table_panel,
+.zrn_planning_production_report_table_panel {
+  margin-top: 12px;
+  border: 1px solid #cfd9e6;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.zrn_planning_filter_table_panel .zrn_planning_plans_list_container {
+  padding: 10px;
+  background: #f7f9fc;
+}
+
+.o_form_view.zrn_planning_filter_form .o_list_table thead th,
+.o_form_view.zrn_planning_production_report_form .o_list_table thead th {
+  background: #e9f0f7;
+  color: #174b86;
+  text-align: left;
+}
+
+.o_form_view.zrn_planning_filter_form .o_list_table tbody td,
+.o_form_view.zrn_planning_production_report_form .o_list_table tbody td {
+  background: #f7f9fc;
+}
+
+.o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_header_shell {
+  border: 1px solid #cfd9e6;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_header {
+  justify-content: flex-start;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.zrn_planning_production_report_heading_group,
+.zrn_planning_production_report_actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.zrn_planning_production_report_action_btn,
+.zrn_planning_production_report_title_tab {
+  border: 1px solid #c7d4e2;
+  border-radius: 4px;
+  background: #fff;
+  color: #174b86;
+}
+
+.zrn_planning_production_report_action_btn:not(.zrn_planning_production_report_action_btn_inactive),
+.zrn_planning_production_report_title_tab:not(.zrn_planning_production_report_title_tab_inactive) {
+  background: #315f98;
+  border-color: #315f98;
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .zrn_planning_home_grid {
+    grid-template-columns: 1fr;
+  }
+
+  .zrn_planning_home_metrics,
+  .zrn_planning_filter_modal_body {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
