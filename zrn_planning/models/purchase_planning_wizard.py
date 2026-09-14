@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import json
+
 from odoo import _, api, fields, models
 from odoo.exceptions import UserError
 
@@ -121,6 +123,11 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
     report_supply_count = fields.Integer(string='Insumos en reporte', readonly=True)
     report_product_count = fields.Integer(string='Productos en reporte', readonly=True)
     report_document_count = fields.Integer(string='Ordenes consideradas', readonly=True)
+    report_required_qty = fields.Float(string='Requerimiento total', readonly=True)
+    report_stock_free_qty = fields.Float(string='Stock libre', readonly=True)
+    report_suggested_purchase_qty = fields.Float(string='Compra sugerida', readonly=True)
+    report_coverage_pct = fields.Float(string='Cobertura', readonly=True)
+    report_chart_data = fields.Text(string='Datos de la grafica', readonly=True)
     report_date_range_label = fields.Char(string='Rango consultado', readonly=True)
     report_date_from_label = fields.Char(string='Fecha inicial del reporte', readonly=True)
     report_date_to_label = fields.Char(string='Fecha final del reporte', readonly=True)
@@ -507,6 +514,11 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
             wizard.report_supply_count = 0
             wizard.report_product_count = 0
             wizard.report_document_count = 0
+            wizard.report_required_qty = 0.0
+            wizard.report_stock_free_qty = 0.0
+            wizard.report_suggested_purchase_qty = 0.0
+            wizard.report_coverage_pct = 0.0
+            wizard.report_chart_data = '[]'
             wizard.report_date_range_label = False
             wizard.report_date_from_label = False
             wizard.report_date_to_label = False
@@ -775,6 +787,15 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
         self._sync_supply_lines()
         self._sync_product_lines()
         self._sync_document_lines()
+        required_qty = sum(self.report_supply_line_ids.mapped('total_required_qty'))
+        stock_free_qty = sum(self.report_supply_line_ids.mapped('stock_free'))
+        suggested_purchase_qty = sum(self.report_supply_line_ids.mapped('suggested_purchase_qty'))
+        coverage_pct = ((required_qty - suggested_purchase_qty) / required_qty * 100.0) if required_qty else 0.0
+        chart_rows = sorted(
+            self.report_supply_line_ids,
+            key=lambda line: line.total_required_qty,
+            reverse=True,
+        )[:12]
         self.write({
             'report_ready': True,
             'report_active_tab': 'overview',
@@ -782,6 +803,18 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
             'report_supply_count': len(self.report_supply_line_ids),
             'report_product_count': len(self.report_product_line_ids),
             'report_document_count': len(self.report_document_line_ids),
+            'report_required_qty': required_qty,
+            'report_stock_free_qty': stock_free_qty,
+            'report_suggested_purchase_qty': suggested_purchase_qty,
+            'report_coverage_pct': coverage_pct,
+            'report_chart_data': json.dumps([
+                {
+                    'name': line.component_id.display_name,
+                    'required': line.total_required_qty,
+                    'suggested': line.suggested_purchase_qty,
+                }
+                for line in chart_rows
+            ]),
         })
         date_range_payload = self._get_report_date_range_payload(self.report_requirement_line_ids)
         self.write({

@@ -353,7 +353,8 @@ button.zrn_commercial_btn_orders:hover {
 
 .o_action_manager .zrn_commercial_chart_config_dialog {
   position: relative;
-  width: min(520px, calc(100% - 32px));
+  width: 520px;
+  max-width: calc(100% - 32px);
   margin: 10vh auto 0;
   border: 1px solid #cbd5e1;
   border-radius: 5px;

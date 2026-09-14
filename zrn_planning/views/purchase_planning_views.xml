@@ -24,11 +24,12 @@
                             </div>
                             <div class="zrn_planning_filter_footer_end">
                                 <button
-                                    name="action_clear_filters"
-                                    type="object"
-                                    string="Limpiar"
-                                    icon="fa-eraser"
+                                    name="zrn_planning_filter_control"
+                                    type="button"
+                                    string="Filtros"
+                                    icon="fa-sliders"
                                     class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"
+                                    data-zrn-planning-filter-toggle="1"
                                 />
                                 <button
                                     name="action_continue"
@@ -57,37 +58,6 @@
 
                     <div class="zrn_planning_filter_page">
                         <div class="zrn_planning_filter_bar">
-                            <div class="zrn_planning_filter_fields">
-                                <div class="zrn_planning_filter_field_item">
-                                    <span class="zrn_planning_filter_field_label">Fecha desde</span>
-                                    <field name="fecha_desde" nolabel="1"/>
-                                </div>
-                                <div class="zrn_planning_filter_field_item">
-                                    <span class="zrn_planning_filter_field_label">Fecha hasta</span>
-                                    <field name="fecha_hasta" nolabel="1"/>
-                                </div>
-                                <div class="zrn_planning_filter_field_item zrn_planning_filter_field_item_select">
-                                    <span class="zrn_planning_filter_field_label">Base</span>
-                                    <field name="planning_basis" nolabel="1"/>
-                                </div>
-                                <div class="zrn_planning_filter_field_item zrn_planning_filter_field_item_select">
-                                    <span class="zrn_planning_filter_field_label">Estado</span>
-                                    <field name="mrp_source_state" nolabel="1" invisible="planning_basis != 'mrp'"/>
-                                    <field name="sale_source_state" nolabel="1" invisible="planning_basis != 'sale'"/>
-                                </div>
-                                <div class="zrn_planning_filter_field_item zrn_planning_filter_field_item_wide">
-                                    <span class="zrn_planning_filter_field_label">Insumos</span>
-                                    <field
-                                        name="supply_product_ids"
-                                        widget="many2many_tags"
-                                        nolabel="1"
-                                        domain="[('id', 'in', available_supply_product_ids)]"
-                                        options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
-                                        placeholder="Selecciona uno o varios insumos"
-                                    />
-                                </div>
-                            </div>
-
                             <div class="zrn_planning_filter_summary_inline">
                                 <div class="zrn_planning_filter_summary_item">
                                     <span>Documentos:</span>
@@ -106,6 +76,44 @@
                             </div>
                         </div>
 
+                        <div class="zrn_planning_filter_modal d-none" data-zrn-planning-filter-modal="1">
+                            <div class="zrn_planning_filter_modal_backdrop" data-zrn-planning-filter-close="1"/>
+                            <div class="zrn_planning_filter_modal_dialog" role="dialog" aria-modal="true">
+                                <div class="zrn_planning_filter_modal_header">
+                                    <div>
+                                        <h3>Filtros</h3>
+                                        <span>Planeacion de abastecimiento</span>
+                                    </div>
+                                    <button name="action_open_filters" type="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar">
+                                        <i class="fa fa-times"/>
+                                    </button>
+                                </div>
+                                <div class="zrn_planning_filter_modal_body">
+                                    <div class="zrn_planning_filter_modal_grid">
+                                        <div class="zrn_planning_filter_modal_field"><span class="o_form_label">Fecha desde</span><field name="fecha_desde" nolabel="1"/></div>
+                                        <div class="zrn_planning_filter_modal_field"><span class="o_form_label">Fecha hasta</span><field name="fecha_hasta" nolabel="1"/></div>
+                                        <div class="zrn_planning_filter_modal_field"><span class="o_form_label">Base de planeacion</span><field name="planning_basis" nolabel="1"/></div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span class="o_form_label">Estado de fabricacion</span>
+                                            <field name="mrp_source_state" nolabel="1" invisible="planning_basis != 'mrp'"/>
+                                            <field name="sale_source_state" nolabel="1" invisible="planning_basis != 'sale'"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_full">
+                                            <span class="o_form_label">Insumos</span>
+                                            <field name="supply_product_ids" widget="many2many_tags" nolabel="1"
+                                                   domain="[('id', 'in', available_supply_product_ids)]"
+                                                   options="{'no_create': True, 'no_create_edit': True, 'no_open': True}"
+                                                   placeholder="Selecciona uno o varios insumos"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="zrn_planning_filter_modal_footer">
+                                    <button name="action_clear_filters" type="object" string="Limpiar" icon="fa-eraser" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"/>
+                                    <button name="action_open_filters" type="button" string="Aplicar" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary" data-zrn-planning-filter-close="1"/>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="zrn_planning_filter_table_panel">
                             <div class="zrn_planning_filter_table_head">
                                 <div class="zrn_planning_filter_table_head_main">
@@ -113,6 +121,9 @@
                                         <span>Ultimos registros</span>
                                         <strong><field name="planning_record_count" readonly="1" nolabel="1"/></strong>
                                     </div>
+                                    <button name="action_open_existing_plans" type="object" class="btn zrn_planning_filter_table_arrow" title="Ver planes">
+                                        <i class="fa fa-arrow-right"/>
+                                    </button>
                                 </div>
                             </div>
 
@@ -150,6 +161,11 @@
                         <field name="report_date_range_mode"/>
                         <field name="report_date_from_label"/>
                         <field name="report_date_to_label"/>
+                        <field name="report_required_qty"/>
+                        <field name="report_stock_free_qty"/>
+                        <field name="report_suggested_purchase_qty"/>
+                        <field name="report_coverage_pct"/>
+                        <field name="report_chart_data"/>
                     </group>
                     <div class="zrn_planning_production_report_screen">
                         <div class="zrn_planning_production_report_header_shell">
@@ -221,6 +237,15 @@
                                     </button>
                                 </div>
                             </div>
+                        </div>
+                        <div class="zrn_planning_production_report_metrics" invisible="report_active_tab != 'overview'">
+                            <div class="zrn_planning_production_report_metric"><span>Requerimiento total</span><strong><field name="report_required_qty" readonly="1" nolabel="1"/></strong></div>
+                            <div class="zrn_planning_production_report_metric"><span>Stock libre</span><strong><field name="report_stock_free_qty" readonly="1" nolabel="1"/></strong></div>
+                            <div class="zrn_planning_production_report_metric"><span>Compra sugerida</span><strong><field name="report_suggested_purchase_qty" readonly="1" nolabel="1"/></strong></div>
+                            <div class="zrn_planning_production_report_metric"><span>Cobertura</span><strong><field name="report_coverage_pct" readonly="1" nolabel="1"/>%</strong></div>
+                        </div>
+                        <div class="zrn_planning_production_report_chart_panel" invisible="report_active_tab != 'overview'">
+                            <div class="zrn_planning_production_report_chart_mount" data-zrn-planning-report-chart="1"/>
                         </div>
                         <div class="zrn_planning_production_report_table_panel">
                             <div class="zrn_planning_production_report_table_toolbar">

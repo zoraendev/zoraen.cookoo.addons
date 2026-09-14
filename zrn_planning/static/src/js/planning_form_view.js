@@ -36,7 +36,7 @@ class ZrnPlanningFormController extends FormController {
         this.rootRef.el?.addEventListener("click", this._boundHomeClick);
         this.loadAndRenderHomeCharts();
       }
-      if (this.isProductionFilter) this.rootRef.el?.addEventListener("click", this._boundFilterClick);
+      if (this.isPlanningFilter) this.rootRef.el?.addEventListener("click", this._boundFilterClick);
       if (this.isInventoryReconciliation) {
         this.rootRef.el?.addEventListener("click", this._boundReconciliationHeaderClick);
         this.renderSelectAllHeaderCheckbox();
@@ -60,7 +60,7 @@ class ZrnPlanningFormController extends FormController {
         this.closeHomeExportMenu();
         this.disposeHomeCharts();
       }
-      if (this.isProductionFilter) this.rootRef.el?.removeEventListener("click", this._boundFilterClick);
+      if (this.isPlanningFilter) this.rootRef.el?.removeEventListener("click", this._boundFilterClick);
       if (this.isInventoryReconciliation) {
         this.rootRef.el?.removeEventListener("click", this._boundReconciliationHeaderClick);
         if (this._reconciliationCheckboxInterval) clearInterval(this._reconciliationCheckboxInterval);
@@ -89,8 +89,11 @@ class ZrnPlanningFormController extends FormController {
     return this.props.resModel === "zrn_planning.inventory.reconciliation";
   }
 
-  get isProductionFilter() {
-    return this.props.resModel === "zrn_planning.production.planning.wizard" && Boolean(this.rootRef.el?.querySelector("[data-zrn-planning-filter-modal]"));
+  get isPlanningFilter() {
+    return [
+      "zrn_planning.production.planning.wizard",
+      "zrn_planning.purchase.planning.wizard",
+    ].includes(this.props.resModel) && Boolean(this.rootRef.el?.querySelector("[data-zrn-planning-filter-modal]"));
   }
 
   onPlanningFilterClick(event) {
