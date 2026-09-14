@@ -15,7 +15,7 @@ Addon dedicado a planeacion operativa:
     'author': 'Zoraen Corporation',
     'website': 'https://www.zoraen.com',
     'category': 'Operations/Inventory',
-    'version': '0.1.3',
+    'version': '0.1.4',
     'license': 'LGPL-3',
     'application': True,
     'depends': ['base', 'sale_stock', 'mrp', 'purchase_stock'],
@@ -31,8 +31,8 @@ Addon dedicado a planeacion operativa:
     ],
     'assets': {
         'web.assets_backend': [
-            'zrn_analitics/static/lib/echarts/echarts.min.js',
-            'zrn_analitics/static/src/js/dark_mode_bridge.js',
+            'zrn_planning/static/lib/echarts/echarts.min.js',
+            'zrn_planning/static/src/js/dark_mode_bridge.js',
             'zrn_planning/static/src/js/planning_form_view.js',
             'zrn_planning/static/src/scss/planning_dashboard.scss',
             'zrn_planning/static/src/js/production_report_form_view.js',
