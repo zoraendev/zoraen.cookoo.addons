@@ -245,12 +245,13 @@ class ZrnPlanningFormController extends FormController {
       const chart = this.rootRef.el.querySelector(`[data-zrn-planning-home-chart="${key}"]`);
       const empty = this.rootRef.el.querySelector(`[data-zrn-planning-home-empty="${key}"]`);
       if (metricsMount) {
+        const orderLabel = payload.order_label || "Ordenes";
         metricsMount.innerHTML = [
-          ["Planes", metrics.plans || 0],
-          [payload.order_label || "Ordenes", metrics.orders_generated || 0],
-          ["Finalizadas", metrics.orders_completed || 0],
-          ["Avance", `${metrics.progress || 0}%`],
-        ].map(([label, value]) => `<div><span>${label}</span><strong>${this.escapeHtml(value)}</strong></div>`).join("");
+          ["Planes", metrics.plans || 0, "fa-list-alt"],
+          [orderLabel, metrics.orders_generated || 0, key === "production" ? "fa-industry" : "fa-shopping-cart"],
+          ["Finalizadas", metrics.orders_completed || 0, "fa-check-square-o"],
+          ["Avance", `${metrics.progress || 0}%`, "fa-line-chart"],
+        ].map(([label, value, icon]) => `<div class="zrn_planning_home_summary_cell"><span class="zrn_planning_home_summary_label"><i class="fa ${icon}"/>${this.escapeHtml(label)}</span><strong class="zrn_planning_home_summary_value">${this.escapeHtml(value)}</strong></div>`).join("");
       }
       if (table) {
         table.classList.toggle("d-none", this._homePanelViews[key] === "chart");

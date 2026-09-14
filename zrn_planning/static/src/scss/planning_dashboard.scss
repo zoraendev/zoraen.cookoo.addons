@@ -34,7 +34,7 @@
   min-height: 44px;
   padding: 7px 10px;
   border-bottom: 1px solid #cfd9e6;
-  background: #edf3f9;
+  background: #f4f7fb;
   color: #174b86;
   text-transform: uppercase;
   letter-spacing: .02em;
@@ -80,39 +80,53 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
-  margin: 10px;
+  margin: 10px 10px 0;
   border: 1px solid #d7e0ea;
   background: #d7e0ea;
 }
 
-.zrn_planning_home_metrics > div {
+.zrn_planning_home_summary_cell {
   min-width: 0;
   padding: 8px 9px;
   background: #fff;
 }
 
-.zrn_planning_home_metrics span,
-.zrn_planning_home_metrics strong {
+.zrn_planning_home_summary_label,
+.zrn_planning_home_summary_value {
   display: block;
 }
 
-.zrn_planning_home_metrics span {
-  color: #65768b;
-  font-size: 10px;
+.zrn_planning_home_summary_label {
+  color: #1f4e8c;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
 }
 
-.zrn_planning_home_metrics strong {
+.zrn_planning_home_summary_label i {
+  margin-right: 6px;
+  color: #5f78a1;
+}
+
+.zrn_planning_home_summary_value {
   margin-top: 4px;
-  color: #173b62;
-  font-size: 16px;
+  color: #1f4e8c;
+  font-size: 18px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
 }
 
 .zrn_planning_home_table_mount,
 .zrn_planning_home_chart_canvas {
   min-height: 290px;
-  margin: 10px;
+  margin: 0 10px 10px;
   background: #f7f9fc;
+}
+
+.zrn_planning_home_table_mount {
+  padding-top: 10px;
 }
 
 .zrn_planning_home_table_surface {
@@ -124,21 +138,21 @@
   width: 100%;
   border-collapse: collapse;
   color: #526b88;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .zrn_planning_home_table_surface th {
-  padding: 9px 8px;
+  padding: 8px 9px;
   border-bottom: 1px solid #cfd9e6;
   background: #e9f0f7;
   color: #174b86;
   text-align: left;
   text-transform: uppercase;
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .zrn_planning_home_table_surface td {
-  padding: 9px 8px;
+  padding: 8px 9px;
   border-bottom: 1px solid #d7e0ea;
   background: #f7f9fc;
   white-space: nowrap;

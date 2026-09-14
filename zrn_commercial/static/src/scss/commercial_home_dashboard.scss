@@ -230,6 +230,15 @@ button.zrn_commercial_btn_orders:hover {
 }
 
 .o_action_manager .zrn_commercial_summary_value {
+  display: inline-block;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.o_action_manager .zrn_commercial_summary_value .o_field_widget,
+.o_action_manager .zrn_commercial_summary_value .o_field_widget span {
+  display: inline;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
