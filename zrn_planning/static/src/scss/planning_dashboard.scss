@@ -296,12 +296,13 @@
 .zrn_planning_filter_modal_dialog {
   position: relative;
   z-index: 1;
-  width: 560px;
+  width: 800px;
   max-width: calc(100vw - 32px);
-  margin: 8vh auto 0;
+  margin: 7vh auto 0;
   border: 1px solid #c7d4e2;
-  border-radius: 4px;
+  border-radius: 6px;
   background: #fff;
+  box-shadow: 0 10px 28px rgba(23, 59, 98, .16);
 }
 
 .zrn_planning_home_chart_config_head,
@@ -362,12 +363,14 @@
 
 .zrn_planning_filter_modal_body {
   display: block;
+  padding: 18px 16px 20px;
+  background: #fff;
 }
 
 .zrn_planning_filter_modal_grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px 14px;
+  gap: 16px 14px;
 }
 
 .zrn_planning_filter_modal_field_full {
@@ -389,14 +392,46 @@
 
 .zrn_planning_filter_modal_field > span {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
   color: #174b86;
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+.zrn_planning_filter_modal_field > .o_field_widget {
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid #c7d4e2;
+  border-radius: 4px;
+  background: #fff;
+  color: #173b62;
+}
+
+.zrn_planning_filter_modal_field > .o_field_widget.o_field_many2manytags {
+  min-height: 38px;
+  padding: 3px 6px;
+}
+
+.zrn_planning_filter_modal_field > .o_field_widget:focus-within {
+  border-color: #5f83ad;
+  box-shadow: 0 0 0 2px rgba(95, 131, 173, .12);
+}
+
+.zrn_planning_filter_modal_field > .o_field_widget input,
+.zrn_planning_filter_modal_field > .o_field_widget select {
+  color: #173b62;
+}
+
+.zrn_planning_filter_modal_field > .o_field_widget input::placeholder {
+  color: #8192a7;
 }
 
 .zrn_planning_filter_modal_close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 30px;
   height: 30px;
   padding: 0;
@@ -404,6 +439,11 @@
   border-radius: 4px;
   background: #fff;
   color: #526b88;
+  line-height: 1;
+}
+
+.zrn_planning_filter_modal_close i {
+  line-height: 1;
 }
 
 .zrn_planning_filter_page {
@@ -979,7 +1019,6 @@
   }
 
   .zrn_planning_home_metrics,
-  .zrn_planning_filter_modal_body,
   .zrn_planning_production_report_metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -996,5 +1035,22 @@
   .zrn_planning_production_report_context_stats {
     justify-content: flex-start;
     margin-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .zrn_planning_filter_modal_dialog {
+    width: calc(100vw - 20px);
+    max-width: none;
+    margin-top: 4vh;
+  }
+
+  .zrn_planning_filter_modal_grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .zrn_planning_filter_modal_field_wide {
+    grid-column: auto;
   }
 }
