@@ -19,20 +19,71 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Spend mensual</span>
                                         <span>Evolucion del gasto</span>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-purchases-spend', filename: 'zrn_operaciones_compras_spend_mensual' })" aria-label="Exportar spend mensual"><i class="fa fa-download"/></button>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_purchase_spend') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_purchase_spend', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-purchases-spend', filename: 'zrn_operaciones_compras_spend_mensual' })" aria-label="Exportar spend mensual"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_purchase_spend') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_purchase_spend', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_operations_line_chart">
-                                        <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-purchases-spend"/>
+                                    <div t-if="getCommercialPanelView('operations_purchase_spend') === 'chart'" class="zrn_analitics_operations_line_chart">
+                                        <t t-if="(operationsPayload.purchases.spend_series || []).length">
+                                            <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-purchases-spend"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_operations_chart_empty">Sin spend en el periodo.</div>
+                                        </t>
+                                    </div>
+                                    <div t-if="getCommercialPanelView('operations_purchase_spend') === 'table'" class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead><tr><th>Mes</th><th class="text-end">Spend</th></tr></thead>
+                                                <tbody>
+                                                    <tr t-foreach="operationsPayload.purchases.spend_series" t-as="row" t-key="row.label">
+                                                        <td><strong><t t-esc="row.label"/></strong></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.value || 0)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </section>
                                 <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_side">
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Top proveedores</span>
                                         <span>Spend del periodo</span>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-purchases-suppliers', filename: 'zrn_operaciones_compras_top_proveedores' })" aria-label="Exportar top proveedores"><i class="fa fa-download"/></button>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_purchase_suppliers') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_purchase_suppliers', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-purchases-suppliers', filename: 'zrn_operaciones_compras_top_proveedores' })" aria-label="Exportar top proveedores"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_purchase_suppliers') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_purchase_suppliers', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_operations_bar_list">
-                                        <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-purchases-suppliers"/>
+                                    <div t-if="getCommercialPanelView('operations_purchase_suppliers') === 'chart'" class="zrn_analitics_operations_bar_list">
+                                        <t t-if="(operationsPayload.purchases.supplier_rows || []).length">
+                                            <div class="zrn_analitics_operations_echart zrn_analitics_operations_echart_bar" data-zrn-chart="operations-purchases-suppliers"/>
+                                        </t>
+                                        <t t-else="">
+                                            <div class="zrn_analitics_operations_chart_empty">Sin proveedores con spend.</div>
+                                        </t>
+                                    </div>
+                                    <div t-if="getCommercialPanelView('operations_purchase_suppliers') === 'table'" class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Proveedor</th>
+                                                        <th class="text-end">Spend</th>
+                                                        <th class="text-end">Abierto</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="sortedOperationsPurchaseSuppliers.slice(0, 8)" t-as="row" t-key="'ops_top_sup_' + row.partner_id" t-on-click="() =&gt; this.openOperationsSupplier(row)" style="cursor: pointer;">
+                                                        <td><strong><t t-esc="row.supplier"/></strong></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.spend)"/></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.open_amount)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </section>
                             </div>

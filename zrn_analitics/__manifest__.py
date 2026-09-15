@@ -76,7 +76,6 @@ Addon base para la capa analitica:
             'zrn_analitics/static/src/xml/hubs/operations/tab_forecast.xml',
             'zrn_analitics/static/src/xml/hubs/operations/tab_inventarios.xml',
             'zrn_analitics/static/src/xml/hubs/operations/tab_compras.xml',
-            'zrn_analitics/static/src/xml/hubs/operations/tab_alertas.xml',
             'zrn_analitics/static/src/xml/hubs/operations/hub.xml',
             'zrn_analitics/static/src/xml/hubs/pdv/shared.xml',
             'zrn_analitics/static/src/xml/hubs/pdv/tab_overview.xml',

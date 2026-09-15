@@ -6,10 +6,10 @@
                                     <span>Plan de produccion sugerido</span>
                                     <span>Lotes base desde demanda promedio</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_demanda', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_demanda') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_demanda', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('operations_demanda')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-operations_demanda', filename: 'zrn_operaciones_plan_produccion' })" aria-label="Exportar plan de producción"><i class="fa fa-download"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('operations_demanda', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_demanda') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_demanda', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
                                 <t t-if="getCommercialPanelView('operations_demanda') === 'chart'">

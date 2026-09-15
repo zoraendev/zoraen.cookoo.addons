@@ -6,7 +6,7 @@
                 <span><t t-esc="operationsPayload.summary.period_label"/></span>
             </div>
             <div class="zrn_analitics_hub_search zrn_analitics_commercial_search">
-                <input type="text" class="form-control" placeholder="Producto, marca, canal o codigo" t-att-value="state.operationsFilters.search" t-on-input="(ev) =&gt; this.updateOperationsFilter('search', ev.target.value)" t-on-keydown="this.onOperationsSearchKeydown"/>
+                <input type="text" class="form-control" t-att-placeholder="state.operationsTab === 'compras' ? 'Proveedor, OC, producto o codigo' : 'Producto, marca, canal o codigo'" t-att-value="state.operationsFilters.search" t-on-input="(ev) =&gt; this.updateOperationsFilter('search', ev.target.value)" t-on-keydown="this.onOperationsSearchKeydown"/>
                 <button t-if="state.operationsFilters.search" type="button" class="btn zrn_analitics_commercial_search_clear" t-on-click="() =&gt; this.updateOperationsFilter('search', '')" aria-label="Limpiar busqueda">
                     <i class="fa fa-times"/>
                 </button>
@@ -45,7 +45,7 @@
                                     <label>Marca</label>
                                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(operationsPayload.filter_options.brands, state.operationsFilters.brand_ids)" domain="getOptionDomain(operationsPayload.filter_options.brands)" resModel="'zrn_commercial.commercial.brand'" fieldString="'Marca'" placeholder="'Todas las marcas'" onChange.bind="this.onOperationsBrandsChange"/>
                                 </div>
-                                <div class="zrn_analitics_operations_field">
+                                <div t-if="state.operationsTab !== 'compras' &amp;&amp; state.operationsTab !== 'inventarios'" class="zrn_analitics_operations_field">
                                     <label>Canal</label>
                                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(operationsPayload.filter_options.channels, state.operationsFilters.channel_ids)" domain="getOptionDomain(operationsPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onOperationsChannelsChange"/>
                                 </div>
@@ -53,11 +53,11 @@
                                     <label>Canal de producto</label>
                                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(operationsPayload.filter_options.product_channels, state.operationsFilters.product_channel_ids)" domain="getOptionDomain(operationsPayload.filter_options.product_channels)" resModel="'zrn_commercial.product.channel'" fieldString="'Canal de producto'" placeholder="'Todos los canales de producto'" onChange.bind="this.onOperationsProductChannelsChange"/>
                                 </div>
-                                <div class="zrn_analitics_operations_field">
+                                <div t-if="state.operationsTab !== 'forecast' &amp;&amp; state.operationsTab !== 'portafolio' &amp;&amp; state.operationsTab !== 'compras'" class="zrn_analitics_operations_field">
                                     <label>Clase ABC</label>
                                     <SelectMenu choices="getSelectChoices(operationsPayload.filter_options.abc_choices, 'Todas las clases')" value="state.operationsFilters.abc_class" onSelect.bind="this.onOperationsAbcSelect"/>
                                 </div>
-                                <div class="zrn_analitics_operations_field">
+                                <div t-if="state.operationsTab !== 'forecast' &amp;&amp; state.operationsTab !== 'portafolio' &amp;&amp; state.operationsTab !== 'compras'" class="zrn_analitics_operations_field">
                                     <label>Rotacion</label>
                                     <SelectMenu choices="getSelectChoices(operationsPayload.filter_options.rotation_choices, 'Toda la rotacion')" value="state.operationsFilters.rotation_key" onSelect.bind="this.onOperationsRotationSelect"/>
                                 </div>

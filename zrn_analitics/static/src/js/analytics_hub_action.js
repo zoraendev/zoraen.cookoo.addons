@@ -56,7 +56,6 @@ const OPERATIONS_TABS = [
   { key: "forecast", label: "Forecast", icon: "fa-area-chart" },
   { key: "inventarios", label: "Inventarios", icon: "fa-cubes" },
   { key: "compras", label: "Compras", icon: "fa-shopping-cart" },
-  { key: "alertas", label: "Alertas", icon: "fa-bell-o" },
 ];
 
 const PDV_TABS = [
@@ -458,6 +457,15 @@ class ZrnAnalyticsHubAction extends Component {
         financial_channel_overview: "chart",
         operations_overview_monthly: "chart",
         operations_brand_mix: "chart",
+        operations_overview_abc: "chart",
+        operations_overview_rotation: "chart",
+        operations_portfolio_units: "chart",
+        operations_trends_summary: "chart",
+        operations_forecast: "chart",
+        operations_inventory_coverage: "chart",
+        operations_inventory_brand_mix: "chart",
+        operations_purchase_spend: "chart",
+        operations_purchase_suppliers: "chart",
         pdv_overview_revenue: "chart",
         pdv_overview_coverage: "chart",
         pdv_overview_top: "chart",
@@ -1769,6 +1777,9 @@ class ZrnAnalyticsHubAction extends Component {
   }
 
   async setOperationsTab(tabKey) {
+    if (!this.operationsTabs.some((tab) => tab.key === tabKey)) {
+      tabKey = this.operationsTabs[0]?.key || "overview";
+    }
     this.state.operationsTab = tabKey;
     this.closeCommercialSidebar();
     this.closeOperationsFilters();
@@ -5336,8 +5347,13 @@ class ZrnAnalyticsHubAction extends Component {
     }
     chart.setOption({
       animationDuration: 650,
-      legend: { data: ["Actual Q", "Proyectado Q"], textStyle: { color: "#5f6b7a", fontSize: 11 } },
-      grid: { top: 28, right: 20, bottom: 26, left: 24, containLabel: true },
+      legend: {
+        data: ["Actual Q", "Proyectado Q"],
+        top: 0,
+        right: 16,
+        textStyle: { color: "#5f6b7a", fontSize: 11 },
+      },
+      grid: { top: 46, right: 24, bottom: 34, left: 24, containLabel: true },
       tooltip: {
         trigger: "axis",
         valueFormatter: (value) => `${this.operationsPayload.summary.currency_symbol} ${this.formatMoney(value)}`,
@@ -5347,7 +5363,7 @@ class ZrnAnalyticsHubAction extends Component {
         data: rows.map((item) => item.label),
         axisTick: { show: false },
         axisLine: { lineStyle: { color: "#d6deea" } },
-        axisLabel: { color: "#5f6b7a", fontSize: 11 },
+        axisLabel: { color: "#5f6b7a", fontSize: 11, margin: 14 },
       },
       yAxis: {
         type: "value",
@@ -5366,10 +5382,10 @@ class ZrnAnalyticsHubAction extends Component {
           name: "Proyectado Q",
           type: "line",
           smooth: 0.2,
-          symbolSize: 8,
+          symbolSize: 7,
           data: rows.map((item) => Number(item.projected_revenue || 0)),
-          lineStyle: { color: "#bd1730", width: 3 },
-          itemStyle: { color: "#bd1730" },
+          lineStyle: { color: "#0f766e", width: 3 },
+          itemStyle: { color: "#0f766e" },
         },
       ],
     }, true);

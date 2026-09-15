@@ -6,10 +6,38 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Forecast mensual</span>
                                         <span>Actual vs proyectado</span>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-forecast', filename: 'zrn_operaciones_forecast_mensual' })" aria-label="Exportar forecast mensual"><i class="fa fa-download"/></button>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_forecast') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_forecast', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'operations-forecast', filename: 'zrn_operaciones_forecast_mensual' })" aria-label="Exportar forecast mensual"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('operations_forecast') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('operations_forecast', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_operations_line_chart">
+                                    <div t-if="getCommercialPanelView('operations_forecast') === 'chart'" class="zrn_analitics_operations_line_chart">
                                         <div class="zrn_analitics_operations_echart" data-zrn-chart="operations-forecast"/>
+                                    </div>
+                                    <div t-if="getCommercialPanelView('operations_forecast') === 'table'" class="zrn_analitics_operations_table_wrap">
+                                        <div class="o_list_renderer o_list_view table-responsive">
+                                            <table class="o_list_table table table-sm table-hover position-relative mb-0 table-striped">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mes</th>
+                                                        <th class="text-end">Actual Q</th>
+                                                        <th class="text-end">Proyectado Q</th>
+                                                        <th class="text-end">Unidades</th>
+                                                        <th class="text-end">MoM</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr t-foreach="operationsPayload.forecast.monthly" t-as="row" t-key="row.month_key">
+                                                        <td><strong><t t-esc="row.label"/></strong></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></td>
+                                                        <td class="text-end"><t t-esc="operationsPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.projected_revenue)"/></td>
+                                                        <td class="text-end"><t t-esc="formatCount(row.projected_units)"/></td>
+                                                        <td class="text-end"><t t-esc="formatPercent(row.mom_pct)"/></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </section>
                                 <section class="zrn_analitics_hub_panel zrn_analitics_operations_panel_side">
@@ -40,7 +68,9 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Serie mensual</span>
                                         <span>Pace y proyeccion</span>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_serie_mensual_forecast' })" aria-label="Exportar serie mensual"><i class="fa fa-download"/></button>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_serie_mensual_forecast' })" aria-label="Exportar serie mensual"><i class="fa fa-download"/></button>
+                                        </div>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">
@@ -71,7 +101,9 @@
                                     <div class="zrn_analitics_operations_panel_head">
                                         <span>Pace por canal</span>
                                         <span>Comparativo rapido</span>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_pace_canal' })" aria-label="Exportar pace por canal"><i class="fa fa-download"/></button>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_operaciones_pace_canal' })" aria-label="Exportar pace por canal"><i class="fa fa-download"/></button>
+                                        </div>
                                     </div>
                                     <div class="zrn_analitics_operations_table_wrap">
                                         <div class="o_list_renderer o_list_view table-responsive">

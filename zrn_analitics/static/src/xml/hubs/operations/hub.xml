@@ -102,8 +102,6 @@
 
                         <t t-call="zrn_analitics.HubOperationsTabCompras"/>
 
-                        <t t-call="zrn_analitics.HubOperationsTabAlertas"/>
-
                         <t t-if="state.analyticsDetailModal">
                             <div class="modal-backdrop fade show zrn_analitics_commercial_modal_backdrop" t-on-click="closeAnalyticsDetailModal"/>
                             <div class="modal fade show d-block zrn_analitics_commercial_modal_shell" tabindex="-1" role="dialog">

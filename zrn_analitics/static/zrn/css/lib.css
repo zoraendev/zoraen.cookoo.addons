@@ -2322,6 +2322,12 @@
   color: var(--zrn-analitics-brand-800);
 }
 
+.zrn_analitics_commercial_icon_btn.btn.is-active {
+  border-color: var(--zrn-analitics-brand-600);
+  background: var(--zrn-analitics-brand-700);
+  color: #ffffff;
+}
+
 .zrn_analitics_commercial_chart_meta {
   display: flex;
   align-items: baseline;
@@ -6234,6 +6240,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-width: 0;
 }
 
 .zrn_analitics_operations_shell {
@@ -6241,8 +6248,9 @@
   display: flex;
   gap: 14px;
   align-items: start;
-  min-height: 95vh;
-  min-height: 95dvh;
+  min-width: 0;
+  min-height: calc(100vh - 120px);
+  min-height: calc(100dvh - 120px);
 }
 
 .zrn_analitics_operations_sidebar {
@@ -6251,16 +6259,17 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px;
-  border: 1px solid var(--zrn-analitics-line);
-  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid rgba(116, 132, 157, 0.28);
+  border-radius: 4px;
   background: var(--zrn-analitics-surface);
-  height: 95vh;
-  height: 95dvh;
-  max-height: 95vh;
-  max-height: 95dvh;
+  height: calc(100vh - 120px);
+  height: calc(100dvh - 120px);
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
   overflow: hidden;
-  width: 20vw;
+  width: 220px;
+  flex: 0 0 220px;
 }
 
 .zrn_analitics_operations_sidebar_head {
@@ -6285,17 +6294,18 @@
 
 .zrn_analitics_operations_content {
   min-width: 0;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  height: 95vh;
-  height: 95dvh;
-  max-height: 95vh;
-  max-height: 95dvh;
+  gap: 12px;
+  height: calc(100vh - 120px);
+  height: calc(100dvh - 120px);
+  max-height: calc(100vh - 120px);
+  max-height: calc(100dvh - 120px);
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 4px;
-  width: 80vw;
+  padding-right: 10px;
+  width: auto;
 }
 
 .zrn_analitics_operations_hero {
@@ -6448,8 +6458,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--zrn-analitics-line);
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid rgba(116, 132, 157, 0.3);
+  border-radius: 4px;
+  background: var(--zrn-analitics-surface);
 }
 
 .zrn_analitics_operations_line_chart,
@@ -6986,6 +6999,74 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
 
   .zrn_analitics_financial_content::-webkit-scrollbar-thumb:hover,
   .zrn_analitics_financial_section_tabs::-webkit-scrollbar-thumb:hover {
+    background: var(--zrn-analitics-brand-800);
+  }
+
+  .zrn_analitics_operations_hub {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .zrn_analitics_operations_shell {
+    align-items: stretch;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .zrn_analitics_operations_sidebar {
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
+
+  .zrn_analitics_operations_section_tabs {
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+    scrollbar-color: var(--zrn-analitics-brand-600) var(--zrn-analitics-surface-soft);
+    scrollbar-width: auto;
+  }
+
+  .zrn_analitics_operations_content {
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    padding-right: 10px;
+    scrollbar-color: var(--zrn-analitics-brand-600) var(--zrn-analitics-surface-soft);
+    scrollbar-width: auto;
+  }
+
+  .zrn_analitics_operations_content::-webkit-scrollbar,
+  .zrn_analitics_operations_section_tabs::-webkit-scrollbar {
+    width: 13px;
+  }
+
+  .zrn_analitics_operations_content::-webkit-scrollbar-track,
+  .zrn_analitics_operations_section_tabs::-webkit-scrollbar-track {
+    background: var(--zrn-analitics-surface-soft);
+    border-left: 1px solid var(--zrn-analitics-line);
+  }
+
+  .zrn_analitics_operations_content::-webkit-scrollbar-thumb,
+  .zrn_analitics_operations_section_tabs::-webkit-scrollbar-thumb {
+    min-height: 52px;
+    border: 3px solid var(--zrn-analitics-surface-soft);
+    border-radius: 999px;
+    background: var(--zrn-analitics-brand-600);
+  }
+
+  .zrn_analitics_operations_content::-webkit-scrollbar-thumb:hover,
+  .zrn_analitics_operations_section_tabs::-webkit-scrollbar-thumb:hover {
     background: var(--zrn-analitics-brand-800);
   }
 }
