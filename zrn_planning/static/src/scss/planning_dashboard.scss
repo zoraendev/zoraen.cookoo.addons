@@ -92,6 +92,9 @@
 }
 
 .zrn_planning_home_icon_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 30px;
   height: 30px;
   padding: 0;
@@ -99,6 +102,12 @@
   border-radius: 4px;
   background: #fff;
   color: #174b86;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.zrn_planning_home_icon_btn i {
+  line-height: 1;
 }
 
 .zrn_planning_home_icon_btn:hover,
@@ -484,6 +493,9 @@
 }
 
 .zrn_planning_filter_table_arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 30px;
   height: 30px;
   padding: 0 8px;
@@ -491,6 +503,7 @@
   border-radius: 4px;
   background: #315f98;
   color: #fff;
+  line-height: 1;
 }
 
 .zrn_planning_production_report_metrics {
@@ -614,10 +627,22 @@
 .zrn_planning_production_report_action_btn,
 .zrn_planning_production_report_title_tab,
 .zrn_planning_report_icon_btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
   border: 1px solid #c7d4e2;
   border-radius: 4px;
   background: #fff;
   color: #174b86;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.zrn_planning_production_report_action_btn i,
+.zrn_planning_production_report_title_tab i,
+.zrn_planning_report_icon_btn i {
+  line-height: 1;
 }
 
 .zrn_planning_production_report_action_btn:not(.zrn_planning_production_report_action_btn_inactive),
@@ -657,6 +682,19 @@
   width: 30px;
   height: 30px;
   padding: 0;
+}
+
+.o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_header_range strong,
+.o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_inline_stat strong,
+.o_form_view.zrn_planning_production_report_form .zrn_planning_report_metric_strip strong {
+  font-weight: 600;
+}
+
+.o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_header_range .o_field_widget,
+.o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_inline_stat .o_field_widget,
+.o_form_view.zrn_planning_production_report_form .zrn_planning_report_metric_strip .o_field_widget {
+  margin-bottom: 0;
+  font-weight: 600;
 }
 
 .zrn_planning_report_metric_strip {
@@ -718,14 +756,45 @@
 .zrn_planning_report_html_scroll {
   width: 100%;
   min-width: 0;
-  overflow: visible;
+  overflow-x: scroll;
+  overflow-y: visible;
+  padding-bottom: 8px;
+  scrollbar-gutter: stable;
+  scrollbar-width: auto;
+  scrollbar-color: #6f5d80 #e5edf6;
 }
 
 .zrn_planning_report_html_scroll .zrn_am_report_matrix_wrap {
-  height: calc(100vh - 365px);
-  min-height: 360px;
-  max-height: calc(100vh - 365px);
+  flex: none;
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
+  height: auto;
+  min-height: 0;
+  max-height: none;
+  overflow: visible;
   border-radius: 4px;
+}
+
+.zrn_planning_report_html_scroll::-webkit-scrollbar {
+  height: 16px;
+}
+
+.zrn_planning_report_html_scroll::-webkit-scrollbar-track {
+  background: #e5edf6;
+  border: 1px solid #cfd9e6;
+  border-radius: 4px;
+}
+
+.zrn_planning_report_html_scroll::-webkit-scrollbar-thumb {
+  min-width: 48px;
+  border: 3px solid #e5edf6;
+  border-radius: 8px;
+  background: #6f5d80;
+}
+
+.zrn_planning_report_html_scroll::-webkit-scrollbar-thumb:hover {
+  background: #315f98;
 }
 
 .zrn_planning_report_config {
