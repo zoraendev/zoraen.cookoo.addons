@@ -120,6 +120,7 @@
     />
 
     <record id="menu_zrn_analitics_scenarios" model="ir.ui.menu">
+        <field name="name">Escenarios</field>
         <field name="active" eval="False"/>
     </record>
 
