@@ -5607,14 +5607,18 @@ class ZrnAnalyticsHubAction extends Component {
     chart.setOption(
       {
         animationDuration: 650,
-        grid: { top: 28, right: 20, bottom: 26, left: 24, containLabel: true },
+        grid: { top: 54, right: 20, bottom: 36, left: 24, containLabel: true },
         tooltip: {
           trigger: "axis",
           valueFormatter: (value) =>
             `${this.financialPayload.summary.currency_symbol} ${this.formatMoney(value)}`,
         },
         legend: {
+          top: 0,
+          left: "center",
           data: ["Revenue", "Costo", "Margen"],
+          itemWidth: 14,
+          itemHeight: 8,
           textStyle: { color: "#5f6b7a", fontSize: 11 },
         },
         xAxis: {
