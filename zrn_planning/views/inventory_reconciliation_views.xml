@@ -64,6 +64,63 @@
                                     <span><field name="lot_count" readonly="1" nolabel="1"/></span>
                                 </div>
                                 <div class="zrn_planning_production_report_actions">
+                                    <div class="zrn_inventory_reconciliation_header_actions">
+                                        <a
+                                            href="#"
+                                            role="button"
+                                            aria-label="Filtros"
+                                            title="Filtros"
+                                            class="btn zrn_planning_report_icon_btn zrn_inventory_reconciliation_filter_btn"
+                                            data-zrn-planning-filter-toggle="1"
+                                        >
+                                            <i class="fa fa-cog"/>
+                                        </a>
+                                        <button
+                                            name="action_apply_filters"
+                                            type="object"
+                                            class="btn zrn_planning_production_report_action_btn"
+                                        >
+                                            <i class="fa fa-refresh" style="margin-right:4px;"/>
+                                            <span>Actualizar lista</span>
+                                        </button>
+                                        <button
+                                            name="action_open_filtered_lots"
+                                            type="object"
+                                            class="btn zrn_planning_production_report_action_btn zrn_inventory_reconciliation_btn_info"
+                                        >
+                                            <i class="fa fa-list" style="margin-right:4px;"/>
+                                            <span>Abrir listado</span>
+                                        </button>
+                                        <button
+                                            name="action_archive_filtered_lots"
+                                            type="object"
+                                            confirm="Se archivaran los lotes filtrados. Al quedar archivados, dejaran de participar en reservas automaticas mientras no se reactiven. Desea continuar?"
+                                            invisible="selected_line_count &gt; 0"
+                                            class="btn zrn_planning_production_report_action_btn"
+                                        >
+                                            <i class="fa fa-archive" style="margin-right:4px;"/>
+                                            <span>Archivar filtrados</span>
+                                        </button>
+                                        <button
+                                            name="action_archive_selected_lots"
+                                            type="object"
+                                            confirm="Se archivaran unicamente los lotes seleccionados (Maximo 500). Desea continuar?"
+                                            invisible="selected_line_count == 0"
+                                            class="btn zrn_planning_production_report_action_btn"
+                                        >
+                                            <i class="fa fa-archive" style="margin-right:4px;"/>
+                                            <span>Archivar seleccionados</span>
+                                        </button>
+                                        <button
+                                            name="action_unarchive_filtered_lots"
+                                            type="object"
+                                            confirm="Se reactivaran los lotes archivados dentro del rango seleccionado. Desea continuar?"
+                                            class="btn zrn_planning_production_report_action_btn zrn_inventory_reconciliation_btn_success"
+                                        >
+                                            <i class="fa fa-undo" style="margin-right:4px;"/>
+                                            <span>Reactivar filtrados</span>
+                                        </button>
+                                    </div>
                                     <div class="zrn_planning_production_report_inline_stat zrn_planning_production_report_inline_stat_passive">
                                         <i class="fa fa-check-circle"/>
                                         <span>Activos:</span>
@@ -82,73 +139,76 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="zrn_planning_production_report_table_panel">
-                            <div class="zrn_planning_production_report_table_toolbar zrn_inventory_reconciliation_toolbar">
-                                <div class="zrn_inventory_reconciliation_filters">
-                                    <div class="zrn_inventory_reconciliation_filter_item">
-                                        <label for="date_from">Fecha desde</label>
-                                        <field name="date_from" nolabel="1"/>
+                        <div class="zrn_planning_filter_modal d-none" data-zrn-planning-filter-modal="1">
+                            <div class="zrn_planning_filter_modal_backdrop" data-zrn-planning-filter-close="1"/>
+                            <div class="zrn_planning_filter_modal_dialog" role="dialog" aria-modal="true">
+                                <div class="zrn_planning_filter_modal_head">
+                                    <div>
+                                        <strong>Filtros de inventario</strong>
+                                        <span>Cuadre de lotes</span>
                                     </div>
-                                    <div class="zrn_inventory_reconciliation_filter_item">
-                                        <label for="date_to">Fecha hasta</label>
-                                        <field name="date_to" nolabel="1"/>
-                                    </div>
-                                    <div class="zrn_inventory_reconciliation_filter_item zrn_inventory_reconciliation_filter_item_boolean">
-                                        <label for="only_on_hand">Solo con stock</label>
-                                        <field name="only_on_hand" nolabel="1"/>
-                                    </div>
-                                    <div class="zrn_inventory_reconciliation_filter_item zrn_inventory_reconciliation_filter_item_boolean">
-                                        <label for="show_archived">Mostrar archivados</label>
-                                        <field name="show_archived" nolabel="1"/>
+                                    <a href="#" role="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar">
+                                        <i class="fa fa-times"/>
+                                    </a>
+                                </div>
+                                <div class="zrn_planning_filter_modal_body">
+                                    <div class="zrn_planning_filter_modal_grid">
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Fecha desde</span>
+                                            <field name="date_from" nolabel="1"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Fecha hasta</span>
+                                            <field name="date_to" nolabel="1"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Lote</span>
+                                            <field name="lot_name" nolabel="1" placeholder="Codigo de lote"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Referencia interna</span>
+                                            <field name="internal_ref" nolabel="1" placeholder="Referencia"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Productos</span>
+                                            <field name="product_ids" widget="many2many_tags" nolabel="1" placeholder="Selecciona productos"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Categorias</span>
+                                            <field name="category_ids" widget="many2many_tags" nolabel="1" placeholder="Selecciona categorias"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field">
+                                            <span>Ubicaciones</span>
+                                            <field name="location_ids" widget="many2many_tags" nolabel="1" placeholder="Selecciona ubicaciones"/>
+                                        </div>
+                                        <div class="zrn_planning_filter_modal_field zrn_inventory_reconciliation_modal_checks">
+                                            <span>Estado de lotes</span>
+                                            <div class="zrn_inventory_reconciliation_modal_check">
+                                                <field name="only_on_hand" nolabel="1"/>
+                                                <span>Solo con stock disponible</span>
+                                            </div>
+                                            <div class="zrn_inventory_reconciliation_modal_check">
+                                                <field name="show_archived" nolabel="1"/>
+                                                <span>Mostrar archivados</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="zrn_inventory_reconciliation_actions">
-                                    <button
-                                        name="action_apply_filters"
-                                        type="object"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary"
-                                    >
-                                        <i class="fa fa-filter" style="margin-right:4px;"/>
-                                        <span>Actualizar</span>
-                                    </button>
-                                    <button
-                                        name="action_open_filtered_lots"
-                                        type="object"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_inventory_reconciliation_btn zrn_inventory_reconciliation_btn_info"
-                                    >
-                                        <i class="fa fa-list" style="margin-right:4px;"/>
-                                        <span>Abrir listado</span>
-                                    </button>
-                                    <button
-                                        name="action_archive_filtered_lots"
-                                        type="object"
-                                        confirm="Se archivaran los lotes filtrados. Al quedar archivados, dejaran de participar en reservas automaticas mientras no se reactiven. Desea continuar?"
-                                        invisible="selected_line_count &gt; 0"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary"
-                                    >
-                                        <i class="fa fa-archive" style="margin-right:4px;"/>
-                                        <span>Archivar filtrados</span>
-                                    </button>
-                                     <button
-                                         name="action_archive_selected_lots"
-                                         type="object"
-                                         confirm="Se archivaran unicamente los lotes seleccionados (Maximo 500). Desea continuar?"
-                                         invisible="selected_line_count == 0"
-                                         class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary"
-                                     >
-                                         <i class="fa fa-archive" style="margin-right:4px;"/>
-                                         <span>Archivar seleccionados</span>
-                                     </button>
-
-                                    <button
-                                        name="action_unarchive_filtered_lots"
-                                        type="object"
-                                        confirm="Se reactivaran los lotes archivados dentro del rango seleccionado. Desea continuar?"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_inventory_reconciliation_btn zrn_inventory_reconciliation_btn_success"
-                                    >
-                                        <i class="fa fa-undo" style="margin-right:4px;"/>
-                                        <span>Reactivar filtrados</span>
-                                    </button>
+                                <div class="zrn_planning_filter_modal_footer">
+                                    <button name="action_clear_filters" type="object" string="Limpiar" icon="fa-eraser" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"/>
+                                    <button name="action_apply_filters" type="object" string="Aplicar" icon="fa-check" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary"/>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="zrn_planning_production_report_table_panel">
+                            <div class="zrn_planning_production_report_table_toolbar zrn_inventory_reconciliation_toolbar">
+                                <div class="zrn_planning_production_report_table_title">
+                                    Lotes filtrados
+                                </div>
+                                <div class="zrn_inventory_reconciliation_selection_status" invisible="selected_line_count == 0">
+                                    <i class="fa fa-check-square-o"/>
+                                    <span>Seleccionados:</span>
+                                    <strong><field name="selected_line_count" readonly="1" nolabel="1"/></strong>
                                 </div>
                             </div>
                             <div class="zrn_planning_production_report_table_placeholder">

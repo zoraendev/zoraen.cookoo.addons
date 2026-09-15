@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import json
 from datetime import datetime, time
 
 from odoo import _, api, fields, models
@@ -15,6 +16,44 @@ class ZrnPlanningInventoryReconciliation(ZrnPlanningNavigationMixin, models.Mode
     name = fields.Char(string='Nombre', required=True, default='Cuadre Inventario')
     date_from = fields.Date(string='Fecha desde')
     date_to = fields.Date(string='Fecha hasta')
+    lot_name = fields.Char(
+        string='Lote',
+        compute='_compute_extra_filter_fields',
+        inverse='_inverse_extra_filter_fields',
+        store=False,
+        readonly=False,
+    )
+    internal_ref = fields.Char(
+        string='Referencia interna',
+        compute='_compute_extra_filter_fields',
+        inverse='_inverse_extra_filter_fields',
+        store=False,
+        readonly=False,
+    )
+    product_ids = fields.Many2many(
+        'product.product',
+        string='Productos',
+        compute='_compute_extra_filter_fields',
+        inverse='_inverse_extra_filter_fields',
+        store=False,
+        readonly=False,
+    )
+    category_ids = fields.Many2many(
+        'product.category',
+        string='Categorias',
+        compute='_compute_extra_filter_fields',
+        inverse='_inverse_extra_filter_fields',
+        store=False,
+        readonly=False,
+    )
+    location_ids = fields.Many2many(
+        'stock.location',
+        string='Ubicaciones',
+        compute='_compute_extra_filter_fields',
+        inverse='_inverse_extra_filter_fields',
+        store=False,
+        readonly=False,
+    )
     only_on_hand = fields.Boolean(string='Solo con stock disponible', default=True)
     show_archived = fields.Boolean(string='Mostrar archivados')
     line_ids = fields.One2many(
@@ -37,6 +76,48 @@ class ZrnPlanningInventoryReconciliation(ZrnPlanningNavigationMixin, models.Mode
     date_to_label = fields.Char(string='Fecha hasta label', compute='_compute_date_range_labels', readonly=True)
     date_range_label = fields.Char(string='Etiqueta de rango', compute='_compute_date_range_labels', readonly=True)
 
+    def _get_extra_filter_key(self):
+        self.ensure_one()
+        return 'zrn_planning.inventory_reconciliation.extra_filters.%s' % (self.id or 'default')
+
+    def _read_extra_filter_values(self):
+        self.ensure_one()
+        raw_values = self.env['ir.config_parameter'].sudo().get_param(self._get_extra_filter_key()) or '{}'
+        try:
+            values = json.loads(raw_values)
+        except json.JSONDecodeError:
+            values = {}
+        return values if isinstance(values, dict) else {}
+
+    def _compute_extra_filter_fields(self):
+        Product = self.env['product.product']
+        Category = self.env['product.category']
+        Location = self.env['stock.location']
+        for record in self:
+            values = record._read_extra_filter_values()
+            record.lot_name = values.get('lot_name') or False
+            record.internal_ref = values.get('internal_ref') or False
+            record.product_ids = Product.browse(values.get('product_ids') or [])
+            record.category_ids = Category.browse(values.get('category_ids') or [])
+            record.location_ids = Location.browse(values.get('location_ids') or [])
+
+    def _inverse_extra_filter_fields(self):
+        Config = self.env['ir.config_parameter'].sudo()
+        for record in self:
+            values = record._read_extra_filter_values()
+            cache = record.env.cache
+            if cache.contains(record, record._fields['lot_name']):
+                values['lot_name'] = record.lot_name or False
+            if cache.contains(record, record._fields['internal_ref']):
+                values['internal_ref'] = record.internal_ref or False
+            if cache.contains(record, record._fields['product_ids']):
+                values['product_ids'] = record.product_ids.ids
+            if cache.contains(record, record._fields['category_ids']):
+                values['category_ids'] = record.category_ids.ids
+            if cache.contains(record, record._fields['location_ids']):
+                values['location_ids'] = record.location_ids.ids
+            Config.set_param(record._get_extra_filter_key(), json.dumps(values))
+
     @api.depends('date_from', 'date_to')
     def _compute_date_range_labels(self):
         for record in self:
@@ -55,7 +136,17 @@ class ZrnPlanningInventoryReconciliation(ZrnPlanningNavigationMixin, models.Mode
                 record.date_range_mode = 'all'
                 record.date_range_label = 'Todos los lotes vigentes'
 
-    @api.depends('date_from', 'date_to', 'only_on_hand', 'show_archived')
+    @api.depends(
+        'date_from',
+        'date_to',
+        'lot_name',
+        'internal_ref',
+        'product_ids',
+        'category_ids',
+        'location_ids',
+        'only_on_hand',
+        'show_archived',
+    )
     def _compute_lot_ids(self):
         for record in self:
             lots = record._get_filtered_lots()
@@ -88,6 +179,16 @@ class ZrnPlanningInventoryReconciliation(ZrnPlanningNavigationMixin, models.Mode
         if self.date_to:
             date_to = datetime.combine(self.date_to, time.max)
             domain.append(('create_date', '<=', fields.Datetime.to_string(date_to)))
+        if self.lot_name:
+            domain.append(('name', 'ilike', self.lot_name.strip()))
+        if self.internal_ref:
+            domain.append(('ref', 'ilike', self.internal_ref.strip()))
+        if self.product_ids:
+            domain.append(('product_id', 'in', self.product_ids.ids))
+        if self.category_ids:
+            domain.append(('product_id.categ_id', 'child_of', self.category_ids.ids))
+        if self.location_ids:
+            domain.append(('quant_ids.location_id', 'in', self.location_ids.ids))
         return self._get_lot_search_model().search(domain, order='create_date asc, id asc')
 
     def _sync_lot_lines(self, lots=None):
@@ -132,6 +233,23 @@ class ZrnPlanningInventoryReconciliation(ZrnPlanningNavigationMixin, models.Mode
 
     def action_apply_filters(self):
         self.ensure_one()
+        self._sync_lot_lines()
+        return self._open_singleton_action('zrn_planning.action_zrn_planning_inventory_reconciliation')
+
+    def action_clear_filters(self):
+        self.ensure_one()
+        self.write({
+            'date_from': False,
+            'date_to': False,
+            'lot_name': False,
+            'internal_ref': False,
+            'product_ids': [(5, 0, 0)],
+            'category_ids': [(5, 0, 0)],
+            'location_ids': [(5, 0, 0)],
+            'only_on_hand': True,
+            'show_archived': False,
+        })
+        self._clear_line_selection()
         self._sync_lot_lines()
         return self._open_singleton_action('zrn_planning.action_zrn_planning_inventory_reconciliation')
 
@@ -193,13 +311,15 @@ class ZrnPlanningInventoryReconciliation(ZrnPlanningNavigationMixin, models.Mode
         action = self.env.ref('stock.action_production_lot_form').read()[0]
         action['name'] = _('Lotes filtrados')
         action['domain'] = [('id', 'in', self._get_filtered_lots().ids)]
-        action['context'] = {
+        action_context = {
             'active_test': False,
             'display_complete': True,
             'search_default_group_by_product': 1,
-            'search_default_on_hand': 1,
             'default_company_id': self.env.company.id,
         }
+        if self.only_on_hand:
+            action_context['search_default_on_hand'] = 1
+        action['context'] = action_context
         return action
 
 

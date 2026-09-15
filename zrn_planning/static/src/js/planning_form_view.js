@@ -109,6 +109,7 @@ class ZrnPlanningFormController extends FormController {
     return [
       "zrn_planning.production.planning.wizard",
       "zrn_planning.purchase.planning.wizard",
+      "zrn_planning.inventory.reconciliation",
     ].includes(this.props.resModel) && Boolean(this.rootRef.el?.querySelector("[data-zrn-planning-filter-modal]"));
   }
 

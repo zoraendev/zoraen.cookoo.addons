@@ -889,6 +889,61 @@
   padding: 0;
 }
 
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_header_actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_filter_btn {
+  flex: 0 0 30px;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_btn_info {
+  border-color: #4666d8;
+  background: #eef3ff;
+  color: #2846b7;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_btn_success {
+  border-color: #2f7d4d;
+  background: #edf8f1;
+  color: #24633d;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_selection_status {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #174b86;
+  font-size: 12px;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_selection_status i {
+  color: #315f98;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_modal_checks {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_modal_check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  color: #173b62;
+  font-size: 13px;
+}
+
+.o_form_view.zrn_planning_inventory_reconciliation_form .zrn_inventory_reconciliation_modal_check .o_field_widget {
+  margin: 0;
+}
+
 .o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_header_range strong,
 .o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_inline_stat strong,
 .o_form_view.zrn_planning_production_report_form .zrn_planning_report_metric_strip strong {

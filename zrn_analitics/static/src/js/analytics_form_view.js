@@ -12,6 +12,7 @@ class ZrnAnalyticsFormController extends FormController {
     super.setup();
     this.orm = useService("orm");
     this.processingView = getSharedProcessingView();
+    this.processingView.setServices({ orm: this.orm });
     this.processingView.setNavigationHandlers({
       openWorkspace: () =>
         this.openAnalyticsAction("action_open_processing_workspace", {
