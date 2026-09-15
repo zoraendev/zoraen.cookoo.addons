@@ -8,32 +8,150 @@ import { FormController } from "@web/views/form/form_controller";
 
 const DATASETS = {
   channelRevenue: {
-    label: "Ingresos por canal",
-    metrics: [
-      { key: "revenue", label: "Ingresos" },
-      { key: "orders", label: "Pedidos" },
-      { key: "units", label: "Unidades" },
-      { key: "ticket", label: "Ticket promedio" },
+    label: "Resumen por canal",
+    variants: [
+      {
+        key: "channel_income",
+        label: "Ingresos del canal",
+        chartLabel: "Ingresos por canal",
+        metrics: [
+          { key: "revenue", label: "Ingresos", format: "money" },
+          { key: "margin", label: "Margen", format: "money" },
+          { key: "ticket", label: "Ticket promedio", format: "money" },
+        ],
+        columns: [["Canal", "name"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]],
+      },
+      {
+        key: "channel_cost",
+        label: "Egresos del canal",
+        chartLabel: "Costo teórico por canal",
+        metrics: [
+          { key: "cost", label: "Costo teórico", format: "money" },
+          { key: "margin", label: "Margen", format: "money" },
+          { key: "margin_pct", label: "Margen %", format: "percent" },
+        ],
+        columns: [["Canal", "name"], ["Costo teórico", "cost", "money"], ["Ingresos", "revenue", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["SKUs", "skus"], ["Unidades", "units"]],
+      },
+      {
+        key: "channel_production",
+        label: "Fabricación / demanda del canal",
+        chartLabel: "Unidades por canal",
+        metrics: [
+          { key: "units", label: "Unidades" },
+          { key: "skus", label: "SKUs vendidos" },
+          { key: "orders", label: "Pedidos" },
+        ],
+        columns: [["Canal", "name"], ["Unidades", "units"], ["SKUs vendidos", "skus"], ["Pedidos", "orders"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"]],
+      },
     ],
   },
   channelCategoryRevenue: {
-    label: "Ingresos por categoría de canal",
-    metrics: [
-      { key: "revenue", label: "Ingresos" },
-      { key: "orders", label: "Pedidos" },
-      { key: "units", label: "Unidades" },
-      { key: "ticket", label: "Ticket promedio" },
+    label: "Categorías de canal",
+    variants: [
+      {
+        key: "channel_category_income",
+        label: "Ingresos por categoría de canal",
+        chartLabel: "Ingresos por categoría de canal",
+        metrics: [
+          { key: "revenue", label: "Ingresos", format: "money" },
+          { key: "ticket", label: "Ticket promedio", format: "money" },
+          { key: "orders", label: "Pedidos" },
+        ],
+        columns: [["Categoría", "category"], ["Canal", "channel"], ["Ingresos", "revenue", "money"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]],
+      },
+      {
+        key: "channel_category_cost",
+        label: "Egresos por categoría de canal",
+        chartLabel: "Costo teórico por categoría",
+        metrics: [
+          { key: "cost", label: "Costo teórico", format: "money" },
+          { key: "margin", label: "Margen", format: "money" },
+          { key: "margin_pct", label: "Margen %", format: "percent" },
+        ],
+        columns: [["Categoría", "category"], ["Canal", "channel"], ["Costo teórico", "cost", "money"], ["Ingresos", "revenue", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"]],
+      },
+      {
+        key: "channel_category_volume",
+        label: "Volumen por categoría de canal",
+        chartLabel: "Unidades por categoría",
+        metrics: [
+          { key: "units", label: "Unidades" },
+          { key: "skus", label: "SKUs vendidos" },
+          { key: "orders", label: "Pedidos" },
+        ],
+        columns: [["Categoría", "category"], ["Canal", "channel"], ["Unidades", "units"], ["SKUs vendidos", "skus"], ["Pedidos", "orders"], ["Ingresos", "revenue", "money"]],
+      },
     ],
   },
   categoryProducts: {
-    label: "Productos por categoría",
-    metrics: [{ key: "products", label: "Productos" }],
+    label: "Categorías de marca",
+    variants: [
+      {
+        key: "brand_category_portfolio",
+        label: "Portafolio por categoría de marca",
+        chartLabel: "Productos por categoría",
+        metrics: [{ key: "products", label: "Productos" }],
+        columns: [["Categoría", "category"], ["Marca", "brand"], ["Productos", "products"], ["SKUs vendidos", "skus"]],
+      },
+      {
+        key: "brand_category_sales",
+        label: "Ingresos por categoría de marca",
+        chartLabel: "Ingresos por categoría de marca",
+        metrics: [
+          { key: "revenue", label: "Ingresos", format: "money" },
+          { key: "units", label: "Unidades" },
+          { key: "orders", label: "Pedidos" },
+        ],
+        columns: [["Categoría", "category"], ["Marca", "brand"], ["Ingresos", "revenue", "money"], ["Unidades", "units"], ["Pedidos", "orders"], ["Productos", "products"]],
+      },
+      {
+        key: "brand_category_margin",
+        label: "Margen por categoría de marca",
+        chartLabel: "Margen por categoría de marca",
+        metrics: [
+          { key: "margin", label: "Margen", format: "money" },
+          { key: "margin_pct", label: "Margen %", format: "percent" },
+          { key: "cost", label: "Costo teórico", format: "money" },
+        ],
+        columns: [["Categoría", "category"], ["Marca", "brand"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"]],
+      },
+    ],
   },
   brandProducts: {
-    label: "Productos por marca",
-    metrics: [
-      { key: "products", label: "Productos" },
-      { key: "categories", label: "Categorías" },
+    label: "Marcas",
+    variants: [
+      {
+        key: "brand_portfolio",
+        label: "Portafolio por marca",
+        chartLabel: "Productos por marca",
+        metrics: [
+          { key: "products", label: "Productos" },
+          { key: "categories", label: "Categorías" },
+        ],
+        columns: [["Marca", "name"], ["Categorías", "categories"], ["Productos", "products"], ["SKUs vendidos", "skus"]],
+      },
+      {
+        key: "brand_sales",
+        label: "Ingresos por marca",
+        chartLabel: "Ingresos por marca",
+        metrics: [
+          { key: "revenue", label: "Ingresos", format: "money" },
+          { key: "units", label: "Unidades" },
+          { key: "orders", label: "Pedidos" },
+        ],
+        columns: [["Marca", "name"], ["Ingresos", "revenue", "money"], ["Unidades", "units"], ["Pedidos", "orders"], ["Categorías", "categories"], ["Productos", "products"]],
+      },
+      {
+        key: "brand_margin",
+        label: "Margen por marca",
+        chartLabel: "Margen por marca",
+        metrics: [
+          { key: "margin", label: "Margen", format: "money" },
+          { key: "margin_pct", label: "Margen %", format: "percent" },
+          { key: "cost", label: "Costo teórico", format: "money" },
+        ],
+        columns: [["Marca", "name"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["Productos", "products"]],
+      },
     ],
   },
 };
@@ -48,6 +166,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
     this.currentResId = null;
     this.charts = new Map();
     this._tableSort = {};
+    this._panelConfig = {};
     this._exportPanel = null;
     this._exportOptions = null;
     this._exportMenuEl = null;
@@ -73,6 +192,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
       this.rootRef.el?.removeEventListener("change", this._rootChangeHandler);
       this.charts.forEach((chart) => chart.dispose());
       this.charts.clear();
+      this.closeExportMenu();
     });
   }
 
@@ -121,7 +241,9 @@ class ZrnCommercialHomeDashboardController extends FormController {
     }
     const exportButton = ev.target.closest?.("[data-zrn-commercial-export]");
     if (exportButton) {
-      this.openExportMenu(ev, exportButton.dataset.zrnCommercialExport);
+      ev.preventDefault();
+      ev.stopPropagation();
+      this.openExportMenu(ev, exportButton.dataset.zrnCommercialExport, exportButton);
       return;
     }
     if (ev.target.closest?.("[data-zrn-commercial-config-close]")) {
@@ -152,7 +274,12 @@ class ZrnCommercialHomeDashboardController extends FormController {
       return;
     }
     modal.classList.remove("d-none");
-    modal.querySelector('[data-zrn-commercial-config-field="metric"]').innerHTML = DATASETS[config.key].metrics
+    const definition = DATASETS[config.key];
+    const variant = this.getVariant(config.key, config.variant);
+    modal.querySelector('[data-zrn-commercial-config-field="variant"]').innerHTML = definition.variants
+      .map((item) => `<option value="${item.key}">${item.label}</option>`).join("");
+    modal.querySelector('[data-zrn-commercial-config-field="variant"]').value = variant.key;
+    modal.querySelector('[data-zrn-commercial-config-field="metric"]').innerHTML = variant.metrics
       .map((metric) => `<option value="${metric.key}">${metric.label}</option>`).join("");
     modal.querySelector('[data-zrn-commercial-config-field="metric"]').value = config.metric;
     modal.querySelector('[data-zrn-commercial-config-field="type"]').value = config.type;
@@ -168,7 +295,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
   }
 
   getTableRows(key) {
-    const rows = [...(this.getDataset(key).rows || [])];
+    const rows = this.getRowsForDataset(key);
     const sort = this._tableSort[key];
     if (!sort) {
       return rows;
@@ -191,6 +318,15 @@ class ZrnCommercialHomeDashboardController extends FormController {
     return rows;
   }
 
+  getRowsForDataset(key) {
+    const rows = [...(this.getDataset(key).rows || [])];
+    const config = this.getConfig(key);
+    if (key === "channelCategoryRevenue" && config.channel !== "all") {
+      return rows.filter((row) => row.channel === config.channel);
+    }
+    return rows;
+  }
+
   renderTables() {
     Object.keys(DATASETS).forEach((key) => {
       const mount = this.rootRef.el?.querySelector(`[data-zrn-commercial-table="${key}"]`);
@@ -198,13 +334,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
         return;
       }
       const rows = this.getTableRows(key);
-      const columns = key === "channelRevenue"
-        ? [["Canal", "name"], ["Ingresos", "revenue", "money"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]]
-        : key === "channelCategoryRevenue"
-          ? [["Categoría", "category"], ["Canal", "channel"], ["Ingresos", "revenue", "money"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]]
-          : key === "categoryProducts"
-            ? [["Categoría", "name"], ["Marca", "brand"], ["Productos", "products"]]
-            : [["Marca", "name"], ["Categorías", "categories"], ["Productos", "products"]];
+      const columns = this.getVariant(key).columns;
       const sort = this._tableSort[key];
       const head = columns.map(([label, field]) => {
         const active = sort?.field === field;
@@ -212,7 +342,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
         return `<th><span class="zrn_commercial_sort_header" data-zrn-commercial-sort="${key}" data-zrn-commercial-sort-field="${field}" role="button" tabindex="0">${label}<i class="fa ${icon}" aria-hidden="true"></i></span></th>`;
       }).join("");
       const body = rows.length
-        ? rows.map((row) => `<tr>${columns.map(([, field, format]) => `<td>${format === "money" ? `${this.escapeHtml(this.payload?.currency || "")} ${Number(row[field] || 0).toLocaleString()}` : Number.isFinite(Number(row[field])) ? Number(row[field]).toLocaleString() : this.escapeHtml(row[field] || "")}</td>`).join("")}</tr>`).join("")
+        ? rows.map((row) => `<tr>${columns.map(([, field, format]) => `<td>${this.formatCell(row[field], format)}</td>`).join("")}</tr>`).join("")
         : `<tr><td colspan="${columns.length}" class="zrn_commercial_table_empty">Sin datos para mostrar.</td></tr>`;
       mount.innerHTML = `<div class="zrn_commercial_table_surface"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>`;
     });
@@ -226,6 +356,13 @@ class ZrnCommercialHomeDashboardController extends FormController {
     return this.state.panelViews[key] || "table";
   }
 
+  getVariant(key, variantKey = null) {
+    const definition = DATASETS[key];
+    const config = this.getConfig(key);
+    const selectedKey = variantKey || config.variant;
+    return definition.variants.find((variant) => variant.key === selectedKey) || definition.variants[0];
+  }
+
   setPanelView(key, view) {
     this.state.panelViews[key] = view;
     this.closeChartConfig();
@@ -237,7 +374,11 @@ class ZrnCommercialHomeDashboardController extends FormController {
     if (this.state.chartConfig?.key === key) {
       return this.state.chartConfig;
     }
-    return { key, metric: DATASETS[key].metrics[0].key, type: "bar", limit: 10, channel: "all" };
+    if (this._panelConfig[key]) {
+      return this._panelConfig[key];
+    }
+    const variant = DATASETS[key].variants[0];
+    return { key, variant: variant.key, metric: variant.metrics[0].key, type: "bar", limit: 10, channel: "all" };
   }
 
   openChartConfig(key) {
@@ -253,6 +394,13 @@ class ZrnCommercialHomeDashboardController extends FormController {
     if (!this.state.chartConfig) {
       return;
     }
+    if (field === "variant") {
+      const variant = this.getVariant(this.state.chartConfig.key, value);
+      this.state.chartConfig.variant = variant.key;
+      this.state.chartConfig.metric = variant.metrics[0].key;
+      this.renderConfigModal();
+      return;
+    }
     this.state.chartConfig[field] = field === "limit"
       ? Math.max(1, Math.min(30, Number(value) || 10))
       : value;
@@ -262,18 +410,15 @@ class ZrnCommercialHomeDashboardController extends FormController {
     if (!this.state.chartConfig) {
       return;
     }
+    this._panelConfig[this.state.chartConfig.key] = { ...this.state.chartConfig };
     this.state.panelViews[this.state.chartConfig.key] = "chart";
     this.closeChartConfig();
     requestAnimationFrame(() => this.renderCharts());
   }
 
   getRowsForChart(key) {
-    const payload = this.getDataset(key);
     const config = this.getConfig(key);
-    let rows = [...(payload.rows || [])];
-    if (key === "channelCategoryRevenue" && config.channel !== "all") {
-      rows = rows.filter((row) => row.channel === config.channel);
-    }
+    const rows = this.getRowsForDataset(key);
     rows.sort((left, right) => Number(right[config.metric] || 0) - Number(left[config.metric] || 0));
     return rows.slice(0, config.limit || 10);
   }
@@ -282,13 +427,21 @@ class ZrnCommercialHomeDashboardController extends FormController {
     const config = this.getConfig(key);
     const rows = this.getRowsForChart(key);
     return {
-      labels: rows.map((row) => row.name || row.category || row.brand || "Sin nombre"),
+      labels: rows.map((row) => this.getChartLabel(key, row, config)),
       values: rows.map((row) => Number(row[config.metric] || 0)),
     };
   }
 
+  getChartLabel(key, row, config) {
+    if (key === "channelCategoryRevenue" && config.channel === "all") {
+      return `${row.channel || "Sin canal"} / ${row.category || row.name || "Sin categoria"}`;
+    }
+    return row.name || row.category || row.brand || "Sin nombre";
+  }
+
   renderCharts() {
     this.renderTables();
+    this.updateActionStates();
     if (this.state.chartConfig) {
       this.renderConfigModal();
     }
@@ -315,11 +468,28 @@ class ZrnCommercialHomeDashboardController extends FormController {
     });
   }
 
+  updateActionStates() {
+    Object.keys(DATASETS).forEach((key) => {
+      const view = this.getPanelView(key);
+      this.rootRef.el?.querySelectorAll(`[data-zrn-commercial-view^="${key}:"]`).forEach((button) => {
+        button.classList.toggle("is-active", button.dataset.zrnCommercialView === `${key}:${view}`);
+      });
+      this.rootRef.el?.querySelector(`[data-zrn-commercial-config="${key}"]`)?.classList.toggle(
+        "is-active",
+        Boolean(this._panelConfig[key]),
+      );
+    });
+  }
+
   buildChartOption(key, data) {
     const config = this.getConfig(key);
+    const variant = this.getVariant(key);
     const currency = this.payload?.currency || "";
-    const formatValue = (value) => config.metric === "revenue" || config.metric === "ticket"
+    const metric = variant.metrics.find((item) => item.key === config.metric);
+    const formatValue = (value) => metric?.format === "money"
       ? `${currency} ${Number(value).toLocaleString()}`
+      : metric?.format === "percent"
+        ? `${Number(value || 0).toLocaleString()}%`
       : Number(value).toLocaleString();
     if (config.type === "pie") {
       return {
@@ -335,7 +505,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
       grid: { top: 18, right: 24, bottom: 54, left: 54, containLabel: true },
       xAxis: { type: "category", data: data.labels, axisLabel: { interval: 0, rotate: data.labels.length > 4 ? 24 : 0 } },
       yAxis: { type: "value", minInterval: 1 },
-      series: [{ name: DATASETS[key].label, type: config.type === "line" ? "line" : "bar", smooth: config.type === "line", barMaxWidth: 28, data: data.values }],
+      series: [{ name: variant.chartLabel || variant.label || DATASETS[key].label, type: config.type === "line" ? "line" : "bar", smooth: config.type === "line", barMaxWidth: 28, data: data.values }],
     };
   }
 
@@ -361,28 +531,29 @@ class ZrnCommercialHomeDashboardController extends FormController {
     emptyEl?.classList.toggle("d-none", !isEmpty);
   }
 
-  openExportMenu(ev, key) {
+  openExportMenu(ev, key, button) {
     ev.stopPropagation();
-    const panel = ev.currentTarget.closest(".zrn_commercial_panel");
+    const panel = button.closest(".zrn_commercial_panel");
     if (!panel) {
       return;
     }
     const chart = panel.querySelector(`[data-zrn-commercial-chart="${key}"]`);
-    const rect = ev.currentTarget.getBoundingClientRect();
+    const rect = button.getBoundingClientRect();
     const hasChart = chart && this.isVisible(chart);
     this._exportPanel = panel;
     this._exportOptions = { key, filename: `zrn_commercial_${key}` };
+    const dataOptions = [
+      { key: "xls", label: "Excel (.xls)", icon: "fa-file-excel-o" },
+      { key: "xml", label: "XML", icon: "fa-code" },
+      { key: "csv", label: "CSV", icon: "fa-file-text-o" },
+      { key: "json", label: "JSON", icon: "fa-file-code-o" },
+    ];
     this.state.exportMenu = {
       left: Math.max(8, Math.min(rect.left, window.innerWidth - 188)),
       top: Math.min(rect.bottom + 4, window.innerHeight - 180),
       options: hasChart
-        ? [{ key: "png", label: "Imagen PNG", icon: "fa-image" }]
-        : [
-            { key: "xls", label: "Excel (.xls)", icon: "fa-file-excel-o" },
-            { key: "xml", label: "XML", icon: "fa-code" },
-            { key: "csv", label: "CSV", icon: "fa-file-text-o" },
-            { key: "json", label: "JSON", icon: "fa-file-code-o" },
-          ],
+        ? [{ key: "png", label: "Imagen PNG", icon: "fa-image" }, ...dataOptions]
+        : dataOptions,
     };
     this.renderExportMenu();
   }
@@ -428,7 +599,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
       return;
     }
     const rows = Array.from(table.querySelectorAll("tr")).map((row) => Array.from(row.querySelectorAll("th, td")).map((cell) => cell.textContent.trim()));
-    const title = DATASETS[options.key].label;
+    const title = this.getVariant(options.key).label || DATASETS[options.key].label;
     const content = format === "xls" ? this.tableToExcel(title, rows) : format === "csv" ? rows.map((row) => row.map((cell) => this.csvCell(cell)).join(",")).join("\r\n") : format === "json" ? this.tableToJson(rows) : this.tableToXml(title, rows);
     const type = format === "xls" ? "application/vnd.ms-excel" : format === "csv" ? "text/csv;charset=utf-8" : format === "json" ? "application/json;charset=utf-8" : "application/xml;charset=utf-8";
     this.downloadText(options.filename, content, type, format);
@@ -463,6 +634,19 @@ class ZrnCommercialHomeDashboardController extends FormController {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  }
+
+  formatCell(value, format = null) {
+    const number = Number(value || 0);
+    if (format === "money") {
+      return `${this.escapeHtml(this.payload?.currency || "")} ${number.toLocaleString()}`;
+    }
+    if (format === "percent") {
+      return `${number.toLocaleString()}%`;
+    }
+    return Number.isFinite(Number(value)) && value !== ""
+      ? Number(value).toLocaleString()
+      : this.escapeHtml(value || "");
   }
 
   escapeHtml(value) {

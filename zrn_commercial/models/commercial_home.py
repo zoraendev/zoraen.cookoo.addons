@@ -149,15 +149,30 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
             ('company_id', '=', company.id),
         ], order='name')
         SaleOrder = self.env['sale.order'].sudo()
+        confirmed_orders = SaleOrder.search(self._get_confirmed_sale_order_domain())
 
-        def order_metrics(orders):
-            revenue = sum(orders.mapped('amount_untaxed'))
-            units = sum(orders.mapped('order_line.product_uom_qty'))
-            count = len(orders)
+        def order_metrics(orders, product_ids=None):
+            lines = orders.mapped('order_line').filtered(lambda line: not line.display_type)
+            if product_ids is not None:
+                product_id_set = set(product_ids)
+                lines = lines.filtered(lambda line: line.product_id.id in product_id_set)
+            revenue = sum(lines.mapped('price_subtotal'))
+            units = sum(lines.mapped('product_uom_qty'))
+            cost = sum(
+                float(line.product_id.standard_price or 0.0) * float(line.product_uom_qty or 0.0)
+                for line in lines
+            )
+            count = len(lines.mapped('order_id'))
+            sku_count = len(set(lines.mapped('product_id').ids))
+            margin = revenue - cost
             return {
                 'revenue': revenue,
+                'cost': cost,
+                'margin': margin,
+                'margin_pct': margin / revenue * 100 if revenue else 0,
                 'orders': count,
                 'units': units,
+                'skus': sku_count,
                 'ticket': revenue / count if count else 0,
             }
 
@@ -217,22 +232,28 @@ class ZrnCommercialHome(ZrnCommercialNavigationMixin, models.Model):
                 })
 
         category_items = [
-            {
+            dict({
                 'name': '%s / %s' % (category.brand_id.name, category.name),
                 'value': len(category.product_ids),
                 'products': len(category.product_ids),
                 'brand': category.brand_id.name,
                 'category': category.name,
-            }
+            }, **order_metrics(
+                confirmed_orders,
+                product_ids=category.product_ids.ids,
+            ))
             for category in categories
         ]
         brand_items = [
-            {
+            dict({
                 'name': brand.name,
                 'value': brand.product_count,
                 'products': brand.product_count,
                 'categories': brand.category_count,
-            }
+            }, **order_metrics(
+                confirmed_orders,
+                product_ids=brand.category_ids.mapped('product_ids').ids,
+            ))
             for brand in self.env['zrn_commercial.commercial.brand'].sudo().search([
                 ('company_id', '=', company.id),
             ], order='name')

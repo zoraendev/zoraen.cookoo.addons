@@ -110,8 +110,10 @@
                         <div class="zrn_commercial_chart_config d-none" data-zrn-commercial-config-modal="1">
                             <div class="zrn_commercial_chart_config_backdrop" data-zrn-commercial-config-close="1"/>
                             <div class="zrn_commercial_chart_config_dialog" role="dialog" aria-modal="true">
-                                <div class="zrn_commercial_chart_config_head"><strong>Configurar gráfica</strong><div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></div></div>
+                                <div class="zrn_commercial_chart_config_head"><strong>Configurar vista</strong><div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></div></div>
                                 <div class="zrn_commercial_chart_config_body">
+                                    <div class="o_form_label">Dataset</div>
+                                    <select class="form-select" data-zrn-commercial-config-field="variant"/>
                                     <div class="o_form_label">Métrica</div>
                                     <select class="form-select" data-zrn-commercial-config-field="metric"/>
                                     <div class="o_form_label">Tipo de gráfica</div>
