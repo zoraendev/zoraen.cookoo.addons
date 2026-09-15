@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="action_zrn_analitics_hubs" model="ir.actions.client">
         <field name="name">Hubs</field>
         <field name="tag">zrn_analitics.hubs</field>
         <field name="target">current</field>
     </record>
-
 </odoo>
