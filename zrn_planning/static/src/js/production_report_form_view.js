@@ -320,6 +320,22 @@ class ZrnPlanningProductionManufactureFormController extends FormController {
   setup() {
     super.setup();
     this.orm = useService("orm");
+    this.manufactureExportMenu = null;
+    this.handleManufactureClick = (ev) => this.onManufactureClick(ev);
+    onMounted(() => {
+      this.rootRef.el?.addEventListener("click", this.handleManufactureClick);
+    });
+    onWillUnmount(() => {
+      this.rootRef.el?.removeEventListener("click", this.handleManufactureClick);
+      this.closeManufactureExportMenu();
+    });
+  }
+
+  onManufactureClick(ev) {
+    const exportButton = ev.target.closest?.("[data-zrn-planning-manufacture-export]");
+    if (!exportButton) return;
+    ev.preventDefault();
+    this.openManufactureExportMenu(exportButton);
   }
 
   async createMfgPlan() {
@@ -332,6 +348,132 @@ class ZrnPlanningProductionManufactureFormController extends FormController {
       [[this.model.root.resId]],
     );
     await this.actionService.doAction(action);
+  }
+
+  openManufactureExportMenu(button) {
+    this.closeManufactureExportMenu();
+    const rect = button.getBoundingClientRect();
+    const options = [
+      { key: "xls", label: "Excel (.xls)", icon: "fa-file-excel-o" },
+      { key: "xml", label: "XML", icon: "fa-code" },
+      { key: "csv", label: "CSV", icon: "fa-file-text-o" },
+      { key: "json", label: "JSON", icon: "fa-file-code-o" },
+    ];
+    const menu = document.createElement("div");
+    menu.className = "zrn_planning_export_menu_wrap";
+    menu.innerHTML = `<div class="zrn_planning_export_backdrop"></div><div class="zrn_planning_export_menu" style="left: ${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px; top: ${Math.min(rect.bottom + 4, window.innerHeight - 180)}px;"><div class="zrn_planning_export_menu_title">Exportar como</div>${options.map((option) => `<button type="button" class="btn zrn_planning_export_menu_item" data-format="${option.key}"><i class="fa ${option.icon}"></i><span>${option.label}</span></button>`).join("")}</div>`;
+    menu.querySelector(".zrn_planning_export_backdrop").addEventListener("click", () => this.closeManufactureExportMenu());
+    menu.querySelectorAll("[data-format]").forEach((item) => item.addEventListener("click", () => this.exportManufactureRows(item.dataset.format)));
+    document.body.appendChild(menu);
+    this.manufactureExportMenu = menu;
+  }
+
+  closeManufactureExportMenu() {
+    this.manufactureExportMenu?.remove();
+    this.manufactureExportMenu = null;
+  }
+
+  async exportManufactureRows(format) {
+    this.closeManufactureExportMenu();
+    const resId = this.model.root.resId;
+    if (!resId) return;
+    const fields = [
+      "first_delivery_date",
+      "last_delivery_date",
+      "product_id",
+      "default_code",
+      "categ_name",
+      "customer_count",
+      "order_count",
+      "line_count",
+      "total_units",
+      "stock_initial",
+      "stock_free",
+      "suggested_production",
+    ];
+    const lines = await this.orm.searchRead(
+      "zrn_planning.production.planning.wizard.report.product.line",
+      [["wizard_id", "=", resId]],
+      fields,
+      { order: "first_delivery_date asc, product_id asc" },
+    );
+    const headers = [
+      "Primera entrega",
+      "Ultima entrega",
+      "Producto",
+      "Referencia",
+      "Categoria",
+      "Clientes",
+      "OVs",
+      "Lineas",
+      "Demanda total",
+      "Stock inicial",
+      "Stock libre",
+      "Sugerido fabricar",
+    ];
+    const rows = [
+      headers,
+      ...lines.map((line) => [
+        line.first_delivery_date || "",
+        line.last_delivery_date || "",
+        Array.isArray(line.product_id) ? line.product_id[1] : "",
+        line.default_code || "",
+        line.categ_name || "",
+        line.customer_count || 0,
+        line.order_count || 0,
+        line.line_count || 0,
+        this.numberCell(line.total_units, 2),
+        this.numberCell(line.stock_initial, 2),
+        this.numberCell(line.stock_free, 2),
+        this.numberCell(line.suggested_production, 2),
+      ]),
+    ];
+    const title = "Datos a fabricar";
+    const filename = "zrn_planning_datos_a_fabricar";
+    const content = format === "xls" ? this.tableToExcel(title, rows) : format === "csv" ? rows.map((row) => row.map((cell) => this.csvCell(cell)).join(",")).join("\r\n") : format === "json" ? this.tableToJson(rows) : this.tableToXml(title, rows);
+    const type = format === "xls" ? "application/vnd.ms-excel" : format === "csv" ? "text/csv;charset=utf-8" : format === "json" ? "application/json;charset=utf-8" : "application/xml;charset=utf-8";
+    this.downloadText(filename, content, type, format);
+  }
+
+  numberCell(value, decimals = 0) {
+    return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+  }
+
+  csvCell(value) {
+    return `"${String(value || "").replace(/"/g, '""')}"`;
+  }
+
+  tableToJson(rows) {
+    const [headers = [], ...dataRows] = rows;
+    return JSON.stringify(dataRows.map((row) => Object.fromEntries(headers.map((header, index) => [header, row[index] || ""]))), null, 2);
+  }
+
+  tableToExcel(title, rows) {
+    const body = rows.map((row) => `<tr>${row.map((cell) => `<td>${this.escapeHtml(cell)}</td>`).join("")}</tr>`).join("");
+    return `<!doctype html><html><head><meta charset="utf-8"><title>${this.escapeHtml(title)}</title></head><body><h2>${this.escapeHtml(title)}</h2><table border="1">${body}</table></body></html>`;
+  }
+
+  tableToXml(title, rows) {
+    const body = rows.map((row) => `<Row>${row.map((cell) => `<Cell><Data ss:Type="String">${this.escapeHtml(cell)}</Data></Cell>`).join("")}</Row>`).join("");
+    return `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="${this.escapeHtml(title).slice(0, 31)}"><Table>${body}</Table></Worksheet></Workbook>`;
+  }
+
+  downloadText(filename, content, type, extension) {
+    const blob = new Blob(["\ufeff", content], { type });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  escapeHtml(value) {
+    const div = document.createElement("div");
+    div.textContent = value == null ? "" : String(value);
+    return div.innerHTML;
   }
 }
 
