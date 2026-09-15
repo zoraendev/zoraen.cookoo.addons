@@ -9,7 +9,7 @@
         <field name="name">zrn_planning.purchase.planning.wizard.form</field>
         <field name="model">zrn_planning.purchase.planning.wizard</field>
         <field name="arch" type="xml">
-            <form string="Planeacion de abastecimiento" create="0" delete="0" duplicate="0" class="zrn_planning_filter_form">
+            <form string="Planeacion de abastecimiento" js_class="zrn_planning_form" create="0" delete="0" duplicate="0" class="zrn_planning_filter_form">
                 <sheet>
                     <header>
                         <div class="zrn_planning_filter_footer">
@@ -22,15 +22,32 @@
                                     class="btn zrn_planning_back_btn"
                                 />
                             </div>
+                            <div class="zrn_planning_filter_footer_stats">
+                                <div class="zrn_planning_filter_summary_item">
+                                    <i class="fa fa-file-text-o"/>
+                                    <span>Docs.</span>
+                                    <strong><field name="preview_source_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                                <div class="zrn_planning_filter_summary_item">
+                                    <i class="fa fa-list-alt"/>
+                                    <span>Recetas</span>
+                                    <strong><field name="preview_bom_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                                <div class="zrn_planning_filter_summary_item">
+                                    <i class="fa fa-cubes"/>
+                                    <span>Insumos</span>
+                                    <strong><field name="preview_supply_product_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                            </div>
                             <div class="zrn_planning_filter_footer_end">
                                 <a
                                     href="#"
                                     role="button"
                                     class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"
                                     data-zrn-planning-filter-toggle="1"
+                                    aria-label="Configurar filtros"
                                 >
                                     <i class="fa fa-sliders"/>
-                                    <span>Filtros</span>
                                 </a>
                                 <button
                                     name="action_continue"
@@ -55,40 +72,14 @@
                         <field name="available_supply_product_ids"/>
                         <field name="planning_record_count"/>
                         <field name="planning_record_ids"/>
+                        <field name="planning_record_data"/>
                     </group>
 
                     <div class="zrn_planning_filter_page">
-                        <div class="zrn_planning_filter_bar">
-                            <div class="zrn_planning_filter_summary_inline">
-                                <div class="zrn_planning_filter_summary_item">
-                                    <span>Documentos:</span>
-                                    <field name="preview_source_count" readonly="1" nolabel="1"/>
-                                </div>
-                                <span class="zrn_planning_filter_summary_sep">-</span>
-                                <div class="zrn_planning_filter_summary_item">
-                                    <span>Recetas:</span>
-                                    <field name="preview_bom_count" readonly="1" nolabel="1"/>
-                                </div>
-                                <span class="zrn_planning_filter_summary_sep">-</span>
-                                <div class="zrn_planning_filter_summary_item">
-                                    <span>Insumos:</span>
-                                    <field name="preview_supply_product_count" readonly="1" nolabel="1"/>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="zrn_planning_filter_modal d-none" data-zrn-planning-filter-modal="1">
                             <div class="zrn_planning_filter_modal_backdrop" data-zrn-planning-filter-close="1"/>
                             <div class="zrn_planning_filter_modal_dialog" role="dialog" aria-modal="true">
-                                <div class="zrn_planning_filter_modal_header">
-                                    <div>
-                                        <h3>Filtros</h3>
-                                        <span>Planeacion de abastecimiento</span>
-                                    </div>
-                                    <a href="#" role="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar">
-                                        <i class="fa fa-times"/>
-                                    </a>
-                                </div>
+                                <div class="zrn_planning_filter_modal_head"><strong>Filtros de planeacion</strong><a href="#" role="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar"><i class="fa fa-times"/></a></div>
                                 <div class="zrn_planning_filter_modal_body">
                                     <div class="zrn_planning_filter_modal_grid">
                                         <div class="zrn_planning_filter_modal_field"><span class="o_form_label">Fecha desde</span><field name="fecha_desde" nolabel="1"/></div>
@@ -122,22 +113,27 @@
                                         <span>Ultimos registros</span>
                                         <strong><field name="planning_record_count" readonly="1" nolabel="1"/></strong>
                                     </div>
-                                    <button name="action_open_existing_plans" type="object" class="btn zrn_planning_filter_table_arrow" title="Ver planes">
-                                        <i class="fa fa-arrow-right"/>
-                                    </button>
+                                    <div class="zrn_planning_plan_explorer_actions">
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-view="chart" aria-label="Ver grafica">
+                                            <i class="fa fa-bar-chart"/>
+                                        </a>
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-config="1" aria-label="Configurar datos">
+                                            <i class="fa fa-sliders"/>
+                                        </a>
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-export="1" aria-label="Exportar">
+                                            <i class="fa fa-download"/>
+                                        </a>
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-view="table" aria-label="Ver tabla">
+                                            <i class="fa fa-table"/>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="zrn_planning_plans_list_container">
-                                <field name="planning_record_ids" readonly="1" nolabel="1"
-                                       context="{'form_view_ref': 'zrn_planning.view_zrn_planning_supply_plan_form'}">
-                                    <tree limit="15" create="0" delete="0" edit="0">
-                                        <field name="name" string="Nombre del Plan"/>
-                                        <field name="date_start" string="Inicio"/>
-                                        <field name="date_end" string="Fin"/>
-                                        <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'approved'"/>
-                                    </tree>
-                                </field>
+                                <div class="zrn_planning_plan_explorer_table" data-zrn-planning-plan-table="1"/>
+                                <div class="zrn_planning_plan_explorer_chart d-none" data-zrn-planning-plan-chart="1"/>
+                                <div class="zrn_planning_home_chart_empty d-none" data-zrn-planning-plan-empty="1">Sin planes de abastecimiento.</div>
                             </div>
                         </div>
                     </div>
@@ -162,6 +158,11 @@
                         <field name="report_date_range_mode"/>
                         <field name="report_date_from_label"/>
                         <field name="report_date_to_label"/>
+                        <field name="report_date_range_label"/>
+                        <field name="report_row_count"/>
+                        <field name="report_supply_count"/>
+                        <field name="report_product_count"/>
+                        <field name="report_document_count"/>
                         <field name="report_required_qty"/>
                         <field name="report_stock_free_qty"/>
                         <field name="report_suggested_purchase_qty"/>
@@ -179,12 +180,6 @@
                                         icon="fa-arrow-left"
                                         class="btn zrn_planning_back_btn zrn_planning_report_back_inline"
                                     />
-                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_title_tab" invisible="report_active_tab != 'overview'">
-                                        Detalle operativo de abastecimiento
-                                    </button>
-                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_title_tab zrn_planning_production_report_title_tab_inactive" invisible="report_active_tab == 'overview'">
-                                        Detalle operativo de abastecimiento
-                                    </button>
                                 </div>
                                 <div class="zrn_planning_production_report_header_range">
                                     <span>Rango consultado:</span>
@@ -205,7 +200,35 @@
                                         <field name="report_date_range_label" readonly="1" nolabel="1"/>
                                     </strong>
                                 </div>
+                                <div class="zrn_planning_production_report_context_stats">
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-list-ul"/>
+                                        <span>Lineas</span>
+                                        <strong><field name="report_row_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-cubes"/>
+                                        <span>Insumos</span>
+                                        <strong><field name="report_supply_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-industry"/>
+                                        <span>Productos</span>
+                                        <strong><field name="report_product_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-file-text-o"/>
+                                        <span>Docs.</span>
+                                        <strong><field name="report_document_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                </div>
                                 <div class="zrn_planning_production_report_actions">
+                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_action_btn" invisible="report_active_tab != 'overview'">
+                                        <i class="fa fa-table"/><span>Detalle operativo</span>
+                                    </button>
+                                    <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_action_btn zrn_planning_production_report_action_btn_inactive" invisible="report_active_tab == 'overview'">
+                                        <i class="fa fa-table"/><span>Detalle operativo</span>
+                                    </button>
                                     <button name="action_open_report_supplies_list" type="object" class="btn zrn_planning_production_report_action_btn" invisible="report_active_tab != 'supplies'">
                                         <i class="fa fa-cubes"/>
                                         <span>Insumos:</span>
@@ -239,56 +262,63 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="zrn_planning_production_report_metrics" invisible="report_active_tab != 'overview'">
-                            <div class="zrn_planning_production_report_metric"><span>Requerimiento total</span><strong><field name="report_required_qty" readonly="1" nolabel="1"/></strong></div>
-                            <div class="zrn_planning_production_report_metric"><span>Stock libre</span><strong><field name="report_stock_free_qty" readonly="1" nolabel="1"/></strong></div>
-                            <div class="zrn_planning_production_report_metric"><span>Compra sugerida</span><strong><field name="report_suggested_purchase_qty" readonly="1" nolabel="1"/></strong></div>
-                            <div class="zrn_planning_production_report_metric"><span>Cobertura</span><strong><field name="report_coverage_pct" readonly="1" nolabel="1"/>%</strong></div>
-                        </div>
-                        <div class="zrn_planning_production_report_chart_panel" invisible="report_active_tab != 'overview'">
-                            <div class="zrn_planning_production_report_chart_mount" data-zrn-planning-report-chart="1"/>
-                        </div>
                         <div class="zrn_planning_production_report_table_panel">
                             <div class="zrn_planning_production_report_table_toolbar">
-                                <button name="action_open_report_supplies_list" type="object"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary"
-                                        invisible="report_active_tab != 'supplies'">
-                                    <i class="fa fa-check-square-o" style='margin-right:4px;'/>
-                                    <span>Seleccionar y exportar</span>
-                                </button>
-                                <button name="action_open_report_products_list" type="object"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary"
-                                        invisible="report_active_tab != 'products'">
-                                    <i class="fa fa-check-square-o" style='margin-right:4px;'/>
-                                    <span>Seleccionar y exportar</span>
-                                </button>
-                                <button name="action_open_report_documents_list" type="object"
-                                        class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary"
-                                        invisible="report_active_tab != 'documents'">
-                                    <i class="fa fa-check-square-o" style='margin-right:4px;'/>
-                                    <span>Seleccionar y exportar</span>
-                                </button>
+                                <div class="zrn_planning_production_report_table_title">
+                                    <span>Ultimos registros</span>
+                                    <strong><field name="report_row_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                                <div class="zrn_planning_production_report_table_actions" invisible="report_active_tab != 'overview'">
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-view="chart" aria-label="Ver grafica">
+                                        <i class="fa fa-bar-chart"/>
+                                    </a>
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-config="1" aria-label="Configurar datos">
+                                        <i class="fa fa-sliders"/>
+                                    </a>
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-export="1" aria-label="Exportar">
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-view="table" aria-label="Ver tabla">
+                                        <i class="fa fa-table"/>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="zrn_planning_report_metric_strip zrn_planning_report_metric_strip_top" invisible="report_active_tab != 'overview'">
+                                <div><i class="fa fa-cubes"/><span>Requerimiento total</span><strong><field name="report_required_qty" readonly="1" nolabel="1"/></strong></div>
+                                <div><i class="fa fa-archive"/><span>Stock libre</span><strong><field name="report_stock_free_qty" readonly="1" nolabel="1"/></strong></div>
+                                <div><i class="fa fa-shopping-cart"/><span>Compra sugerida</span><strong><field name="report_suggested_purchase_qty" readonly="1" nolabel="1"/></strong></div>
+                                <div><i class="fa fa-line-chart"/><span>Cobertura</span><strong><field name="report_coverage_pct" readonly="1" nolabel="1"/>%</strong></div>
                             </div>
                             <div class="zrn_planning_production_report_table_placeholder">
-                                <div class="zrn_planning_production_manufacture_table_wrap" invisible="report_active_tab != 'overview'">
-                                    <field name="report_supply_line_ids" readonly="1" nolabel="1">
-                                        <tree create="0" edit="0" delete="0" decoration-danger="suggested_purchase_qty &gt; 0">
-                                            <field name="first_required_date" string="Primera necesidad"/>
-                                            <field name="last_required_date" string="Ultima necesidad"/>
-                                            <field name="component_id" string="Insumo"/>
-                                            <field name="default_code" string="Referencia"/>
-                                            <field name="categ_name" string="Categoria"/>
-                                            <field name="document_count" string="Docs."/>
-                                            <field name="product_count" string="Productos"/>
-                                            <field name="line_count" string="Lineas"/>
-                                            <field name="stock_initial" string="Stock inicial" sum="Stock inicial"/>
-                                            <field name="stock_free" string="Stock libre" sum="Stock libre"/>
-                                            <field name="total_required_qty" string="Consumo del rango" sum="Consumo del rango"/>
-                                            <field name="suggested_purchase_qty" string="Comprar" sum="Comprar"/>
-                                        </tree>
-                                    </field>
+                                <div invisible="report_active_tab != 'overview'">
+                                    <div class="zrn_planning_report_chart_canvas d-none" data-zrn-planning-report-chart="1"/>
+                                    <div class="zrn_planning_production_manufacture_table_wrap" data-zrn-planning-report-table="1">
+                                        <field name="report_supply_line_ids" readonly="1" nolabel="1">
+                                            <tree create="0" edit="0" delete="0" decoration-danger="suggested_purchase_qty &gt; 0">
+                                                <field name="first_required_date" string="Primera necesidad"/>
+                                                <field name="last_required_date" string="Ultima necesidad"/>
+                                                <field name="component_id" string="Insumo"/>
+                                                <field name="default_code" string="Referencia"/>
+                                                <field name="categ_name" string="Categoria"/>
+                                                <field name="document_count" string="Docs."/>
+                                                <field name="product_count" string="Productos"/>
+                                                <field name="line_count" string="Lineas"/>
+                                                <field name="stock_initial" string="Stock inicial" sum="Stock inicial"/>
+                                                <field name="stock_free" string="Stock libre" sum="Stock libre"/>
+                                                <field name="total_required_qty" string="Consumo del rango" sum="Consumo del rango"/>
+                                                <field name="suggested_purchase_qty" string="Comprar" sum="Comprar"/>
+                                            </tree>
+                                        </field>
+                                    </div>
                                 </div>
                                 <div invisible="report_active_tab != 'supplies'">
+                                    <div class="zrn_planning_production_report_list_shell">
+                                        <button name="action_open_report_supplies_list" type="object"
+                                                class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary">
+                                            <i class="fa fa-check-square-o" style='margin-right:4px;'/>
+                                            <span>Seleccionar</span>
+                                        </button>
+                                    </div>
                                     <div class="zrn_planning_production_manufacture_table_wrap">
                                         <field name="report_supply_line_ids" readonly="1" nolabel="1">
                                             <tree create="0" edit="0" delete="0">
@@ -309,6 +339,13 @@
                                     </div>
                                 </div>
                                 <div invisible="report_active_tab != 'products'">
+                                    <div class="zrn_planning_production_report_list_shell">
+                                        <button name="action_open_report_products_list" type="object"
+                                                class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary">
+                                            <i class="fa fa-check-square-o" style='margin-right:4px;'/>
+                                            <span>Seleccionar</span>
+                                        </button>
+                                    </div>
                                     <div class="zrn_planning_production_manufacture_table_wrap">
                                         <field name="report_product_line_ids" readonly="1" nolabel="1">
                                             <tree create="0" edit="0" delete="0">
@@ -326,6 +363,13 @@
                                     </div>
                                 </div>
                                 <div invisible="report_active_tab != 'documents'">
+                                    <div class="zrn_planning_production_report_list_shell">
+                                        <button name="action_open_report_documents_list" type="object"
+                                                class="btn zrn_planning_production_report_table_toolbar_btn zrn_planning_production_report_table_toolbar_btn_primary">
+                                            <i class="fa fa-check-square-o" style='margin-right:4px;'/>
+                                            <span>Seleccionar</span>
+                                        </button>
+                                    </div>
                                     <div class="zrn_planning_production_manufacture_table_wrap">
                                         <field name="report_document_line_ids" readonly="1" nolabel="1">
                                             <tree create="0" edit="0" delete="0">

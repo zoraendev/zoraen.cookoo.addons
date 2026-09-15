@@ -113,8 +113,15 @@ class ZrnPlanningFormController extends FormController {
   }
 
   get isProductionPlanningFilter() {
-    return this.props.resModel === "zrn_planning.production.planning.wizard"
+    return [
+      "zrn_planning.production.planning.wizard",
+      "zrn_planning.purchase.planning.wizard",
+    ].includes(this.props.resModel)
       && Boolean(this.rootRef.el?.querySelector("[data-zrn-planning-plan-table]"));
+  }
+
+  get isPurchasePlanningFilter() {
+    return this.props.resModel === "zrn_planning.purchase.planning.wizard";
   }
 
   onPlanningFilterClick(event) {
@@ -171,6 +178,25 @@ class ZrnPlanningFormController extends FormController {
   }
 
   getProductionPlanColumns() {
+    if (this.isPurchasePlanningFilter) {
+      return [
+        ["Plan", "name"],
+        ["Inicio", "date_start"],
+        ["Fin", "date_end"],
+        ["Estado", "state_label"],
+        ["Base", "basis_label"],
+        ["Lineas", "line_count"],
+        ["Productos", "product_count"],
+        ["Insumos", "supply_count"],
+        ["Docs.", "source_count"],
+        ["Planeadas", "planned_qty"],
+        ["Ejecutadas", "executed_qty"],
+        ["Pendientes", "pending_qty"],
+        ["Avance", "progress"],
+        ["OCs", "purchase_count"],
+        ["OCs fin.", "completed_purchase_count"],
+      ];
+    }
     return [
       ["Plan", "name"],
       ["Inicio", "date_start"],
@@ -192,13 +218,21 @@ class ZrnPlanningFormController extends FormController {
   }
 
   getProductionPlanDataset() {
-    const datasets = {
-      progress: { label: "Avance por plan", series: [["Avance %", "progress"]] },
-      units: { label: "Unidades por plan", series: [["Planeadas", "planned_qty"], ["Ejecutadas", "executed_qty"], ["Pendientes", "pending_qty"]] },
-      records: { label: "Volumen operativo", series: [["Lineas", "line_count"], ["Productos", "product_count"], ["OVs", "source_count"]] },
-      manufacturing: { label: "Ordenes de fabricacion", series: [["OFs", "production_count"], ["OFs finalizadas", "completed_production_count"]] },
-      productivity: { label: "Productividad por plan", series: [["Unidades ejecutadas por linea", "productivity"]] },
-    };
+    const datasets = this.isPurchasePlanningFilter
+      ? {
+        progress: { label: "Avance por plan", series: [["Avance %", "progress"]] },
+        units: { label: "Unidades por plan", series: [["Planeadas", "planned_qty"], ["Ejecutadas", "executed_qty"], ["Pendientes", "pending_qty"]] },
+        records: { label: "Volumen operativo", series: [["Lineas", "line_count"], ["Productos", "product_count"], ["Insumos", "supply_count"], ["Docs.", "source_count"]] },
+        manufacturing: { label: "Ordenes de compra", series: [["OCs", "purchase_count"], ["OCs finalizadas", "completed_purchase_count"]] },
+        productivity: { label: "Productividad por plan", series: [["Unidades ejecutadas por linea", "productivity"]] },
+      }
+      : {
+        progress: { label: "Avance por plan", series: [["Avance %", "progress"]] },
+        units: { label: "Unidades por plan", series: [["Planeadas", "planned_qty"], ["Ejecutadas", "executed_qty"], ["Pendientes", "pending_qty"]] },
+        records: { label: "Volumen operativo", series: [["Lineas", "line_count"], ["Productos", "product_count"], ["OVs", "source_count"]] },
+        manufacturing: { label: "Ordenes de fabricacion", series: [["OFs", "production_count"], ["OFs finalizadas", "completed_production_count"]] },
+        productivity: { label: "Productividad por plan", series: [["Unidades ejecutadas por linea", "productivity"]] },
+      };
     return datasets[this._planExplorerDataset] || datasets.progress;
   }
 
@@ -254,7 +288,7 @@ class ZrnPlanningFormController extends FormController {
     }).join("");
     const body = rows.length
       ? rows.map(row => `<tr>${columns.map(([label, field]) => `<td class="${field === "name" ? "zrn_planning_plan_name_cell" : ""}">${this.escapeHtml(this.formatProductionPlanCell(row[field], field))}</td>`).join("")}</tr>`).join("")
-      : `<tr><td colspan="${columns.length}" class="zrn_planning_home_empty_cell">Sin planings de fabricacion.</td></tr>`;
+      : `<tr><td colspan="${columns.length}" class="zrn_planning_home_empty_cell">${this.isPurchasePlanningFilter ? "Sin planings de abastecimiento." : "Sin planings de fabricacion."}</td></tr>`;
     return `<div class="zrn_planning_plan_explorer_scroll"><table class="zrn_planning_plan_explorer_grid"><thead><tr>${headers}</tr></thead><tbody>${body}</tbody></table></div>`;
   }
 
@@ -299,6 +333,7 @@ class ZrnPlanningFormController extends FormController {
 
   openPlanExplorerConfig() {
     this.closePlanExplorerConfig();
+    const recordsOptionLabel = this.isPurchasePlanningFilter ? "Ordenes de compra" : "Ordenes de fabricacion";
     const modal = document.createElement("div");
     modal.className = "zrn_planning_report_config";
     modal.innerHTML = `
@@ -314,7 +349,7 @@ class ZrnPlanningFormController extends FormController {
             <option value="progress">Avance por plan</option>
             <option value="units">Unidades por plan</option>
             <option value="records">Volumen operativo</option>
-            <option value="manufacturing">Ordenes de fabricacion</option>
+            <option value="manufacturing">${recordsOptionLabel}</option>
             <option value="productivity">Productividad por plan</option>
           </select>
           <label>Tipo de grafica</label>
@@ -371,7 +406,7 @@ class ZrnPlanningFormController extends FormController {
 
   exportPlanExplorer(format) {
     this.closePlanExplorerExportMenu();
-    const filename = "zrn_planning_planes_fabricacion";
+    const filename = this.isPurchasePlanningFilter ? "zrn_planning_planes_abastecimiento" : "zrn_planning_planes_fabricacion";
     if (format === "png" && this._planExplorerChart) {
       const link = document.createElement("a");
       link.href = this._planExplorerChart.getDataURL({ type: "png", pixelRatio: 2, backgroundColor: "#ffffff" });

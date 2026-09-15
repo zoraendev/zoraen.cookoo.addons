@@ -30,6 +30,14 @@
   margin: 0 !important;
 }
 
+.o_form_view.zrn_planning_production_report_form .o_form_renderer {
+  min-width: 0;
+}
+
+.o_form_view.zrn_planning_production_report_form .o_form_sheet_bg > .o_form_sheet {
+  min-height: calc(100vh - 190px);
+}
+
 .zrn_planning_home_dashboard {
   background: transparent;
   min-height: 620px;
@@ -884,6 +892,80 @@
   background: #fff;
 }
 
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_screen {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 220px);
+  min-width: 0;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_table_panel {
+  flex: 1 1 auto;
+  min-height: 360px;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_table_placeholder {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap {
+  max-height: calc(100vh - 430px);
+  min-height: 280px;
+  min-width: 0;
+  overflow: auto;
+  border: 1px solid #d7e0ea;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_renderer,
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_field_x2many_list {
+  min-width: max-content;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_table {
+  margin-bottom: 0;
+  min-width: 1180px;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_table th,
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_table td {
+  height: auto;
+  min-height: 36px;
+  padding: 9px 12px;
+  color: #173b62;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_table td[data-tooltip],
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap .o_list_table td.o_data_cell {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-track {
+  background: #edf3f9;
+}
+
+.o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #8fb1d1;
+}
+
 .o_form_view.zrn_planning_report_detail_form .o_form_sheet {
   width: 100%;
   max-width: none;
@@ -1119,6 +1201,90 @@
   background: #e9f0f7;
 }
 
+.o_web_client.o_dark .o_form_view.zrn_planning_purchase_report_form,
+.o_web_client[data-theme="dark"] .o_form_view.zrn_planning_purchase_report_form,
+.o_dark .o_form_view.zrn_planning_purchase_report_form {
+  .zrn_planning_production_report_header_shell,
+  .zrn_planning_production_report_table_panel,
+  .zrn_planning_report_metric_strip,
+  .zrn_planning_production_report_table_toolbar,
+  .zrn_planning_production_report_table_placeholder {
+    border-color: #3a4654;
+    background: #151b23;
+  }
+
+  .zrn_planning_production_report_header_range,
+  .zrn_planning_production_report_inline_stat,
+  .zrn_planning_report_metric_strip > div,
+  .zrn_planning_production_manufacture_table_wrap,
+  .zrn_planning_report_chart_canvas {
+    border-color: #3a4654;
+    background: #1d2530;
+    color: #d9e3ee;
+  }
+
+  .zrn_planning_production_report_table_title,
+  .zrn_planning_production_report_header_range,
+  .zrn_planning_production_report_inline_stat,
+  .zrn_planning_report_metric_strip strong,
+  .zrn_planning_production_manufacture_table_wrap .o_list_table th,
+  .zrn_planning_production_manufacture_table_wrap .o_list_table td {
+    color: #d9e3ee;
+  }
+
+  .zrn_planning_report_metric_strip span,
+  .zrn_planning_production_report_header_range span,
+  .zrn_planning_production_report_inline_stat span {
+    color: #9fb1c4;
+  }
+
+  .zrn_planning_production_report_inline_stat i,
+  .zrn_planning_report_metric_strip i {
+    color: #78a7dc;
+  }
+
+  .zrn_planning_production_report_action_btn,
+  .zrn_planning_report_icon_btn {
+    border-color: #46586b;
+    background: #202b38;
+    color: #d9e3ee;
+  }
+
+  .zrn_planning_production_report_action_btn:not(.zrn_planning_production_report_action_btn_inactive),
+  .zrn_planning_report_icon_btn.is-active {
+    border-color: #4f82bd;
+    background: #315f98;
+    color: #fff;
+  }
+
+  .o_list_table thead th {
+    background: #243244;
+    color: #e4edf6;
+  }
+
+  .o_list_table tbody td {
+    background: #1d2530;
+    color: #d9e3ee;
+  }
+
+  .o_list_table tbody tr:nth-child(even) td {
+    background: #202a36;
+  }
+
+  .o_list_table tfoot td {
+    background: #263549;
+    color: #e4edf6;
+  }
+
+  .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-track {
+    background: #151b23;
+  }
+
+  .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-thumb {
+    background: #536d88;
+  }
+}
+
 @media (max-width: 900px) {
   .zrn_planning_home_grid {
     grid-template-columns: 1fr;
@@ -1141,6 +1307,22 @@
   .zrn_planning_production_report_context_stats {
     justify-content: flex-start;
     margin-left: 0;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_header_range,
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_context_stats,
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_actions {
+    flex: 1 1 100%;
+    max-width: none;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_context_stats,
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_actions {
+    flex-wrap: wrap;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap {
+    max-height: calc(100vh - 470px);
   }
 }
 
@@ -1166,6 +1348,34 @@
 
   .zrn_planning_filter_modal_field_wide {
     grid-column: auto;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .o_form_sheet_bg {
+    padding: 8px;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_table_toolbar,
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_report_metric_strip {
+    grid-template-columns: 1fr;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_table_toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_table_actions {
+    flex-wrap: wrap;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_report_action_btn {
+    flex: 1 1 calc(50% - 4px);
+    min-height: 34px;
+  }
+
+  .o_form_view.zrn_planning_purchase_report_form .zrn_planning_production_manufacture_table_wrap {
+    max-height: 60vh;
+    min-height: 260px;
   }
 }
 

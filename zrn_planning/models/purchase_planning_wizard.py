@@ -87,6 +87,11 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
         compute='_compute_planning_record_ids',
         readonly=True,
     )
+    planning_record_data = fields.Text(
+        string='Datos de planings creados',
+        compute='_compute_planning_record_ids',
+        readonly=True,
+    )
     report_requirement_line_ids = fields.One2many(
         'zrn_planning.purchase.planning.wizard.report.requirement.line',
         'wizard_id',
@@ -431,6 +436,8 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
         self._compute_filter_data()
 
     def _compute_planning_record_ids(self):
+        state_labels = dict(self.env['zrn_planning.mfg.plan']._fields['state'].selection)
+        basis_labels = dict(self.env['zrn_planning.mfg.plan']._fields['planning_basis'].selection)
         domain = [
             ('company_id', '=', self.env.company.id),
             ('planning_basis', '=', 'mixed'),
@@ -439,10 +446,51 @@ class ZrnPlanningPurchasePlanningWizard(models.TransientModel):
         plans = self.env['zrn_planning.mfg.plan'].search(
             domain,
             order='date_start desc, id desc',
+            limit=250,
         )
         for wizard in self:
-            wizard.planning_record_count = len(plans)
-            wizard.planning_record_ids = [(6, 0, plans.ids)]
+            wizard.planning_record_count = self.env['zrn_planning.mfg.plan'].search_count(domain)
+            wizard.planning_record_ids = [(6, 0, plans[:15].ids)]
+            rows = []
+            for plan in plans:
+                line_count = len(plan.line_ids)
+                source_count = len(plan.source_ids)
+                product_count = len(plan.line_ids.mapped('product_id'))
+                supply_count = len(plan.line_ids.mapped('supply_ids.component_id'))
+                planned_qty = sum(plan.line_ids.mapped('qty_planned'))
+                released_qty = sum(plan.line_ids.mapped('qty_released'))
+                executed_qty = sum(plan.line_ids.mapped('qty_executed'))
+                pending_qty = max(planned_qty - executed_qty, 0.0)
+                progress = (executed_qty / planned_qty * 100.0) if planned_qty else 0.0
+                productivity = (executed_qty / line_count) if line_count else 0.0
+                rows.append({
+                    'id': plan.id,
+                    'name': plan.display_name,
+                    'date_start': fields.Date.to_string(plan.date_start) if plan.date_start else '',
+                    'date_end': fields.Date.to_string(plan.date_end) if plan.date_end else '',
+                    'state': plan.state,
+                    'state_label': state_labels.get(plan.state, plan.state or ''),
+                    'basis_label': basis_labels.get(plan.planning_basis, plan.planning_basis or ''),
+                    'line_count': line_count,
+                    'source_count': source_count,
+                    'product_count': product_count,
+                    'supply_count': supply_count,
+                    'production_count': plan.production_count,
+                    'completed_production_count': plan.completed_production_count,
+                    'purchase_count': plan.purchase_count,
+                    'completed_purchase_count': plan.completed_purchase_count,
+                    'planned_qty': planned_qty,
+                    'released_qty': released_qty,
+                    'executed_qty': executed_qty,
+                    'pending_qty': pending_qty,
+                    'progress': round(progress, 1),
+                    'productivity': round(productivity, 1),
+                    'approved_by': plan.approved_by.name or '',
+                    'approved_at': fields.Datetime.to_string(plan.approved_at) if plan.approved_at else '',
+                    'released_by': plan.released_by.name or '',
+                    'released_at': fields.Datetime.to_string(plan.released_at) if plan.released_at else '',
+                })
+            wizard.planning_record_data = json.dumps(rows)
 
     def action_open_existing_plans(self):
         self.ensure_one()

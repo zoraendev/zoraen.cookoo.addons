@@ -477,27 +477,8 @@ class ZrnPlanningProductionManufactureFormController extends FormController {
   }
 }
 
-class ZrnPlanningPurchaseReportFormController extends FormController {
-  setup() {
-    super.setup();
-    this.orm = useService("orm");
-    this.reportChart = null;
-    this.resizeReportChart = () => this.reportChart?.resize();
-    onMounted(() => {
-      window.addEventListener("resize", this.resizeReportChart);
-      this.renderReportChart();
-    });
-    onPatched(() => this.renderReportChart());
-    onWillUnmount(() => {
-      window.removeEventListener("resize", this.resizeReportChart);
-      this.reportChart?.dispose();
-      this.reportChart = null;
-    });
-  }
-
-  renderReportChart() {
-    const mount = this.rootRef.el?.querySelector("[data-zrn-planning-report-chart]");
-    if (!mount || !window.echarts) return;
+class ZrnPlanningPurchaseReportFormController extends ZrnPlanningProductionReportFormController {
+  getReportRows() {
     const raw = this.model.root.data.report_chart_data || "[]";
     let rows;
     try {
@@ -505,21 +486,103 @@ class ZrnPlanningPurchaseReportFormController extends FormController {
     } catch {
       rows = [];
     }
-    if (!rows.length) return;
-    if (!this.reportChart) this.reportChart = window.echarts.init(mount);
-    this.reportChart.setOption({
-      color: ["#315f98", "#c58b2b"],
-      tooltip: { trigger: "axis" },
-      legend: { top: 0, left: "right" },
-      grid: { top: 32, right: 18, bottom: 68, left: 52, containLabel: true },
-      xAxis: { type: "category", data: rows.map(row => row.name), axisLabel: { rotate: rows.length > 4 ? 24 : 0 } },
-      yAxis: { type: "value", minInterval: 1 },
-      series: [
-        { name: "Requerido", type: "bar", barMaxWidth: 26, data: rows.map(row => row.required) },
-        { name: "Compra sugerida", type: "bar", barMaxWidth: 26, data: rows.map(row => row.suggested) },
-      ],
-    }, true);
-    this.reportChart.resize();
+    return rows.map((row) => {
+      const required = Number(row.required || 0);
+      const suggested = Number(row.suggested || 0);
+      const covered = Math.max(required - suggested, 0);
+      return {
+        name: row.name || "Sin insumo",
+        required,
+        suggested,
+        covered,
+        coverage: required ? (covered / required) * 100 : 0,
+      };
+    });
+  }
+
+  getReportVariant() {
+    const variants = {
+      demand: {
+        label: "Requerimiento por insumo",
+        series: [["Requerido", "required"]],
+      },
+      pending: {
+        label: "Compra sugerida por insumo",
+        series: [["Compra sugerida", "suggested"]],
+      },
+      completion: {
+        label: "Cobertura por insumo",
+        series: [["Cobertura %", "coverage"]],
+      },
+      balance: {
+        label: "Requerido vs compra sugerida",
+        series: [["Requerido", "required"], ["Compra sugerida", "suggested"]],
+      },
+    };
+    return variants[this.reportDataset] || variants.demand;
+  }
+
+  openReportConfig() {
+    this.closeReportConfig();
+    const modal = document.createElement("div");
+    modal.className = "zrn_planning_report_config";
+    modal.innerHTML = `
+      <div class="zrn_planning_report_config_backdrop"></div>
+      <div class="zrn_planning_report_config_dialog">
+        <div class="zrn_planning_report_config_head">
+          <strong>Configurar contenido</strong>
+          <button type="button" class="btn zrn_planning_report_config_close" aria-label="Cerrar"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="zrn_planning_report_config_body">
+          <label>Dataset</label>
+          <select class="form-select" data-field="dataset">
+            <option value="demand">Requerimiento por insumo</option>
+            <option value="pending">Compra sugerida por insumo</option>
+            <option value="completion">Cobertura por insumo</option>
+            <option value="balance">Requerido vs compra sugerida</option>
+          </select>
+          <label>Tipo de grafica</label>
+          <select class="form-select" data-field="chartType">
+            <option value="bar">Barras</option>
+            <option value="line">Linea</option>
+          </select>
+          <label>Limite de registros</label>
+          <input class="form-control" type="number" min="1" max="50" data-field="limit"/>
+        </div>
+        <div class="zrn_planning_report_config_footer">
+          <button type="button" class="btn btn-primary" data-apply="1">Aplicar</button>
+        </div>
+      </div>`;
+    modal.querySelector('[data-field="dataset"]').value = this.reportDataset;
+    modal.querySelector('[data-field="chartType"]').value = this.reportChartType;
+    modal.querySelector('[data-field="limit"]').value = String(this.reportLimit);
+    modal.querySelector(".zrn_planning_report_config_backdrop").addEventListener("click", () => this.closeReportConfig());
+    modal.querySelector(".zrn_planning_report_config_close").addEventListener("click", () => this.closeReportConfig());
+    modal.querySelector("[data-apply]").addEventListener("click", () => {
+      this.reportDataset = modal.querySelector('[data-field="dataset"]').value || "demand";
+      this.reportChartType = modal.querySelector('[data-field="chartType"]').value || "bar";
+      this.reportLimit = Number(modal.querySelector('[data-field="limit"]').value || 12);
+      this.reportView = "chart";
+      this.closeReportConfig();
+      this.renderReportView();
+    });
+    document.body.appendChild(modal);
+    this.reportConfig = modal;
+  }
+
+  getExportRows(variant) {
+    const rows = this.getReportRows().slice(0, Math.max(Number(this.reportLimit || 12), 1));
+    return [
+      ["Insumo", ...variant.series.map(([label]) => label), "Requerido", "Cubierto", "Compra sugerida", "Cobertura %"],
+      ...rows.map((row) => [
+        row.name,
+        ...variant.series.map(([, field]) => this.numberCell(row[field], field === "coverage" ? 1 : 0)),
+        this.numberCell(row.required, 0),
+        this.numberCell(row.covered, 0),
+        this.numberCell(row.suggested, 0),
+        this.numberCell(row.coverage, 1),
+      ]),
+    ];
   }
 
   async createSupplyPlan() {
