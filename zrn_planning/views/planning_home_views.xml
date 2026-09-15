@@ -14,7 +14,6 @@
                             <section class="zrn_planning_home_panel" data-zrn-planning-home-panel="production">
                                 <div class="zrn_planning_home_panel_head"><strong>Produccion</strong><div class="zrn_planning_home_panel_actions">
                                     <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="production:chart" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></div>
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-config="production" aria-label="Configurar grafica"><i class="fa fa-sliders"/></div>
                                     <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-export="production" aria-label="Exportar"><i class="fa fa-download"/></div>
                                     <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="production:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
                                     <button name="action_open_production_planning" type="object" class="btn zrn_planning_home_icon_btn zrn_planning_home_nav_btn" aria-label="Abrir produccion"><i class="fa fa-arrow-right"/></button>
@@ -27,7 +26,6 @@
                             <section class="zrn_planning_home_panel" data-zrn-planning-home-panel="supply">
                                 <div class="zrn_planning_home_panel_head"><strong>Abastecimiento</strong><div class="zrn_planning_home_panel_actions">
                                     <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="supply:chart" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></div>
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-config="supply" aria-label="Configurar grafica"><i class="fa fa-sliders"/></div>
                                     <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-export="supply" aria-label="Exportar"><i class="fa fa-download"/></div>
                                     <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="supply:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
                                     <button name="action_open_supply_planning" type="object" class="btn zrn_planning_home_icon_btn zrn_planning_home_nav_btn" aria-label="Abrir abastecimiento"><i class="fa fa-arrow-right"/></button>
@@ -37,18 +35,6 @@
                                 <div class="zrn_planning_home_chart_canvas d-none" data-zrn-planning-home-chart="supply"/>
                                 <div class="zrn_planning_home_chart_empty d-none" data-zrn-planning-home-empty="supply">Sin datos de abastecimiento.</div>
                             </section>
-                        </div>
-                        <div class="zrn_planning_home_chart_config d-none" data-zrn-planning-home-config-modal="1">
-                            <div class="zrn_planning_home_chart_config_backdrop" data-zrn-planning-home-config-close="1"/>
-                            <div class="zrn_planning_home_chart_config_dialog" role="dialog" aria-modal="true">
-                                <div class="zrn_planning_home_chart_config_head"><strong>Configurar grafica</strong><div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></div></div>
-                                <div class="zrn_planning_home_chart_config_body">
-                                    <div class="o_form_label">Metrica</div><select class="form-select" data-zrn-planning-home-config-field="metric"/>
-                                    <div class="o_form_label">Tipo de grafica</div><select class="form-select" data-zrn-planning-home-config-field="type"><option value="bar">Barras</option><option value="line">Linea</option><option value="pie">Circular</option></select>
-                                    <div class="o_form_label">Limite de planes</div><input type="number" min="1" max="30" class="form-control" data-zrn-planning-home-config-field="limit"/>
-                                </div>
-                                <div class="zrn_planning_home_chart_config_footer"><div role="button" tabindex="0" class="btn btn-primary" data-zrn-planning-home-config-apply="1">Aplicar</div></div>
-                            </div>
                         </div>
                     </div>
                 </sheet>

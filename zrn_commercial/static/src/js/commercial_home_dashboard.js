@@ -8,35 +8,50 @@ import { FormController } from "@web/views/form/form_controller";
 
 const DATASETS = {
   channelRevenue: {
-    label: "Resumen por canal",
+    label: "Por canal",
     variants: [
       {
-        key: "channel_income",
-        label: "Ingresos del canal",
-        chartLabel: "Ingresos por canal",
-        metrics: [
+        key: "channel_summary",
+        label: "Resumen financiero por canal",
+        chartLabel: "Ingresos, costo y margen",
+        chartMetric: "revenue",
+        chartSeries: [
           { key: "revenue", label: "Ingresos", format: "money" },
+          { key: "cost", label: "Costo teórico", format: "money" },
           { key: "margin", label: "Margen", format: "money" },
-          { key: "ticket", label: "Ticket promedio", format: "money" },
         ],
         columns: [["Canal", "name"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]],
       },
       {
+        key: "channel_income",
+        label: "Ingresos por canal",
+        chartLabel: "Ingresos por canal",
+        chartMetric: "revenue",
+        chartSeries: [{ key: "revenue", label: "Ingresos", format: "money" }],
+        columns: [["Canal", "name"], ["Ingresos", "revenue", "money"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]],
+      },
+      {
         key: "channel_cost",
-        label: "Egresos del canal",
+        label: "Egresos por canal",
         chartLabel: "Costo teórico por canal",
-        metrics: [
-          { key: "cost", label: "Costo teórico", format: "money" },
-          { key: "margin", label: "Margen", format: "money" },
-          { key: "margin_pct", label: "Margen %", format: "percent" },
-        ],
-        columns: [["Canal", "name"], ["Costo teórico", "cost", "money"], ["Ingresos", "revenue", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["SKUs", "skus"], ["Unidades", "units"]],
+        chartMetric: "cost",
+        chartSeries: [{ key: "cost", label: "Costo teórico", format: "money" }],
+        columns: [["Canal", "name"], ["Costo teórico", "cost", "money"], ["Ingresos", "revenue", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["Unidades", "units"]],
+      },
+      {
+        key: "channel_margin",
+        label: "Margen por canal",
+        chartLabel: "Margen por canal",
+        chartMetric: "margin",
+        chartSeries: [{ key: "margin", label: "Margen", format: "money" }],
+        columns: [["Canal", "name"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"]],
       },
       {
         key: "channel_production",
         label: "Fabricación / demanda del canal",
-        chartLabel: "Unidades por canal",
-        metrics: [
+        chartLabel: "Demanda operativa por canal",
+        chartMetric: "units",
+        chartSeries: [
           { key: "units", label: "Unidades" },
           { key: "skus", label: "SKUs vendidos" },
           { key: "orders", label: "Pedidos" },
@@ -46,35 +61,30 @@ const DATASETS = {
     ],
   },
   channelCategoryRevenue: {
-    label: "Categorías de canal",
+    label: "Por categoría de canal",
     variants: [
       {
         key: "channel_category_income",
         label: "Ingresos por categoría de canal",
         chartLabel: "Ingresos por categoría de canal",
-        metrics: [
-          { key: "revenue", label: "Ingresos", format: "money" },
-          { key: "ticket", label: "Ticket promedio", format: "money" },
-          { key: "orders", label: "Pedidos" },
-        ],
+        chartMetric: "revenue",
+        chartSeries: [{ key: "revenue", label: "Ingresos", format: "money" }],
         columns: [["Categoría", "category"], ["Canal", "channel"], ["Ingresos", "revenue", "money"], ["Pedidos", "orders"], ["Unidades", "units"], ["Ticket", "ticket", "money"]],
       },
       {
         key: "channel_category_cost",
         label: "Egresos por categoría de canal",
         chartLabel: "Costo teórico por categoría",
-        metrics: [
-          { key: "cost", label: "Costo teórico", format: "money" },
-          { key: "margin", label: "Margen", format: "money" },
-          { key: "margin_pct", label: "Margen %", format: "percent" },
-        ],
+        chartMetric: "cost",
+        chartSeries: [{ key: "cost", label: "Costo teórico", format: "money" }],
         columns: [["Categoría", "category"], ["Canal", "channel"], ["Costo teórico", "cost", "money"], ["Ingresos", "revenue", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"]],
       },
       {
         key: "channel_category_volume",
         label: "Volumen por categoría de canal",
         chartLabel: "Unidades por categoría",
-        metrics: [
+        chartMetric: "units",
+        chartSeries: [
           { key: "units", label: "Unidades" },
           { key: "skus", label: "SKUs vendidos" },
           { key: "orders", label: "Pedidos" },
@@ -84,47 +94,43 @@ const DATASETS = {
     ],
   },
   categoryProducts: {
-    label: "Categorías de marca",
+    label: "Por categoría de marca",
     variants: [
       {
         key: "brand_category_portfolio",
         label: "Portafolio por categoría de marca",
         chartLabel: "Productos por categoría",
-        metrics: [{ key: "products", label: "Productos" }],
+        chartMetric: "products",
+        chartSeries: [{ key: "products", label: "Productos" }],
         columns: [["Categoría", "category"], ["Marca", "brand"], ["Productos", "products"], ["SKUs vendidos", "skus"]],
       },
       {
         key: "brand_category_sales",
         label: "Ingresos por categoría de marca",
         chartLabel: "Ingresos por categoría de marca",
-        metrics: [
-          { key: "revenue", label: "Ingresos", format: "money" },
-          { key: "units", label: "Unidades" },
-          { key: "orders", label: "Pedidos" },
-        ],
+        chartMetric: "revenue",
+        chartSeries: [{ key: "revenue", label: "Ingresos", format: "money" }],
         columns: [["Categoría", "category"], ["Marca", "brand"], ["Ingresos", "revenue", "money"], ["Unidades", "units"], ["Pedidos", "orders"], ["Productos", "products"]],
       },
       {
         key: "brand_category_margin",
         label: "Margen por categoría de marca",
         chartLabel: "Margen por categoría de marca",
-        metrics: [
-          { key: "margin", label: "Margen", format: "money" },
-          { key: "margin_pct", label: "Margen %", format: "percent" },
-          { key: "cost", label: "Costo teórico", format: "money" },
-        ],
+        chartMetric: "margin",
+        chartSeries: [{ key: "margin", label: "Margen", format: "money" }],
         columns: [["Categoría", "category"], ["Marca", "brand"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"]],
       },
     ],
   },
   brandProducts: {
-    label: "Marcas",
+    label: "Por marca",
     variants: [
       {
         key: "brand_portfolio",
         label: "Portafolio por marca",
         chartLabel: "Productos por marca",
-        metrics: [
+        chartMetric: "products",
+        chartSeries: [
           { key: "products", label: "Productos" },
           { key: "categories", label: "Categorías" },
         ],
@@ -134,22 +140,16 @@ const DATASETS = {
         key: "brand_sales",
         label: "Ingresos por marca",
         chartLabel: "Ingresos por marca",
-        metrics: [
-          { key: "revenue", label: "Ingresos", format: "money" },
-          { key: "units", label: "Unidades" },
-          { key: "orders", label: "Pedidos" },
-        ],
+        chartMetric: "revenue",
+        chartSeries: [{ key: "revenue", label: "Ingresos", format: "money" }],
         columns: [["Marca", "name"], ["Ingresos", "revenue", "money"], ["Unidades", "units"], ["Pedidos", "orders"], ["Categorías", "categories"], ["Productos", "products"]],
       },
       {
         key: "brand_margin",
         label: "Margen por marca",
         chartLabel: "Margen por marca",
-        metrics: [
-          { key: "margin", label: "Margen", format: "money" },
-          { key: "margin_pct", label: "Margen %", format: "percent" },
-          { key: "cost", label: "Costo teórico", format: "money" },
-        ],
+        chartMetric: "margin",
+        chartSeries: [{ key: "margin", label: "Margen", format: "money" }],
         columns: [["Marca", "name"], ["Ingresos", "revenue", "money"], ["Costo teórico", "cost", "money"], ["Margen", "margin", "money"], ["Margen %", "margin_pct", "percent"], ["Productos", "products"]],
       },
     ],
@@ -274,16 +274,24 @@ class ZrnCommercialHomeDashboardController extends FormController {
       return;
     }
     modal.classList.remove("d-none");
+    this.ensureConfigModalFields(modal);
     const definition = DATASETS[config.key];
     const variant = this.getVariant(config.key, config.variant);
-    modal.querySelector('[data-zrn-commercial-config-field="variant"]').innerHTML = definition.variants
-      .map((item) => `<option value="${item.key}">${item.label}</option>`).join("");
-    modal.querySelector('[data-zrn-commercial-config-field="variant"]').value = variant.key;
-    modal.querySelector('[data-zrn-commercial-config-field="metric"]').innerHTML = variant.metrics
-      .map((metric) => `<option value="${metric.key}">${metric.label}</option>`).join("");
-    modal.querySelector('[data-zrn-commercial-config-field="metric"]').value = config.metric;
-    modal.querySelector('[data-zrn-commercial-config-field="type"]').value = config.type;
-    modal.querySelector('[data-zrn-commercial-config-field="limit"]').value = config.limit;
+    const variantField = modal.querySelector('[data-zrn-commercial-config-field="variant"]');
+    const metricField = modal.querySelector('[data-zrn-commercial-config-field="metric"]');
+    const typeField = modal.querySelector('[data-zrn-commercial-config-field="type"]');
+    const limitField = modal.querySelector('[data-zrn-commercial-config-field="limit"]');
+    if (variantField) {
+      variantField.innerHTML = definition.variants
+        .map((item) => `<option value="${item.key}">${item.label}</option>`).join("");
+      variantField.value = variant.key;
+    }
+    this.toggleConfigField(metricField, false);
+    if (!typeField || !limitField) {
+      return;
+    }
+    typeField.value = config.type;
+    limitField.value = config.limit;
     const channelWrap = modal.querySelector("[data-zrn-commercial-channel-filter-wrap]");
     channelWrap.classList.toggle("d-none", config.key !== "channelCategoryRevenue");
     if (config.key === "channelCategoryRevenue") {
@@ -291,6 +299,36 @@ class ZrnCommercialHomeDashboardController extends FormController {
       const select = modal.querySelector('[data-zrn-commercial-config-field="channel"]');
       select.innerHTML = `<option value="all">Todos los canales</option>${channels.map((channel) => `<option value="${this.escapeHtml(channel)}">${this.escapeHtml(channel)}</option>`).join("")}`;
       select.value = config.channel || "all";
+    }
+  }
+
+  ensureConfigModalFields(modal) {
+    const body = modal.querySelector(".zrn_commercial_chart_config_body");
+    if (!body) {
+      return;
+    }
+    modal.querySelector(".zrn_commercial_chart_config_head strong").textContent = "Configurar contenido";
+    if (!modal.querySelector('[data-zrn-commercial-config-field="variant"]')) {
+      const metricField = modal.querySelector('[data-zrn-commercial-config-field="metric"]');
+      const label = document.createElement("div");
+      label.className = "o_form_label";
+      label.textContent = "Dataset";
+      const select = document.createElement("select");
+      select.className = "form-select";
+      select.dataset.zrnCommercialConfigField = "variant";
+      body.insertBefore(select, metricField?.previousElementSibling || body.firstChild);
+      body.insertBefore(label, select);
+    }
+  }
+
+  toggleConfigField(field, visible) {
+    if (!field) {
+      return;
+    }
+    field.classList.toggle("d-none", !visible);
+    const label = field.previousElementSibling;
+    if (label?.classList.contains("o_form_label")) {
+      label.classList.toggle("d-none", !visible);
     }
   }
 
@@ -378,7 +416,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
       return this._panelConfig[key];
     }
     const variant = DATASETS[key].variants[0];
-    return { key, variant: variant.key, metric: variant.metrics[0].key, type: "bar", limit: 10, channel: "all" };
+    return { key, variant: variant.key, type: "bar", limit: 10, channel: "all" };
   }
 
   openChartConfig(key) {
@@ -397,7 +435,6 @@ class ZrnCommercialHomeDashboardController extends FormController {
     if (field === "variant") {
       const variant = this.getVariant(this.state.chartConfig.key, value);
       this.state.chartConfig.variant = variant.key;
-      this.state.chartConfig.metric = variant.metrics[0].key;
       this.renderConfigModal();
       return;
     }
@@ -417,18 +454,20 @@ class ZrnCommercialHomeDashboardController extends FormController {
   }
 
   getRowsForChart(key) {
-    const config = this.getConfig(key);
+    const variant = this.getVariant(key);
     const rows = this.getRowsForDataset(key);
-    rows.sort((left, right) => Number(right[config.metric] || 0) - Number(left[config.metric] || 0));
-    return rows.slice(0, config.limit || 10);
+    rows.sort((left, right) => Number(right[variant.chartMetric] || 0) - Number(left[variant.chartMetric] || 0));
+    return rows.slice(0, this.getConfig(key).limit || 10);
   }
 
   getChartData(key) {
     const config = this.getConfig(key);
+    const variant = this.getVariant(key);
     const rows = this.getRowsForChart(key);
     return {
       labels: rows.map((row) => this.getChartLabel(key, row, config)),
-      values: rows.map((row) => Number(row[config.metric] || 0)),
+      rows,
+      values: rows.map((row) => Number(row[variant.chartMetric] || 0)),
     };
   }
 
@@ -440,6 +479,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
   }
 
   renderCharts() {
+    this.updatePanelTitles();
     this.renderTables();
     this.updateActionStates();
     if (this.state.chartConfig) {
@@ -456,7 +496,9 @@ class ZrnCommercialHomeDashboardController extends FormController {
         return;
       }
       const data = this.getChartData(key);
-      const hasData = data.values.some((value) => value > 0);
+      const variant = this.getVariant(key);
+      const chartSeries = variant.chartSeries || [{ key: variant.chartMetric, label: variant.chartLabel || variant.label }];
+      const hasData = chartSeries.some((serie) => data.rows.some((row) => Number(row[serie.key] || 0) > 0));
       this.toggleEmpty(key, !hasData);
       if (!hasData) {
         this.disposeChart(key);
@@ -465,6 +507,15 @@ class ZrnCommercialHomeDashboardController extends FormController {
       const chart = this.getChart(key, chartEl);
       chart.setOption(this.buildChartOption(key, data), true);
       chart.resize();
+    });
+  }
+
+  updatePanelTitles() {
+    Object.entries(DATASETS).forEach(([key, definition]) => {
+      const title = this.rootRef.el?.querySelector(`[data-zrn-commercial-panel="${key}"] .zrn_commercial_panel_head strong`);
+      if (title) {
+        title.textContent = definition.label;
+      }
     });
   }
 
@@ -485,10 +536,11 @@ class ZrnCommercialHomeDashboardController extends FormController {
     const config = this.getConfig(key);
     const variant = this.getVariant(key);
     const currency = this.payload?.currency || "";
-    const metric = variant.metrics.find((item) => item.key === config.metric);
-    const formatValue = (value) => metric?.format === "money"
+    const chartSeries = variant.chartSeries || [{ key: variant.chartMetric, label: variant.chartLabel || variant.label }];
+    const primarySerie = chartSeries.find((serie) => serie.key === variant.chartMetric) || chartSeries[0];
+    const formatValue = (value, serie = primarySerie) => serie?.format === "money"
       ? `${currency} ${Number(value).toLocaleString()}`
-      : metric?.format === "percent"
+      : serie?.format === "percent"
         ? `${Number(value || 0).toLocaleString()}%`
       : Number(value).toLocaleString();
     if (config.type === "pie") {
@@ -496,16 +548,32 @@ class ZrnCommercialHomeDashboardController extends FormController {
         color: COLORS,
         tooltip: { trigger: "item", formatter: (item) => `${item.name}<br/>${formatValue(item.value)}` },
         legend: { bottom: 0, left: "center", type: "scroll" },
-        series: [{ type: "pie", radius: ["42%", "70%"], data: data.labels.map((label, index) => ({ name: label, value: data.values[index] })) }],
+        series: [{
+          name: primarySerie.label,
+          type: "pie",
+          radius: ["42%", "70%"],
+          data: data.rows.map((row, index) => ({ name: data.labels[index], value: Number(row[primarySerie.key] || 0) })),
+        }],
       };
     }
     return {
-      color: [COLORS[0]],
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: formatValue },
-      grid: { top: 18, right: 24, bottom: 54, left: 54, containLabel: true },
+      color: COLORS,
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        valueFormatter: (value) => formatValue(value, primarySerie),
+      },
+      legend: { bottom: 4, left: "center", type: "scroll" },
+      grid: { top: 18, right: 24, bottom: 64, left: 54, containLabel: true },
       xAxis: { type: "category", data: data.labels, axisLabel: { interval: 0, rotate: data.labels.length > 4 ? 24 : 0 } },
       yAxis: { type: "value", minInterval: 1 },
-      series: [{ name: variant.chartLabel || variant.label || DATASETS[key].label, type: config.type === "line" ? "line" : "bar", smooth: config.type === "line", barMaxWidth: 28, data: data.values }],
+      series: chartSeries.map((serie) => ({
+        name: serie.label,
+        type: config.type === "line" ? "line" : "bar",
+        smooth: config.type === "line",
+        barMaxWidth: 28,
+        data: data.rows.map((row) => Number(row[serie.key] || 0)),
+      })),
     };
   }
 
@@ -541,7 +609,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
     const rect = button.getBoundingClientRect();
     const hasChart = chart && this.isVisible(chart);
     this._exportPanel = panel;
-    this._exportOptions = { key, filename: `zrn_commercial_${key}` };
+    this._exportOptions = { key, filename: this.getExportFilename(key) };
     const dataOptions = [
       { key: "xls", label: "Excel (.xls)", icon: "fa-file-excel-o" },
       { key: "xml", label: "XML", icon: "fa-code" },
@@ -594,15 +662,26 @@ class ZrnCommercialHomeDashboardController extends FormController {
       }
       return;
     }
-    const table = panel.querySelector("table");
-    if (!table) {
-      return;
-    }
-    const rows = Array.from(table.querySelectorAll("tr")).map((row) => Array.from(row.querySelectorAll("th, td")).map((cell) => cell.textContent.trim()));
     const title = this.getVariant(options.key).label || DATASETS[options.key].label;
+    const rows = this.getExportRows(options.key);
     const content = format === "xls" ? this.tableToExcel(title, rows) : format === "csv" ? rows.map((row) => row.map((cell) => this.csvCell(cell)).join(",")).join("\r\n") : format === "json" ? this.tableToJson(rows) : this.tableToXml(title, rows);
     const type = format === "xls" ? "application/vnd.ms-excel" : format === "csv" ? "text/csv;charset=utf-8" : format === "json" ? "application/json;charset=utf-8" : "application/xml;charset=utf-8";
     this.downloadText(options.filename, content, type, format);
+  }
+
+  getExportRows(key) {
+    const variant = this.getVariant(key);
+    const columns = variant.columns || [];
+    const rows = this.getTableRows(key);
+    return [
+      columns.map(([label]) => label),
+      ...rows.map((row) => columns.map(([, field, format]) => this.textCell(row[field], format))),
+    ];
+  }
+
+  getExportFilename(key) {
+    const variant = this.getVariant(key);
+    return `zrn_commercial_${key}_${variant.key}`.replace(/[^a-zA-Z0-9_]+/g, "_");
   }
 
   csvCell(value) {
@@ -637,16 +716,20 @@ class ZrnCommercialHomeDashboardController extends FormController {
   }
 
   formatCell(value, format = null) {
+    return this.escapeHtml(this.textCell(value, format));
+  }
+
+  textCell(value, format = null) {
     const number = Number(value || 0);
     if (format === "money") {
-      return `${this.escapeHtml(this.payload?.currency || "")} ${number.toLocaleString()}`;
+      return `${this.payload?.currency || ""} ${number.toLocaleString()}`.trim();
     }
     if (format === "percent") {
       return `${number.toLocaleString()}%`;
     }
     return Number.isFinite(Number(value)) && value !== ""
       ? Number(value).toLocaleString()
-      : this.escapeHtml(value || "");
+      : String(value || "");
   }
 
   escapeHtml(value) {

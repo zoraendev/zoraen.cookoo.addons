@@ -5,9 +5,9 @@
 }
 
 .zrn_planning_home_dashboard {
-  background: #f4f6f9;
+  background: #ffffff;
   min-height: 620px;
-  padding: 16px;
+  padding: 16px 16px 20px;
 }
 
 .zrn_planning_home_grid {
@@ -63,6 +63,12 @@
   color: #123b6a;
 }
 
+.zrn_planning_home_icon_btn.is-active {
+  border-color: #174b86;
+  background: #174b86;
+  color: #ffffff;
+}
+
 .zrn_planning_home_nav_btn {
   margin-left: 4px;
   border-color: #174b86;
@@ -77,39 +83,38 @@
 }
 
 .zrn_planning_home_metrics {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1px;
   margin: 10px 10px 0;
-  border: 1px solid #d7e0ea;
-  background: #d7e0ea;
+  overflow-x: auto;
 }
 
-.zrn_planning_home_summary_cell {
-  min-width: 0;
-  padding: 8px 9px;
-  background: #fff;
+.zrn_planning_home_summary_table {
+  width: 100%;
+  min-width: 520px;
+  border: 1px solid #d3dce8;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #ffffff;
 }
 
-.zrn_planning_home_summary_label,
-.zrn_planning_home_summary_value {
-  display: block;
+.zrn_planning_home_summary_table th,
+.zrn_planning_home_summary_table td {
+  width: 25%;
+  padding: 8px 10px;
+  border-bottom: 1px solid #d3dce8;
+  text-align: left;
 }
 
-.zrn_planning_home_summary_label {
+.zrn_planning_home_summary_table th {
   color: #1f4e8c;
+  background: #f4f7fb;
   font-size: 11px;
   font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.zrn_planning_home_summary_label i {
-  margin-right: 6px;
-  color: #5f78a1;
-}
-
-.zrn_planning_home_summary_value {
-  margin-top: 4px;
+.zrn_planning_home_summary_table td {
+  border-bottom: 0;
   color: #1f4e8c;
   font-size: 18px;
   font-weight: 700;
@@ -121,12 +126,12 @@
 .zrn_planning_home_table_mount,
 .zrn_planning_home_chart_canvas {
   min-height: 290px;
-  margin: 0 10px 10px;
+  margin: 0;
   background: #f7f9fc;
 }
 
 .zrn_planning_home_table_mount {
-  padding-top: 10px;
+  padding: 10px;
 }
 
 .zrn_planning_home_table_surface {
@@ -190,6 +195,31 @@
 .zrn_planning_home_chart_empty {
   min-height: 290px;
   padding: 28px;
+}
+
+.zrn_planning_home_chart_canvas {
+  padding: 10px;
+}
+
+@media (max-width: 1199.98px) {
+  .zrn_planning_home_grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .zrn_planning_home_dashboard {
+    padding: 12px;
+  }
+
+  .zrn_planning_home_panel_head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .zrn_planning_home_panel_actions {
+    flex-wrap: wrap;
+  }
 }
 
 .zrn_planning_home_chart_config,

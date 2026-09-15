@@ -44,7 +44,7 @@
                         <div class="zrn_commercial_dashboard_grid">
                             <section class="zrn_commercial_panel" data-zrn-commercial-panel="channelRevenue">
                                 <div class="zrn_commercial_panel_head">
-                                    <strong>Ingresos por canal</strong>
+                                    <strong>Por canal</strong>
                                     <div class="zrn_commercial_panel_actions">
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
@@ -60,7 +60,7 @@
 
                             <section class="zrn_commercial_panel" data-zrn-commercial-panel="channelCategoryRevenue">
                                 <div class="zrn_commercial_panel_head">
-                                    <strong>Ingresos por categoría de canal</strong>
+                                    <strong>Por categoría de canal</strong>
                                     <div class="zrn_commercial_panel_actions">
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="channelCategoryRevenue:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="channelCategoryRevenue" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
@@ -76,7 +76,7 @@
 
                             <section class="zrn_commercial_panel" data-zrn-commercial-panel="categoryProducts">
                                 <div class="zrn_commercial_panel_head">
-                                    <strong>Productos por categoría</strong>
+                                    <strong>Por categoría de marca</strong>
                                     <div class="zrn_commercial_panel_actions">
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="categoryProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="categoryProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
@@ -92,7 +92,7 @@
 
                             <section class="zrn_commercial_panel" data-zrn-commercial-panel="brandProducts">
                                 <div class="zrn_commercial_panel_head">
-                                    <strong>Productos por marca</strong>
+                                    <strong>Por marca</strong>
                                     <div class="zrn_commercial_panel_actions">
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-view="brandProducts:chart" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></div>
                                         <div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config="brandProducts" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></div>
@@ -110,12 +110,10 @@
                         <div class="zrn_commercial_chart_config d-none" data-zrn-commercial-config-modal="1">
                             <div class="zrn_commercial_chart_config_backdrop" data-zrn-commercial-config-close="1"/>
                             <div class="zrn_commercial_chart_config_dialog" role="dialog" aria-modal="true">
-                                <div class="zrn_commercial_chart_config_head"><strong>Configurar vista</strong><div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></div></div>
+                                <div class="zrn_commercial_chart_config_head"><strong>Configurar contenido</strong><div role="button" tabindex="0" class="btn zrn_commercial_icon_btn" data-zrn-commercial-config-close="1" aria-label="Cerrar"><i class="fa fa-times"/></div></div>
                                 <div class="zrn_commercial_chart_config_body">
                                     <div class="o_form_label">Dataset</div>
                                     <select class="form-select" data-zrn-commercial-config-field="variant"/>
-                                    <div class="o_form_label">Métrica</div>
-                                    <select class="form-select" data-zrn-commercial-config-field="metric"/>
                                     <div class="o_form_label">Tipo de gráfica</div>
                                     <select class="form-select" data-zrn-commercial-config-field="type">
                                         <option value="bar">Barras</option>

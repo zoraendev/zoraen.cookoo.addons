@@ -6,13 +6,6 @@ import { onMounted, onPatched, onWillUnmount } from "@odoo/owl";
 import { formView } from "@web/views/form/form_view";
 import { FormController } from "@web/views/form/form_controller";
 
-const HOME_METRICS = [
-  { key: "orders_generated", label: "Ordenes generadas" },
-  { key: "orders_completed", label: "Ordenes finalizadas" },
-  { key: "progress", label: "Avance %" },
-  { key: "lines", label: "Lineas" },
-];
-
 class ZrnPlanningFormController extends FormController {
   setup() {
     super.setup();
@@ -21,7 +14,6 @@ class ZrnPlanningFormController extends FormController {
     this._chartInstances = new Map();
     this._homePanelViews = { production: "table", supply: "table" };
     this._homeTableSort = {};
-    this._homeConfig = {};
     this._homeExportPanel = null;
     this._homeExportOptions = null;
     this._homeExportMenu = null;
@@ -172,81 +164,23 @@ class ZrnPlanningFormController extends FormController {
       event.stopPropagation();
       const [key, view] = viewButton.dataset.zrnPlanningHomeView.split(":");
       this._homePanelViews[key] = view;
-      this.closeHomeConfig();
       this.closeHomeExportMenu();
       this.renderHomeDashboard();
-      return;
-    }
-    const configButton = event.target.closest?.("[data-zrn-planning-home-config]");
-    if (configButton) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.openHomeConfig(configButton.dataset.zrnPlanningHomeConfig);
       return;
     }
     const exportButton = event.target.closest?.("[data-zrn-planning-home-export]");
     if (exportButton) {
       event.preventDefault();
       event.stopPropagation();
-      this.openHomeExportMenu(event, exportButton.dataset.zrnPlanningHomeExport);
+      this.openHomeExportMenu(event, exportButton.dataset.zrnPlanningHomeExport, exportButton);
       return;
     }
-    if (event.target.closest?.("[data-zrn-planning-home-config-close]")) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.closeHomeConfig();
-      return;
-    }
-    if (event.target.closest?.("[data-zrn-planning-home-config-apply]")) {
-      event.preventDefault();
-      event.stopPropagation();
-      this.applyHomeConfig();
-    }
-  }
-
-  openHomeConfig(key) {
-    const current = this._homeConfig[key] || { metric: "orders_generated", type: "bar", limit: 7 };
-    this._homeConfig[key] = { ...current, key };
-    const modal = this.rootRef.el?.querySelector("[data-zrn-planning-home-config-modal]");
-    if (!modal) return;
-    modal.dataset.zrnPlanningHomeConfigKey = key;
-    const metric = modal.querySelector('[data-zrn-planning-home-config-field="metric"]');
-    metric.innerHTML = HOME_METRICS.map(item => `<option value="${item.key}">${item.label}</option>`).join("");
-    metric.value = current.metric;
-    modal.querySelector('[data-zrn-planning-home-config-field="type"]').value = current.type;
-    modal.querySelector('[data-zrn-planning-home-config-field="limit"]').value = current.limit;
-    modal.classList.remove("d-none");
-  }
-
-  closeHomeConfig() {
-    this.rootRef.el?.querySelector("[data-zrn-planning-home-config-modal]")?.classList.add("d-none");
-  }
-
-  applyHomeConfig() {
-    const modal = this.rootRef.el?.querySelector("[data-zrn-planning-home-config-modal]");
-    const key = modal?.dataset?.zrnPlanningHomeConfigKey;
-    if (modal && key) {
-      this._homeConfig[key] = {
-        ...this._homeConfig[key],
-        metric: modal.querySelector('[data-zrn-planning-home-config-field="metric"]').value,
-        type: modal.querySelector('[data-zrn-planning-home-config-field="type"]').value,
-        limit: Math.max(1, Math.min(30, Number(modal.querySelector('[data-zrn-planning-home-config-field="limit"]').value) || 7)),
-      };
-      this._homePanelViews[key] = "chart";
-    }
-    this.closeHomeConfig();
-    this.renderHomeDashboard();
-  }
-
-  getHomeConfig(key) {
-    return this._homeConfig[key] || { key, metric: "orders_generated", type: "bar", limit: 7 };
   }
 
   getHomeRows(key) {
     const rows = [...(this._chartPayload?.[key]?.rows || [])];
-    const config = this.getHomeConfig(key);
-    rows.sort((a, b) => Number(b[config.metric] || 0) - Number(a[config.metric] || 0));
-    return rows.slice(0, config.limit || 7);
+    rows.sort((a, b) => Number(b.orders_generated || 0) - Number(a.orders_generated || 0));
+    return rows.slice(0, 7);
   }
 
   getHomeTableRows(key) {
@@ -286,12 +220,13 @@ class ZrnPlanningFormController extends FormController {
       const empty = this.rootRef.el.querySelector(`[data-zrn-planning-home-empty="${key}"]`);
       if (metricsMount) {
         const orderLabel = payload.order_label || "Ordenes";
-        metricsMount.innerHTML = [
-          ["Planes", metrics.plans || 0, "fa-list-alt"],
-          [orderLabel, metrics.orders_generated || 0, key === "production" ? "fa-industry" : "fa-shopping-cart"],
-          ["Finalizadas", metrics.orders_completed || 0, "fa-check-square-o"],
-          ["Avance", `${metrics.progress || 0}%`, "fa-line-chart"],
-        ].map(([label, value, icon]) => `<div class="zrn_planning_home_summary_cell"><span class="zrn_planning_home_summary_label"><i class="fa ${icon}"/>${this.escapeHtml(label)}</span><strong class="zrn_planning_home_summary_value">${this.escapeHtml(value)}</strong></div>`).join("");
+        const summaryColumns = [
+          ["Planes", metrics.plans || 0],
+          [orderLabel, metrics.orders_generated || 0],
+          ["Finalizadas", metrics.orders_completed || 0],
+          ["Avance", `${metrics.progress || 0}%`],
+        ];
+        metricsMount.innerHTML = `<table class="zrn_planning_home_summary_table"><thead><tr>${summaryColumns.map(([label]) => `<th>${this.escapeHtml(label)}</th>`).join("")}</tr></thead><tbody><tr>${summaryColumns.map(([, value]) => `<td>${this.escapeHtml(value)}</td>`).join("")}</tr></tbody></table>`;
       }
       if (table) {
         const columns = [["Plan", "name"], ["Inicio", "date_start"], ["Fin", "date_end"], ["Estado", "state_label"], ["Generadas", "orders_generated"], ["Finalizadas", "orders_completed"], ["Avance", "progress"]];
@@ -306,6 +241,7 @@ class ZrnPlanningFormController extends FormController {
       }
       if (!chart) return;
       const visible = this._homePanelViews[key] === "chart";
+      this.updateHomeActionStates(key);
       chart.classList.toggle("d-none", !visible);
       empty?.classList.toggle("d-none", !visible || chartRows.length > 0);
       if (!visible || !chartRows.length || !window.echarts) {
@@ -323,27 +259,43 @@ class ZrnPlanningFormController extends FormController {
   }
 
   buildHomeChartOption(key, rows) {
-    const config = this.getHomeConfig(key);
     const payload = this._chartPayload[key];
     const labels = rows.map(row => row.name);
-    const values = rows.map(row => Number(row[config.metric] || 0));
-    const format = value => config.metric === "progress" ? `${value}%` : Number(value).toLocaleString();
-    if (config.type === "pie") {
-      return { color: ["#315f98", "#4a78ad", "#6f5d9a", "#2f8f6f", "#c58b2b"], tooltip: { trigger: "item", formatter: item => `${item.name}<br/>${format(item.value)}` }, legend: { bottom: 0, type: "scroll" }, series: [{ type: "pie", radius: ["42%", "70%"], data: labels.map((name, index) => ({ name, value: values[index] })) }] };
-    }
-    return { color: ["#315f98"], tooltip: { trigger: "axis", valueFormatter: format }, grid: { top: 22, right: 20, bottom: labels.length > 4 ? 80 : 52, left: 52, containLabel: true }, xAxis: { type: "category", data: labels, axisLabel: { interval: 0, rotate: labels.length > 4 ? 24 : 0 } }, yAxis: { type: "value", minInterval: 1 }, series: [{ name: HOME_METRICS.find(item => item.key === config.metric)?.label || payload.order_label, type: config.type === "line" ? "line" : "bar", smooth: config.type === "line", barMaxWidth: 30, data: values }] };
+    const generatedLabel = payload.order_label || "Ordenes";
+    const completedLabel = "Finalizadas";
+    return {
+      color: ["#315f98", "#9dbfe4"],
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: value => Number(value).toLocaleString() },
+      legend: { bottom: 4, left: "center" },
+      grid: { top: 22, right: 20, bottom: labels.length > 4 ? 88 : 62, left: 52, containLabel: true },
+      xAxis: { type: "category", data: labels, axisLabel: { interval: 0, rotate: labels.length > 4 ? 24 : 0 } },
+      yAxis: { type: "value", minInterval: 1 },
+      series: [
+        { name: generatedLabel, type: "bar", barMaxWidth: 30, data: rows.map(row => Number(row.orders_generated || 0)) },
+        { name: completedLabel, type: "bar", barMaxWidth: 30, data: rows.map(row => Number(row.orders_completed || 0)) },
+      ],
+    };
   }
 
-  openHomeExportMenu(event, key) {
-    const panel = event.currentTarget.closest(".zrn_planning_home_panel");
+  updateHomeActionStates(key) {
+    const view = this._homePanelViews[key] || "table";
+    this.rootRef.el?.querySelectorAll(`[data-zrn-planning-home-view^="${key}:"]`).forEach(button => {
+      button.classList.toggle("is-active", button.dataset.zrnPlanningHomeView === `${key}:${view}`);
+    });
+  }
+
+  openHomeExportMenu(event, key, button) {
+    const panel = button.closest(".zrn_planning_home_panel");
     if (!panel) return;
+    this.closeHomeExportMenu();
     const chart = panel.querySelector(`[data-zrn-planning-home-chart="${key}"]`);
-    const rect = event.currentTarget.getBoundingClientRect();
+    const rect = button.getBoundingClientRect();
     this._homeExportPanel = panel;
     this._homeExportOptions = { key, filename: `zrn_planning_${key}`, isChart: chart && chart.offsetParent !== null };
+    const dataButtons = '<button type="button" data-format="xls"><i class="fa fa-file-excel-o"></i><span>Excel (.xls)</span></button><button type="button" data-format="xml"><i class="fa fa-code"></i><span>XML</span></button><button type="button" data-format="csv"><i class="fa fa-file-text-o"></i><span>CSV</span></button><button type="button" data-format="json"><i class="fa fa-file-code-o"></i><span>JSON</span></button>';
     const menu = document.createElement("div");
     menu.className = "zrn_planning_home_export_menu_wrap";
-    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px;top:${Math.min(rect.bottom + 4, window.innerHeight - 180)}px"><strong>Exportar como</strong>${this._homeExportOptions.isChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : '<button type="button" data-format="xls"><i class="fa fa-file-excel-o"></i><span>Excel (.xls)</span></button><button type="button" data-format="xml"><i class="fa fa-code"></i><span>XML</span></button><button type="button" data-format="csv"><i class="fa fa-file-text-o"></i><span>CSV</span></button><button type="button" data-format="json"><i class="fa fa-file-code-o"></i><span>JSON</span></button>'}</div>`;
+    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px;top:${Math.min(rect.bottom + 4, window.innerHeight - 180)}px"><strong>Exportar como</strong>${this._homeExportOptions.isChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : ''}${dataButtons}</div>`;
     menu.querySelector(".zrn_planning_home_export_backdrop").addEventListener("click", () => this.closeHomeExportMenu());
     menu.querySelectorAll("[data-format]").forEach(button => button.addEventListener("click", () => this.exportHomeFormat(button.dataset.format)));
     document.body.appendChild(menu);
@@ -377,14 +329,26 @@ class ZrnPlanningFormController extends FormController {
     const table = panel.querySelector("table");
     if (!table) return;
     const rows = Array.from(table.querySelectorAll("tr")).map(row => Array.from(row.querySelectorAll("th,td")).map(cell => cell.textContent.trim()));
-    const content = format === "json" ? JSON.stringify(rows.slice(1).map(row => Object.fromEntries(rows[0].map((head, index) => [head, row[index] || ""]))), null, 2) : format === "csv" ? rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\r\n") : `<table border="1">${rows.map(row => `<tr>${row.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</table>`;
-    const type = format === "json" ? "application/json;charset=utf-8" : format === "csv" ? "text/csv;charset=utf-8" : "application/vnd.ms-excel";
+    const content = format === "json"
+      ? JSON.stringify(rows.slice(1).map(row => Object.fromEntries(rows[0].map((head, index) => [head, row[index] || ""]))), null, 2)
+      : format === "csv"
+        ? rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\r\n")
+        : format === "xml"
+          ? `<?xml version="1.0"?><Rows>${rows.slice(1).map(row => `<Row>${rows[0].map((head, index) => `<${this.xmlTag(head)}>${this.escapeHtml(row[index] || "")}</${this.xmlTag(head)}>`).join("")}</Row>`).join("")}</Rows>`
+          : `<table border="1">${rows.map(row => `<tr>${row.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</table>`;
+    const type = format === "json" ? "application/json;charset=utf-8" : format === "csv" ? "text/csv;charset=utf-8" : format === "xml" ? "application/xml;charset=utf-8" : "application/vnd.ms-excel";
+    const url = URL.createObjectURL(new Blob(["\ufeff", content], { type }));
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(new Blob(["\ufeff", content], { type }));
+    link.href = url;
     link.download = `${options.filename}.${format === "xls" ? "xls" : format}`;
     document.body.appendChild(link);
     link.click();
     link.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  xmlTag(value) {
+    return String(value || "Campo").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_]+/g, "_").replace(/^([0-9])/, "_$1") || "Campo";
   }
 
   escapeHtml(value) {
