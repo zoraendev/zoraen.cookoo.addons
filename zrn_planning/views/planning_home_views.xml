@@ -12,25 +12,27 @@
                     <div class="zrn_planning_home_dashboard">
                         <div class="zrn_planning_home_grid">
                             <section class="zrn_planning_home_panel" data-zrn-planning-home-panel="production">
-                                <div class="zrn_planning_home_panel_head"><strong>Produccion</strong><div class="zrn_planning_home_panel_actions">
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="production:chart" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></div>
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-export="production" aria-label="Exportar"><i class="fa fa-download"/></div>
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="production:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
+                                <div class="zrn_planning_home_panel_head"><strong>Produccion</strong></div>
+                                <div class="zrn_planning_home_metrics" data-zrn-planning-home-metrics="production"/>
+                                <div class="zrn_planning_home_visual_head"><span>Vista de planes</span><div class="zrn_planning_home_panel_actions">
+                                    <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="production:chart" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></a>
+                                    <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-export="production" aria-label="Exportar"><i class="fa fa-download"/></a>
+                                    <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="production:table" aria-label="Ver tabla"><i class="fa fa-table"/></a>
                                     <button name="action_open_production_planning" type="object" class="btn zrn_planning_home_icon_btn zrn_planning_home_nav_btn" aria-label="Abrir produccion"><i class="fa fa-arrow-right"/></button>
                                 </div></div>
-                                <div class="zrn_planning_home_metrics" data-zrn-planning-home-metrics="production"/>
                                 <div class="zrn_planning_home_table_mount" data-zrn-planning-home-table="production"/>
                                 <div class="zrn_planning_home_chart_canvas d-none" data-zrn-planning-home-chart="production"/>
                                 <div class="zrn_planning_home_chart_empty d-none" data-zrn-planning-home-empty="production">Sin datos de produccion.</div>
                             </section>
                             <section class="zrn_planning_home_panel" data-zrn-planning-home-panel="supply">
-                                <div class="zrn_planning_home_panel_head"><strong>Abastecimiento</strong><div class="zrn_planning_home_panel_actions">
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="supply:chart" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></div>
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-export="supply" aria-label="Exportar"><i class="fa fa-download"/></div>
-                                    <div role="button" tabindex="0" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="supply:table" aria-label="Ver tabla"><i class="fa fa-table"/></div>
+                                <div class="zrn_planning_home_panel_head"><strong>Abastecimiento</strong></div>
+                                <div class="zrn_planning_home_metrics" data-zrn-planning-home-metrics="supply"/>
+                                <div class="zrn_planning_home_visual_head"><span>Vista de planes</span><div class="zrn_planning_home_panel_actions">
+                                    <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="supply:chart" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></a>
+                                    <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-export="supply" aria-label="Exportar"><i class="fa fa-download"/></a>
+                                    <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-home-view="supply:table" aria-label="Ver tabla"><i class="fa fa-table"/></a>
                                     <button name="action_open_supply_planning" type="object" class="btn zrn_planning_home_icon_btn zrn_planning_home_nav_btn" aria-label="Abrir abastecimiento"><i class="fa fa-arrow-right"/></button>
                                 </div></div>
-                                <div class="zrn_planning_home_metrics" data-zrn-planning-home-metrics="supply"/>
                                 <div class="zrn_planning_home_table_mount" data-zrn-planning-home-table="supply"/>
                                 <div class="zrn_planning_home_chart_canvas d-none" data-zrn-planning-home-chart="supply"/>
                                 <div class="zrn_planning_home_chart_empty d-none" data-zrn-planning-home-empty="supply">Sin datos de abastecimiento.</div>

@@ -690,15 +690,33 @@
                                     class="btn zrn_planning_back_btn"
                                 />
                             </div>
+                            <div class="zrn_planning_filter_footer_stats">
+                                <div class="zrn_planning_filter_summary_item">
+                                    <i class="fa fa-file-text-o"/>
+                                    <span>OVs</span>
+                                    <strong><field name="preview_order_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                                <div class="zrn_planning_filter_summary_item">
+                                    <i class="fa fa-users"/>
+                                    <span>PDVs</span>
+                                    <strong><field name="preview_cliente_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                                <div class="zrn_planning_filter_summary_item">
+                                    <i class="fa fa-cubes"/>
+                                    <span>Productos</span>
+                                    <strong><field name="preview_product_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                            </div>
                             <div class="zrn_planning_filter_footer_end">
-                                <button
-                                    name="zrn_planning_filter_control"
-                                    type="button"
-                                    icon="fa-sliders"
+                                <a
+                                    href="#"
+                                    role="button"
                                     class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"
                                     data-zrn-planning-filter-toggle="1"
                                     aria-label="Configurar filtros"
-                                />
+                                >
+                                    <i class="fa fa-sliders"/>
+                                </a>
                                 <button
                                     name="action_continue"
                                     type="object"
@@ -730,29 +748,10 @@
 
 
                     <div class="zrn_planning_filter_page">
-                        <div class="zrn_planning_filter_bar">
-                            <div class="zrn_planning_filter_summary_inline">
-                                <div class="zrn_planning_filter_summary_item">
-                                    <span>OVs:</span>
-                                    <field name="preview_order_count" readonly="1" nolabel="1"/>
-                                </div>
-                                <span class="zrn_planning_filter_summary_sep">-</span>
-                                <div class="zrn_planning_filter_summary_item">
-                                    <span>Pdvs:</span>
-                                    <field name="preview_cliente_count" readonly="1" nolabel="1"/>
-                                </div>
-                                <span class="zrn_planning_filter_summary_sep">-</span>
-                                <div class="zrn_planning_filter_summary_item">
-                                    <span>Productos:</span>
-                                    <field name="preview_product_count" readonly="1" nolabel="1"/>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="zrn_planning_filter_modal d-none" data-zrn-planning-filter-modal="1">
                             <div class="zrn_planning_filter_modal_backdrop" data-zrn-planning-filter-close="1"/>
                             <div class="zrn_planning_filter_modal_dialog" role="dialog" aria-modal="true">
-                                <div class="zrn_planning_filter_modal_head"><strong>Filtros de planeacion</strong><button name="zrn_planning_filter_control" type="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar"><i class="fa fa-times"/></button></div>
+                                <div class="zrn_planning_filter_modal_head"><strong>Filtros de planeacion</strong><a href="#" role="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar"><i class="fa fa-times"/></a></div>
                                 <div class="zrn_planning_filter_modal_body">
                                     <div class="zrn_planning_filter_modal_field"><span>Entrega desde</span><field name="fecha_entrega_desde" nolabel="1"/></div>
                                     <div class="zrn_planning_filter_modal_field"><span>Entrega hasta</span><field name="fecha_entrega_hasta" nolabel="1"/></div>
@@ -762,7 +761,7 @@
                                     <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Categorias de producto</span><field name="product_categ_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_categ_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona categorias"/></div>
                                     <div class="zrn_planning_filter_modal_field"><span>Estado del pedido</span><field name="order_state" nolabel="1"/></div>
                                 </div>
-                                <div class="zrn_planning_filter_modal_footer"><button name="action_clear_filters" type="object" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary">Limpiar</button><button name="zrn_planning_filter_control" type="button" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary" data-zrn-planning-filter-close="1">Aplicar</button></div>
+                                <div class="zrn_planning_filter_modal_footer"><button name="action_clear_filters" type="object" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary">Limpiar</button><a href="#" role="button" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary" data-zrn-planning-filter-close="1">Aplicar</a></div>
                             </div>
                         </div>
 
@@ -846,10 +845,27 @@
                                         <field name="report_date_range_label" readonly="1" nolabel="1"/>
                                     </strong>
                                 </div>
-                                <div class="zrn_planning_production_report_inline_stat">
-                                    <i class="fa fa-list-ul"/>
-                                    <span>Lineas:</span>
-                                    <span><field name="report_row_count" readonly="1" nolabel="1"/></span>
+                                <div class="zrn_planning_production_report_context_stats">
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-list-ul"/>
+                                        <span>Lineas</span>
+                                        <strong><field name="report_row_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-file-text-o"/>
+                                        <span>OVs</span>
+                                        <strong><field name="report_order_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-users"/>
+                                        <span>PDVs</span>
+                                        <strong><field name="report_customer_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
+                                    <div class="zrn_planning_production_report_inline_stat">
+                                        <i class="fa fa-cubes"/>
+                                        <span>Productos</span>
+                                        <strong><field name="report_product_count" readonly="1" nolabel="1"/></strong>
+                                    </div>
                                 </div>
                                 <div class="zrn_planning_production_report_actions">
                                     <button name="action_open_report_overview" type="object" class="btn zrn_planning_production_report_action_btn" invisible="report_active_tab != 'overview'">
@@ -893,17 +909,37 @@
                         </div>
                         <div class="zrn_planning_production_report_table_panel">
                             <div class="zrn_planning_production_report_table_toolbar">
+                                <div class="zrn_planning_production_report_table_title">
+                                    <span>Ultimos registros</span>
+                                    <strong><field name="report_row_count" readonly="1" nolabel="1"/></strong>
+                                </div>
+                                <div class="zrn_planning_production_report_table_actions" invisible="report_active_tab != 'overview'">
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-view="chart" aria-label="Ver grafica">
+                                        <i class="fa fa-bar-chart"/>
+                                    </a>
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-config="1" aria-label="Configurar datos">
+                                        <i class="fa fa-sliders"/>
+                                    </a>
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-export="1" aria-label="Exportar">
+                                        <i class="fa fa-download"/>
+                                    </a>
+                                    <a href="#" role="button" class="btn zrn_planning_report_icon_btn" data-zrn-planning-report-view="table" aria-label="Ver tabla">
+                                        <i class="fa fa-table"/>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="zrn_planning_report_metric_strip zrn_planning_report_metric_strip_top" invisible="report_active_tab != 'overview'">
+                                <div><i class="fa fa-cubes"/><span>Unidades demandadas</span><strong><field name="report_total_units" readonly="1" nolabel="1"/></strong></div>
+                                <div><i class="fa fa-check"/><span>Entregadas</span><strong><field name="report_delivered_units" readonly="1" nolabel="1"/></strong></div>
+                                <div><i class="fa fa-clock-o"/><span>Pendientes</span><strong><field name="report_pending_units" readonly="1" nolabel="1"/></strong></div>
+                                <div><i class="fa fa-line-chart"/><span>Avance</span><strong><field name="report_completion_pct" readonly="1" nolabel="1"/>%</strong></div>
                             </div>
                                 <div class="zrn_planning_production_report_table_placeholder">
                                 <div class="zrn_planning_production_report_html_wrap" invisible="report_active_tab != 'overview'">
-                                    <div class="zrn_planning_report_metric_strip">
-                                        <div><span>Unidades demandadas</span><strong><field name="report_total_units" readonly="1" nolabel="1"/></strong></div>
-                                        <div><span>Entregadas</span><strong><field name="report_delivered_units" readonly="1" nolabel="1"/></strong></div>
-                                        <div><span>Pendientes</span><strong><field name="report_pending_units" readonly="1" nolabel="1"/></strong></div>
-                                        <div><span>Avance</span><strong><field name="report_completion_pct" readonly="1" nolabel="1"/>%</strong></div>
+                                    <div class="zrn_planning_report_chart_canvas d-none" data-zrn-planning-report-chart="1"/>
+                                    <div class="zrn_planning_report_html_scroll" data-zrn-planning-report-table="1">
+                                        <field name="report_html" widget="html" nolabel="1" readonly="1"/>
                                     </div>
-                                    <div class="zrn_planning_report_chart_canvas" data-zrn-planning-report-chart="1"/>
-                                    <field name="report_html" widget="html" nolabel="1" readonly="1"/>
                                 </div>
                                 <div invisible="report_active_tab != 'customers'">
                                     <div class="zrn_planning_production_report_list_shell">
@@ -988,7 +1024,7 @@
         <field name="name">zrn_planning.production.planning.wizard.manufacture.form</field>
         <field name="model">zrn_planning.production.planning.wizard</field>
         <field name="arch" type="xml">
-            <form string="Tabla para fabricar" js_class="zrn_planning_production_manufacture_form" create="0" edit="0" delete="0" duplicate="0" class="zrn_planning_production_report_form zrn_planning_production_manufacture_form">
+            <form string="Planeacion de fabricacion" js_class="zrn_planning_production_manufacture_form" create="0" edit="0" delete="0" duplicate="0" class="zrn_planning_production_report_form zrn_planning_production_manufacture_form">
                 <sheet>
                     <group invisible="1">
                         <field name="report_product_line_ids"/>
@@ -1012,9 +1048,6 @@
                                         icon="fa-arrow-left"
                                         class="btn zrn_planning_back_btn zrn_planning_report_back_inline"
                                     />
-                                    <div class="zrn_planning_production_report_title_tab">
-                                        Tabla para fabricar
-                                    </div>
                                 </div>
                                 <div class="zrn_planning_production_report_header_range">
                                     <span>Rango consultado:</span>
@@ -1035,20 +1068,20 @@
                                         <field name="report_date_range_label" readonly="1" nolabel="1"/>
                                     </strong>
                                 </div>
-                                 <div class="zrn_planning_production_report_actions">
+                                 <div class="zrn_planning_production_report_context_stats">
                                      <div class="zrn_planning_production_report_inline_stat zrn_planning_production_report_inline_stat_passive">
                                          <i class="fa fa-users"/>
-                                         <span>Clientes:</span>
+                                         <span>Clientes</span>
                                          <strong><field name="report_customer_count" readonly="1" nolabel="1"/></strong>
                                      </div>
                                      <div class="zrn_planning_production_report_inline_stat zrn_planning_production_report_inline_stat_passive">
                                          <i class="fa fa-cubes"/>
-                                         <span>Productos:</span>
+                                         <span>Productos</span>
                                          <strong><field name="report_product_count" readonly="1" nolabel="1"/></strong>
                                      </div>
                                      <div class="zrn_planning_production_report_inline_stat zrn_planning_production_report_inline_stat_passive">
                                          <i class="fa fa-file-text-o"/>
-                                         <span>OVs:</span>
+                                         <span>OVs</span>
                                          <strong><field name="report_order_count" readonly="1" nolabel="1"/></strong>
                                      </div>
                                   </div>

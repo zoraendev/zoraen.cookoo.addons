@@ -23,14 +23,15 @@
                                 />
                             </div>
                             <div class="zrn_planning_filter_footer_end">
-                                <button
-                                    name="zrn_planning_filter_control"
-                                    type="button"
-                                    string="Filtros"
-                                    icon="fa-sliders"
+                                <a
+                                    href="#"
+                                    role="button"
                                     class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"
                                     data-zrn-planning-filter-toggle="1"
-                                />
+                                >
+                                    <i class="fa fa-sliders"/>
+                                    <span>Filtros</span>
+                                </a>
                                 <button
                                     name="action_continue"
                                     type="object"
@@ -84,9 +85,9 @@
                                         <h3>Filtros</h3>
                                         <span>Planeacion de abastecimiento</span>
                                     </div>
-                                    <button name="action_open_filters" type="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar">
+                                    <a href="#" role="button" class="btn zrn_planning_filter_modal_close" data-zrn-planning-filter-close="1" aria-label="Cerrar">
                                         <i class="fa fa-times"/>
-                                    </button>
+                                    </a>
                                 </div>
                                 <div class="zrn_planning_filter_modal_body">
                                     <div class="zrn_planning_filter_modal_grid">
@@ -109,7 +110,7 @@
                                 </div>
                                 <div class="zrn_planning_filter_modal_footer">
                                     <button name="action_clear_filters" type="object" string="Limpiar" icon="fa-eraser" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_secondary"/>
-                                    <button name="action_open_filters" type="button" string="Aplicar" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary" data-zrn-planning-filter-close="1"/>
+                                    <a href="#" role="button" class="btn zrn_planning_filter_btn zrn_planning_filter_btn_primary" data-zrn-planning-filter-close="1">Aplicar</a>
                                 </div>
                             </div>
                         </div>
