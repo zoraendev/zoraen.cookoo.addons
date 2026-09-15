@@ -112,6 +112,7 @@
   color: #174b86;
   line-height: 1;
   vertical-align: middle;
+  cursor: pointer;
 }
 
 .zrn_planning_home_icon_btn i {
@@ -141,6 +142,63 @@
 .zrn_planning_home_nav_btn:focus {
   background: #123b6a;
   color: #fff;
+}
+
+.zrn_planning_home_export_menu_wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1070;
+  pointer-events: none;
+}
+
+.zrn_planning_home_export_backdrop {
+  position: fixed;
+  inset: 0;
+  background: transparent;
+  pointer-events: auto;
+}
+
+.zrn_planning_home_export_menu {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  width: 188px;
+  max-width: calc(100vw - 16px);
+  max-height: calc(100vh - 16px);
+  overflow: auto;
+  border: 1px solid #cfd9e6;
+  border-radius: 4px;
+  background: #fff;
+  pointer-events: auto;
+}
+
+.zrn_planning_home_export_menu strong {
+  display: block;
+  padding: 8px 10px;
+  border-bottom: 1px solid #d7e0ea;
+  color: #173b62;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.zrn_planning_home_export_menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 0;
+  background: #fff;
+  color: #173b62;
+  text-align: left;
+  cursor: pointer;
+}
+
+.zrn_planning_home_export_menu button:hover,
+.zrn_planning_home_export_menu button:focus {
+  background: #e9f0f7;
+  color: #123b6a;
 }
 
 .zrn_planning_home_metrics {
@@ -201,6 +259,10 @@
   overflow-x: auto;
   min-height: 270px;
   background: #f7f9fc;
+}
+
+.zrn_planning_home_table_surface tbody tr {
+  cursor: default;
 }
 
 .zrn_planning_home_table_surface table {
@@ -598,6 +660,10 @@
   min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
+}
+
+.zrn_planning_plan_explorer_grid tbody tr {
+  cursor: default;
 }
 
 .zrn_planning_plan_explorer_grid th,
@@ -1199,6 +1265,36 @@
 .zrn_planning_export_menu_item:hover,
 .zrn_planning_export_menu_item:focus {
   background: #e9f0f7;
+}
+
+.o_web_client.o_dark,
+.o_web_client[data-theme="dark"],
+.o_dark {
+  .zrn_planning_home_export_menu,
+  .zrn_planning_export_menu {
+    border-color: #3a4654;
+    background: #1d2530;
+  }
+
+  .zrn_planning_home_export_menu strong,
+  .zrn_planning_export_menu_title {
+    border-color: #3a4654;
+    color: #d9e3ee;
+  }
+
+  .zrn_planning_home_export_menu button,
+  .zrn_planning_export_menu_item {
+    background: #1d2530;
+    color: #d9e3ee;
+  }
+
+  .zrn_planning_home_export_menu button:hover,
+  .zrn_planning_home_export_menu button:focus,
+  .zrn_planning_export_menu_item:hover,
+  .zrn_planning_export_menu_item:focus {
+    background: #243244;
+    color: #ffffff;
+  }
 }
 
 .o_web_client.o_dark .o_form_view.zrn_planning_purchase_report_form,

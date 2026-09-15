@@ -390,9 +390,12 @@ class ZrnPlanningFormController extends FormController {
     this.closePlanExplorerExportMenu();
     const rect = button.getBoundingClientRect();
     const hasChart = this._planExplorerView === "chart" && this._planExplorerChart;
+    const menuHeight = hasChart ? 230 : 190;
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - 196));
+    const top = Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - menuHeight));
     const menu = document.createElement("div");
     menu.className = "zrn_planning_home_export_menu_wrap";
-    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px;top:${Math.min(rect.bottom + 4, window.innerHeight - 180)}px"><strong>Exportar como</strong>${hasChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : ''}<button type="button" data-format="xls"><i class="fa fa-file-excel-o"></i><span>Excel (.xls)</span></button><button type="button" data-format="xml"><i class="fa fa-code"></i><span>XML</span></button><button type="button" data-format="csv"><i class="fa fa-file-text-o"></i><span>CSV</span></button><button type="button" data-format="json"><i class="fa fa-file-code-o"></i><span>JSON</span></button></div>`;
+    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${left}px;top:${top}px"><strong>Exportar como</strong>${hasChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : ''}<button type="button" data-format="xls"><i class="fa fa-file-excel-o"></i><span>Excel (.xls)</span></button><button type="button" data-format="xml"><i class="fa fa-code"></i><span>XML</span></button><button type="button" data-format="csv"><i class="fa fa-file-text-o"></i><span>CSV</span></button><button type="button" data-format="json"><i class="fa fa-file-code-o"></i><span>JSON</span></button></div>`;
     menu.querySelector(".zrn_planning_home_export_backdrop").addEventListener("click", () => this.closePlanExplorerExportMenu());
     menu.querySelectorAll("[data-format]").forEach(item => item.addEventListener("click", () => this.exportPlanExplorer(item.dataset.format)));
     document.body.appendChild(menu);
@@ -629,10 +632,13 @@ class ZrnPlanningFormController extends FormController {
     const rect = button.getBoundingClientRect();
     this._homeExportPanel = panel;
     this._homeExportOptions = { key, filename: `zrn_planning_${key}`, isChart: chart && chart.offsetParent !== null };
+    const menuHeight = this._homeExportOptions.isChart ? 230 : 190;
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - 196));
+    const top = Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - menuHeight));
     const dataButtons = '<button type="button" data-format="xls"><i class="fa fa-file-excel-o"></i><span>Excel (.xls)</span></button><button type="button" data-format="xml"><i class="fa fa-code"></i><span>XML</span></button><button type="button" data-format="csv"><i class="fa fa-file-text-o"></i><span>CSV</span></button><button type="button" data-format="json"><i class="fa fa-file-code-o"></i><span>JSON</span></button>';
     const menu = document.createElement("div");
     menu.className = "zrn_planning_home_export_menu_wrap";
-    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px;top:${Math.min(rect.bottom + 4, window.innerHeight - 180)}px"><strong>Exportar como</strong>${this._homeExportOptions.isChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : ''}${dataButtons}</div>`;
+    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${left}px;top:${top}px"><strong>Exportar como</strong>${this._homeExportOptions.isChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : ''}${dataButtons}</div>`;
     menu.querySelector(".zrn_planning_home_export_backdrop").addEventListener("click", () => this.closeHomeExportMenu());
     menu.querySelectorAll("[data-format]").forEach(button => button.addEventListener("click", () => this.exportHomeFormat(button.dataset.format)));
     document.body.appendChild(menu);
@@ -663,7 +669,7 @@ class ZrnPlanningFormController extends FormController {
       }
       return;
     }
-    const table = panel.querySelector("table");
+    const table = panel.querySelector(".zrn_planning_home_table_surface table");
     if (!table) return;
     const rows = Array.from(table.querySelectorAll("tr")).map(row => Array.from(row.querySelectorAll("th,td")).map(cell => cell.textContent.trim()));
     const content = format === "json"

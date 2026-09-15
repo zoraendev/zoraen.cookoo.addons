@@ -205,9 +205,12 @@ class ZrnPlanningProductionReportFormController extends FormController {
       { key: "csv", label: "CSV", icon: "fa-file-text-o" },
       { key: "json", label: "JSON", icon: "fa-file-code-o" },
     ];
+    const menuHeight = hasChart ? 230 : 190;
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - 196));
+    const top = Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - menuHeight));
     const menu = document.createElement("div");
     menu.className = "zrn_planning_export_menu_wrap";
-    menu.innerHTML = `<div class="zrn_planning_export_backdrop"></div><div class="zrn_planning_export_menu" style="left: ${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px; top: ${Math.min(rect.bottom + 4, window.innerHeight - 180)}px;"><div class="zrn_planning_export_menu_title">Exportar como</div>${options.map((option) => `<button type="button" class="btn zrn_planning_export_menu_item" data-format="${option.key}"><i class="fa ${option.icon}"></i><span>${option.label}</span></button>`).join("")}</div>`;
+    menu.innerHTML = `<div class="zrn_planning_export_backdrop"></div><div class="zrn_planning_export_menu" style="left: ${left}px; top: ${top}px;"><div class="zrn_planning_export_menu_title">Exportar como</div>${options.map((option) => `<button type="button" class="btn zrn_planning_export_menu_item" data-format="${option.key}"><i class="fa ${option.icon}"></i><span>${option.label}</span></button>`).join("")}</div>`;
     menu.querySelector(".zrn_planning_export_backdrop").addEventListener("click", () => this.closeReportExportMenu());
     menu.querySelectorAll("[data-format]").forEach((item) => item.addEventListener("click", () => this.exportReportDataset(item.dataset.format)));
     document.body.appendChild(menu);
@@ -359,9 +362,11 @@ class ZrnPlanningProductionManufactureFormController extends FormController {
       { key: "csv", label: "CSV", icon: "fa-file-text-o" },
       { key: "json", label: "JSON", icon: "fa-file-code-o" },
     ];
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - 196));
+    const top = Math.max(8, Math.min(rect.bottom + 4, window.innerHeight - 190));
     const menu = document.createElement("div");
     menu.className = "zrn_planning_export_menu_wrap";
-    menu.innerHTML = `<div class="zrn_planning_export_backdrop"></div><div class="zrn_planning_export_menu" style="left: ${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px; top: ${Math.min(rect.bottom + 4, window.innerHeight - 180)}px;"><div class="zrn_planning_export_menu_title">Exportar como</div>${options.map((option) => `<button type="button" class="btn zrn_planning_export_menu_item" data-format="${option.key}"><i class="fa ${option.icon}"></i><span>${option.label}</span></button>`).join("")}</div>`;
+    menu.innerHTML = `<div class="zrn_planning_export_backdrop"></div><div class="zrn_planning_export_menu" style="left: ${left}px; top: ${top}px;"><div class="zrn_planning_export_menu_title">Exportar como</div>${options.map((option) => `<button type="button" class="btn zrn_planning_export_menu_item" data-format="${option.key}"><i class="fa ${option.icon}"></i><span>${option.label}</span></button>`).join("")}</div>`;
     menu.querySelector(".zrn_planning_export_backdrop").addEventListener("click", () => this.closeManufactureExportMenu());
     menu.querySelectorAll("[data-format]").forEach((item) => item.addEventListener("click", () => this.exportManufactureRows(item.dataset.format)));
     document.body.appendChild(menu);

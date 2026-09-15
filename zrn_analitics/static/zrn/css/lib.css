@@ -7212,3 +7212,205 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
     background: var(--zrn-analitics-brand-800);
   }
 }
+
+@media (max-width: 768px), (max-height: 520px) and (orientation: landscape) {
+  .zrn_analitics_hub_workspace {
+    min-width: 0;
+    overflow-x: hidden;
+  }
+
+  .zrn_analitics_hub_body,
+  .zrn_analitics_commercial_hub,
+  .zrn_analitics_financial_hub,
+  .zrn_analitics_operations_hub,
+  .zrn_analitics_pdv_hub,
+  .zrn_analitics_rrhh_hub,
+  .zrn_analitics_commercial_shell,
+  .zrn_analitics_financial_shell,
+  .zrn_analitics_operations_shell,
+  .zrn_analitics_pdv_shell {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .zrn_analitics_commercial_content,
+  .zrn_analitics_financial_content,
+  .zrn_analitics_operations_content,
+  .zrn_analitics_pdv_content,
+  .zrn_analitics_rrhh_content {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding-bottom: 76px;
+  }
+
+  .zrn_analitics_hub_panel {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .zrn_analitics_commercial_summary_table_wrap,
+  .zrn_analitics_commercial_table_wrap,
+  .zrn_analitics_commercial_table_surface,
+  .zrn_analitics_commercial_portfolio_table_wrap,
+  .zrn_analitics_commercial_coverage_table_wrap,
+  .zrn_analitics_commercial_channel_table_wrap,
+  .zrn_analitics_financial_table_wrap,
+  .zrn_analitics_financial_portfolio_table_wrap,
+  .zrn_analitics_financial_coverage_table_wrap,
+  .zrn_analitics_financial_channel_table_wrap,
+  .zrn_analitics_operations_table_wrap,
+  .zrn_analitics_operations_portfolio_table_wrap,
+  .zrn_analitics_pdv_table_wrap,
+  .zrn_analitics_rrhh_table_wrap {
+    min-width: 0;
+    max-width: 100%;
+    max-height: min(58vh, 430px);
+    max-height: min(58dvh, 430px);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .zrn_analitics_commercial_summary_table_wrap table,
+  .zrn_analitics_commercial_table_wrap table,
+  .zrn_analitics_commercial_table_surface table,
+  .zrn_analitics_commercial_portfolio_table_wrap table,
+  .zrn_analitics_commercial_coverage_table_wrap table,
+  .zrn_analitics_commercial_channel_table_wrap table,
+  .zrn_analitics_financial_table_wrap table,
+  .zrn_analitics_financial_portfolio_table_wrap table,
+  .zrn_analitics_financial_coverage_table_wrap table,
+  .zrn_analitics_financial_channel_table_wrap table,
+  .zrn_analitics_operations_table_wrap table,
+  .zrn_analitics_operations_portfolio_table_wrap table,
+  .zrn_analitics_pdv_table_wrap table,
+  .zrn_analitics_rrhh_table_wrap table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .zrn_analitics_commercial_summary_table_wrap thead th,
+  .zrn_analitics_commercial_table_wrap thead th,
+  .zrn_analitics_commercial_table_surface thead th,
+  .zrn_analitics_commercial_portfolio_table_wrap thead th,
+  .zrn_analitics_commercial_coverage_table_wrap thead th,
+  .zrn_analitics_commercial_channel_table_wrap thead th,
+  .zrn_analitics_financial_table_wrap thead th,
+  .zrn_analitics_financial_portfolio_table_wrap thead th,
+  .zrn_analitics_financial_coverage_table_wrap thead th,
+  .zrn_analitics_financial_channel_table_wrap thead th,
+  .zrn_analitics_operations_table_wrap thead th,
+  .zrn_analitics_operations_portfolio_table_wrap thead th,
+  .zrn_analitics_pdv_table_wrap thead th,
+  .zrn_analitics_rrhh_table_wrap thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .zrn_analitics_commercial_table_wrap th,
+  .zrn_analitics_commercial_table_wrap td,
+  .zrn_analitics_commercial_table_surface th,
+  .zrn_analitics_commercial_table_surface td,
+  .zrn_analitics_commercial_portfolio_table_wrap th,
+  .zrn_analitics_commercial_portfolio_table_wrap td,
+  .zrn_analitics_commercial_coverage_table_wrap th,
+  .zrn_analitics_commercial_coverage_table_wrap td,
+  .zrn_analitics_commercial_channel_table_wrap th,
+  .zrn_analitics_commercial_channel_table_wrap td,
+  .zrn_analitics_financial_table_wrap th,
+  .zrn_analitics_financial_table_wrap td,
+  .zrn_analitics_financial_portfolio_table_wrap th,
+  .zrn_analitics_financial_portfolio_table_wrap td,
+  .zrn_analitics_financial_coverage_table_wrap th,
+  .zrn_analitics_financial_coverage_table_wrap td,
+  .zrn_analitics_financial_channel_table_wrap th,
+  .zrn_analitics_financial_channel_table_wrap td,
+  .zrn_analitics_operations_table_wrap th,
+  .zrn_analitics_operations_table_wrap td,
+  .zrn_analitics_operations_portfolio_table_wrap th,
+  .zrn_analitics_operations_portfolio_table_wrap td,
+  .zrn_analitics_pdv_table_wrap th,
+  .zrn_analitics_pdv_table_wrap td,
+  .zrn_analitics_rrhh_table_wrap th,
+  .zrn_analitics_rrhh_table_wrap td {
+    white-space: nowrap;
+  }
+
+  .zrn_analitics_commercial_line_chart,
+  .zrn_analitics_commercial_donut_wrap,
+  .zrn_analitics_commercial_channel_chart,
+  .zrn_analitics_commercial_coverage_chart,
+  .zrn_analitics_commercial_portfolio_chart,
+  .zrn_analitics_commercial_portfolio_brand_mix,
+  .zrn_analitics_financial_line_chart,
+  .zrn_analitics_financial_donut_wrap,
+  .zrn_analitics_financial_coverage_chart,
+  .zrn_analitics_financial_portfolio_chart,
+  .zrn_analitics_financial_portfolio_brand_mix,
+  .zrn_analitics_operations_line_chart,
+  .zrn_analitics_operations_donut_wrap,
+  .zrn_analitics_operations_bar_list,
+  .zrn_analitics_pdv_chart_wrap,
+  .zrn_analitics_rrhh_chart_wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .zrn_analitics_commercial_echart,
+  .zrn_analitics_financial_echart,
+  .zrn_analitics_operations_echart,
+  .zrn_analitics_pdv_echart {
+    width: max(100%, 420px);
+    height: 250px;
+    min-width: 420px;
+    min-height: 250px;
+  }
+
+  .zrn_analitics_commercial_echart_donut,
+  .zrn_analitics_financial_echart_donut,
+  .zrn_analitics_operations_echart_donut {
+    height: 280px;
+    min-height: 280px;
+  }
+
+  .zrn_analitics_commercial_echart_bar,
+  .zrn_analitics_financial_echart_bar,
+  .zrn_analitics_operations_echart_bar {
+    height: 250px;
+    min-height: 250px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .zrn_analitics_commercial_summary_table_wrap,
+  .zrn_analitics_commercial_table_wrap,
+  .zrn_analitics_commercial_table_surface,
+  .zrn_analitics_commercial_portfolio_table_wrap,
+  .zrn_analitics_commercial_coverage_table_wrap,
+  .zrn_analitics_commercial_channel_table_wrap,
+  .zrn_analitics_financial_table_wrap,
+  .zrn_analitics_financial_portfolio_table_wrap,
+  .zrn_analitics_financial_coverage_table_wrap,
+  .zrn_analitics_financial_channel_table_wrap,
+  .zrn_analitics_operations_table_wrap,
+  .zrn_analitics_operations_portfolio_table_wrap,
+  .zrn_analitics_pdv_table_wrap,
+  .zrn_analitics_rrhh_table_wrap {
+    max-height: min(52vh, 300px);
+    max-height: min(52dvh, 300px);
+  }
+
+  .zrn_analitics_commercial_echart,
+  .zrn_analitics_financial_echart,
+  .zrn_analitics_operations_echart,
+  .zrn_analitics_pdv_echart {
+    height: 220px;
+    min-height: 220px;
+  }
+}
