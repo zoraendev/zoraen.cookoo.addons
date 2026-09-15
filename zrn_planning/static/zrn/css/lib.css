@@ -3760,8 +3760,8 @@
     .zrn_planning_report_detail_form
     .zrn_planning_report_detail_lines_group
     .o_field_x2many {
-    display: flex;
-    flex: 1 1 auto;
+    display: block;
+    flex: none;
     min-height: 0;
   }
 

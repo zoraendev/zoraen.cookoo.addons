@@ -401,22 +401,25 @@
 }
 
 .zrn_planning_filter_modal_field > .o_field_widget {
+  display: block;
+  width: 100%;
   min-height: 34px;
   padding: 5px 8px;
-  border: 1px solid #c7d4e2;
-  border-radius: 4px;
+  border: 0;
+  border-bottom: 1px solid #c7d4e2;
+  border-radius: 0;
   background: #fff;
   color: #173b62;
 }
 
 .zrn_planning_filter_modal_field > .o_field_widget.o_field_many2manytags {
   min-height: 38px;
-  padding: 3px 6px;
+  padding: 3px 0;
 }
 
 .zrn_planning_filter_modal_field > .o_field_widget:focus-within {
   border-color: #5f83ad;
-  box-shadow: 0 0 0 2px rgba(95, 131, 173, .12);
+  box-shadow: none;
 }
 
 .zrn_planning_filter_modal_field > .o_field_widget input,
@@ -881,6 +884,109 @@
   background: #fff;
 }
 
+.o_form_view.zrn_planning_report_detail_form .o_form_sheet {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 20px 24px 24px;
+}
+
+.zrn_planning_report_detail_overview {
+  display: grid;
+  gap: 18px;
+}
+
+.zrn_planning_report_detail_top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.zrn_planning_report_detail_media {
+  flex: 0 0 auto;
+}
+
+.zrn_planning_report_detail_heading {
+  min-width: 0;
+}
+
+.zrn_planning_report_detail_heading .oe_title {
+  margin: 0;
+}
+
+.zrn_planning_report_detail_heading h1 {
+  margin: 0;
+  color: #173b62;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.zrn_planning_report_detail_subtitle {
+  margin-top: 8px;
+  color: #6e8197;
+}
+
+.zrn_planning_report_detail_stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.zrn_planning_report_detail_stat {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #d3deea;
+  border-radius: 4px;
+  background: #f7f9fc;
+}
+
+.zrn_planning_report_detail_stat > span {
+  color: #315f98;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.zrn_planning_report_detail_stat > strong {
+  color: #173b62;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.zrn_planning_report_detail_lines_group {
+  width: 100%;
+  min-width: 0;
+  margin-top: 4px;
+}
+
+.zrn_planning_report_detail_lines_group > .o_field_widget {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.o_form_view.zrn_planning_report_detail_form
+  .zrn_planning_report_detail_lines_group
+  .o_field_widget,
+.o_form_view.zrn_planning_report_detail_form
+  .zrn_planning_report_detail_lines_group
+  .o_field_x2many {
+  display: block;
+  flex: none;
+  min-height: 0;
+}
+
+.zrn_planning_report_detail_lines_group .o_list_renderer {
+  width: 100%;
+  min-width: 0;
+}
+
 .zrn_planning_report_html_scroll {
   width: 100%;
   min-width: 0;
@@ -1039,6 +1145,14 @@
 }
 
 @media (max-width: 600px) {
+  .o_form_view.zrn_planning_report_detail_form .o_form_sheet {
+    padding: 16px;
+  }
+
+  .zrn_planning_report_detail_stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .zrn_planning_filter_modal_dialog {
     width: calc(100vw - 20px);
     max-width: none;
@@ -1052,5 +1166,19 @@
 
   .zrn_planning_filter_modal_field_wide {
     grid-column: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .zrn_planning_report_detail_stats {
+    grid-template-columns: 1fr;
+  }
+
+  .zrn_planning_report_detail_top {
+    align-items: flex-start;
+  }
+
+  .zrn_planning_report_detail_heading h1 {
+    font-size: 22px;
   }
 }

@@ -757,10 +757,10 @@
                                     <div class="zrn_planning_filter_modal_grid">
                                         <div class="zrn_planning_filter_modal_field"><span>Entrega desde</span><field name="fecha_entrega_desde" nolabel="1"/></div>
                                         <div class="zrn_planning_filter_modal_field"><span>Entrega hasta</span><field name="fecha_entrega_hasta" nolabel="1"/></div>
-                                        <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Clientes y puntos de venta</span><field name="cliente_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_cliente_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona clientes o puntos de venta"/></div>
-                                        <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Personas y contactos</span><field name="contact_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_contact_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona personas o contactos"/></div>
-                                        <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Productos</span><field name="product_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona productos"/></div>
-                                        <div class="zrn_planning_filter_modal_field zrn_planning_filter_modal_field_wide"><span>Categorias de producto</span><field name="product_categ_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_categ_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona categorias"/></div>
+                                        <div class="zrn_planning_filter_modal_field"><span>Clientes y puntos de venta</span><field name="cliente_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_cliente_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona clientes o puntos de venta"/></div>
+                                        <div class="zrn_planning_filter_modal_field"><span>Personas y contactos</span><field name="contact_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_contact_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona personas o contactos"/></div>
+                                        <div class="zrn_planning_filter_modal_field"><span>Productos</span><field name="product_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona productos"/></div>
+                                        <div class="zrn_planning_filter_modal_field"><span>Categorias de producto</span><field name="product_categ_ids" widget="many2many_tags" nolabel="1" domain="[('id', 'in', available_product_categ_ids)]" options="{'no_create': True, 'no_create_edit': True, 'no_open': True}" placeholder="Selecciona categorias"/></div>
                                         <div class="zrn_planning_filter_modal_field"><span>Estado del pedido</span><field name="order_state" nolabel="1"/></div>
                                     </div>
                                 </div>
@@ -857,22 +857,22 @@
                                     </strong>
                                 </div>
                                 <div class="zrn_planning_production_report_context_stats">
-                                    <div class="zrn_planning_filter_summary_item">
+                                    <div class="zrn_planning_production_report_inline_stat">
                                         <i class="fa fa-list-ul"/>
                                         <span>Lineas</span>
                                         <strong><field name="report_row_count" readonly="1" nolabel="1"/></strong>
                                     </div>
-                                    <div class="zrn_planning_filter_summary_item">
+                                    <div class="zrn_planning_production_report_inline_stat">
                                         <i class="fa fa-file-text-o"/>
                                         <span>OVs</span>
                                         <strong><field name="report_order_count" readonly="1" nolabel="1"/></strong>
                                     </div>
-                                    <div class="zrn_planning_filter_summary_item">
+                                    <div class="zrn_planning_production_report_inline_stat">
                                         <i class="fa fa-users"/>
                                         <span>PDVs</span>
                                         <strong><field name="report_customer_count" readonly="1" nolabel="1"/></strong>
                                     </div>
-                                    <div class="zrn_planning_filter_summary_item">
+                                    <div class="zrn_planning_production_report_inline_stat">
                                         <i class="fa fa-cubes"/>
                                         <span>Productos</span>
                                         <strong><field name="report_product_count" readonly="1" nolabel="1"/></strong>
