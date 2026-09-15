@@ -677,7 +677,7 @@
         <field name="name">zrn_planning.production.planning.wizard.form</field>
         <field name="model">zrn_planning.production.planning.wizard</field>
         <field name="arch" type="xml">
-            <form string="Planeacion de fabricacion" create="0" delete="0" duplicate="0" class="zrn_planning_filter_form">
+            <form string="Planeacion de fabricacion" js_class="zrn_planning_form" create="0" delete="0" duplicate="0" class="zrn_planning_filter_form">
                 <sheet>
                     <header>
                         <div class="zrn_planning_filter_footer">
@@ -741,6 +741,7 @@
                         <field name="available_contact_ids"/>
                         <field name="available_product_categ_ids"/>
                         <field name="planning_record_count"/>
+                        <field name="planning_record_data"/>
                         <field name="contact_ids"/>
                         <field name="product_categ_ids"/>
                         <field name="order_state"/>
@@ -772,19 +773,27 @@
                                         <span>Ultimos registros</span>
                                         <strong><field name="planning_record_count" readonly="1" nolabel="1"/></strong>
                                     </div>
+                                    <div class="zrn_planning_plan_explorer_actions">
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-view="chart" aria-label="Ver grafica">
+                                            <i class="fa fa-bar-chart"/>
+                                        </a>
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-config="1" aria-label="Configurar datos">
+                                            <i class="fa fa-sliders"/>
+                                        </a>
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-export="1" aria-label="Exportar">
+                                            <i class="fa fa-download"/>
+                                        </a>
+                                        <a href="#" role="button" class="btn zrn_planning_home_icon_btn" data-zrn-planning-plan-view="table" aria-label="Ver tabla">
+                                            <i class="fa fa-table"/>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="zrn_planning_plans_list_container">
-                                <field name="planning_record_ids" readonly="1" nolabel="1"
-                                       context="{'form_view_ref': 'zrn_planning.view_zrn_planning_mfg_plan_form'}">
-                                    <tree limit="15" create="0" delete="0" edit="0">
-                                        <field name="name" string="Nombre del Plan"/>
-                                        <field name="date_start" string="Inicio"/>
-                                        <field name="date_end" string="Fin"/>
-                                        <field name="state" widget="badge" decoration-info="state == 'draft'" decoration-success="state == 'approved'"/>
-                                    </tree>
-                                </field>
+                                <div class="zrn_planning_plan_explorer_table" data-zrn-planning-plan-table="1"/>
+                                <div class="zrn_planning_plan_explorer_chart d-none" data-zrn-planning-plan-chart="1"/>
+                                <div class="zrn_planning_home_chart_empty d-none" data-zrn-planning-plan-empty="1">Sin planings de fabricacion.</div>
                             </div>
                         </div>
                     </div>

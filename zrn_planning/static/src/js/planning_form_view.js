@@ -17,7 +17,16 @@ class ZrnPlanningFormController extends FormController {
     this._homeExportPanel = null;
     this._homeExportOptions = null;
     this._homeExportMenu = null;
+    this._planExplorerView = "table";
+    this._planExplorerDataset = "progress";
+    this._planExplorerChartType = "bar";
+    this._planExplorerLimit = 20;
+    this._planExplorerSort = { field: "date_start", direction: "desc" };
+    this._planExplorerChart = null;
+    this._planExplorerExportMenu = null;
+    this._planExplorerConfig = null;
     this._homeChartResizeHandler = () => this.resizeHomeCharts();
+    this._planExplorerResizeHandler = () => this._planExplorerChart?.resize();
     this._boundHomeClick = (event) => this.onHomeClick(event);
     this._boundFilterClick = (event) => this.onPlanningFilterClick(event);
     this._boundReconciliationHeaderClick = (event) => this.onReconciliationHeaderClick(event);
@@ -29,7 +38,13 @@ class ZrnPlanningFormController extends FormController {
         this.rootRef.el?.addEventListener("click", this._boundHomeClick);
         this.loadAndRenderHomeCharts();
       }
-      if (this.isPlanningFilter) this.rootRef.el?.addEventListener("click", this._boundFilterClick);
+      if (this.isPlanningFilter) {
+        this.rootRef.el?.addEventListener("click", this._boundFilterClick);
+        if (this.isProductionPlanningFilter) {
+          window.addEventListener("resize", this._planExplorerResizeHandler);
+          this.renderProductionPlanExplorer();
+        }
+      }
       if (this.isInventoryReconciliation) {
         this.rootRef.el?.addEventListener("click", this._boundReconciliationHeaderClick);
         this.renderSelectAllHeaderCheckbox();
@@ -43,6 +58,7 @@ class ZrnPlanningFormController extends FormController {
 
     onPatched(() => {
       if (this.isPlanningHome) this.loadAndRenderHomeCharts();
+      if (this.isProductionPlanningFilter) this.renderProductionPlanExplorer();
       if (this.isInventoryReconciliation) this.renderSelectAllHeaderCheckbox();
     });
 
@@ -53,7 +69,14 @@ class ZrnPlanningFormController extends FormController {
         this.closeHomeExportMenu();
         this.disposeHomeCharts();
       }
-      if (this.isPlanningFilter) this.rootRef.el?.removeEventListener("click", this._boundFilterClick);
+      if (this.isPlanningFilter) {
+        this.rootRef.el?.removeEventListener("click", this._boundFilterClick);
+        window.removeEventListener("resize", this._planExplorerResizeHandler);
+        this.closePlanExplorerExportMenu();
+        this.closePlanExplorerConfig();
+        this._planExplorerChart?.dispose();
+        this._planExplorerChart = null;
+      }
       if (this.isInventoryReconciliation) {
         this.rootRef.el?.removeEventListener("click", this._boundReconciliationHeaderClick);
         if (this._reconciliationCheckboxInterval) clearInterval(this._reconciliationCheckboxInterval);
@@ -89,7 +112,47 @@ class ZrnPlanningFormController extends FormController {
     ].includes(this.props.resModel) && Boolean(this.rootRef.el?.querySelector("[data-zrn-planning-filter-modal]"));
   }
 
+  get isProductionPlanningFilter() {
+    return this.props.resModel === "zrn_planning.production.planning.wizard"
+      && Boolean(this.rootRef.el?.querySelector("[data-zrn-planning-plan-table]"));
+  }
+
   onPlanningFilterClick(event) {
+    const planSort = event.target.closest?.("[data-zrn-planning-plan-sort]");
+    if (planSort) {
+      event.preventDefault();
+      event.stopPropagation();
+      const field = planSort.dataset.zrnPlanningPlanSort;
+      this._planExplorerSort = {
+        field,
+        direction: this._planExplorerSort.field === field && this._planExplorerSort.direction === "asc" ? "desc" : "asc",
+      };
+      this.renderProductionPlanExplorer();
+      return;
+    }
+    const planView = event.target.closest?.("[data-zrn-planning-plan-view]");
+    if (planView) {
+      event.preventDefault();
+      event.stopPropagation();
+      this._planExplorerView = planView.dataset.zrnPlanningPlanView || "table";
+      this.closePlanExplorerExportMenu();
+      this.renderProductionPlanExplorer();
+      return;
+    }
+    const planConfig = event.target.closest?.("[data-zrn-planning-plan-config]");
+    if (planConfig) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.openPlanExplorerConfig();
+      return;
+    }
+    const planExport = event.target.closest?.("[data-zrn-planning-plan-export]");
+    if (planExport) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.openPlanExplorerExportMenu(planExport);
+      return;
+    }
     const toggle = event.target.closest?.("[data-zrn-planning-filter-toggle]");
     const close = event.target.closest?.("[data-zrn-planning-filter-close]");
     if (!toggle && !close) return;
@@ -97,6 +160,245 @@ class ZrnPlanningFormController extends FormController {
     event.stopPropagation();
     const modal = this.rootRef.el?.querySelector("[data-zrn-planning-filter-modal]");
     if (modal) modal.classList.toggle("d-none", Boolean(close) || !modal.classList.contains("d-none"));
+  }
+
+  getProductionPlanRows() {
+    try {
+      return JSON.parse(this.model?.root?.data?.planning_record_data || "[]");
+    } catch {
+      return [];
+    }
+  }
+
+  getProductionPlanColumns() {
+    return [
+      ["Plan", "name"],
+      ["Inicio", "date_start"],
+      ["Fin", "date_end"],
+      ["Estado", "state_label"],
+      ["Base", "basis_label"],
+      ["Lineas", "line_count"],
+      ["Productos", "product_count"],
+      ["OVs", "source_count"],
+      ["Planeadas", "planned_qty"],
+      ["Ejecutadas", "executed_qty"],
+      ["Pendientes", "pending_qty"],
+      ["Avance", "progress"],
+      ["Productividad", "productivity"],
+      ["OFs", "production_count"],
+      ["OFs fin.", "completed_production_count"],
+      ["OCs", "purchase_count"],
+    ];
+  }
+
+  getProductionPlanDataset() {
+    const datasets = {
+      progress: { label: "Avance por plan", series: [["Avance %", "progress"]] },
+      units: { label: "Unidades por plan", series: [["Planeadas", "planned_qty"], ["Ejecutadas", "executed_qty"], ["Pendientes", "pending_qty"]] },
+      records: { label: "Volumen operativo", series: [["Lineas", "line_count"], ["Productos", "product_count"], ["OVs", "source_count"]] },
+      manufacturing: { label: "Ordenes de fabricacion", series: [["OFs", "production_count"], ["OFs finalizadas", "completed_production_count"]] },
+      productivity: { label: "Productividad por plan", series: [["Unidades ejecutadas por linea", "productivity"]] },
+    };
+    return datasets[this._planExplorerDataset] || datasets.progress;
+  }
+
+  getSortedProductionPlanRows() {
+    const rows = this.getProductionPlanRows();
+    const sort = this._planExplorerSort || {};
+    rows.sort((left, right) => {
+      const leftNumber = Number(left[sort.field]);
+      const rightNumber = Number(right[sort.field]);
+      let result;
+      if (Number.isFinite(leftNumber) && Number.isFinite(rightNumber) && String(left[sort.field] ?? "") !== "" && String(right[sort.field] ?? "") !== "") {
+        result = leftNumber - rightNumber;
+      } else {
+        result = String(left[sort.field] ?? "").localeCompare(String(right[sort.field] ?? ""), undefined, { numeric: true, sensitivity: "base" });
+      }
+      return sort.direction === "desc" ? -result : result;
+    });
+    return rows;
+  }
+
+  renderProductionPlanExplorer() {
+    if (!this.isProductionPlanningFilter || !this.rootRef.el) return;
+    const tableMount = this.rootRef.el.querySelector("[data-zrn-planning-plan-table]");
+    const chartMount = this.rootRef.el.querySelector("[data-zrn-planning-plan-chart]");
+    const empty = this.rootRef.el.querySelector("[data-zrn-planning-plan-empty]");
+    const rows = this.getSortedProductionPlanRows();
+    const chartRows = rows.slice(0, Math.max(Number(this._planExplorerLimit || 20), 1));
+    this.rootRef.el.querySelectorAll("[data-zrn-planning-plan-view]").forEach((button) => {
+      button.classList.toggle("is-active", button.dataset.zrnPlanningPlanView === this._planExplorerView);
+    });
+    if (tableMount) {
+      tableMount.classList.toggle("d-none", this._planExplorerView === "chart");
+      if (this._planExplorerView !== "chart") {
+        tableMount.innerHTML = this.buildProductionPlanTable(rows);
+      }
+    }
+    if (chartMount) chartMount.classList.toggle("d-none", this._planExplorerView !== "chart");
+    empty?.classList.toggle("d-none", this._planExplorerView !== "chart" || chartRows.length > 0);
+    if (this._planExplorerView === "chart") {
+      this.renderProductionPlanChart(chartRows);
+    } else {
+      this._planExplorerChart?.resize();
+    }
+  }
+
+  buildProductionPlanTable(rows) {
+    const columns = this.getProductionPlanColumns();
+    const sort = this._planExplorerSort || {};
+    const headers = columns.map(([label, field]) => {
+      const active = sort.field === field;
+      const icon = active ? (sort.direction === "asc" ? "fa-sort-asc" : "fa-sort-desc") : "fa-sort";
+      return `<th><span class="zrn_planning_sort_header" data-zrn-planning-plan-sort="${field}" role="button" tabindex="0">${this.escapeHtml(label)}<i class="fa ${icon}" aria-hidden="true"></i></span></th>`;
+    }).join("");
+    const body = rows.length
+      ? rows.map(row => `<tr>${columns.map(([label, field]) => `<td class="${field === "name" ? "zrn_planning_plan_name_cell" : ""}">${this.escapeHtml(this.formatProductionPlanCell(row[field], field))}</td>`).join("")}</tr>`).join("")
+      : `<tr><td colspan="${columns.length}" class="zrn_planning_home_empty_cell">Sin planings de fabricacion.</td></tr>`;
+    return `<div class="zrn_planning_plan_explorer_scroll"><table class="zrn_planning_plan_explorer_grid"><thead><tr>${headers}</tr></thead><tbody>${body}</tbody></table></div>`;
+  }
+
+  formatProductionPlanCell(value, field) {
+    if (["planned_qty", "released_qty", "executed_qty", "pending_qty", "productivity"].includes(field)) {
+      return Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    }
+    if (field === "progress") {
+      return `${Number(value || 0).toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+    }
+    return value ?? "";
+  }
+
+  renderProductionPlanChart(rows) {
+    const mount = this.rootRef.el?.querySelector("[data-zrn-planning-plan-chart]");
+    if (!mount || !window.echarts) return;
+    if (!rows.length) {
+      this._planExplorerChart?.dispose();
+      this._planExplorerChart = null;
+      return;
+    }
+    if (!this._planExplorerChart) this._planExplorerChart = window.echarts.init(mount);
+    const dataset = this.getProductionPlanDataset();
+    const labels = rows.map(row => row.name);
+    this._planExplorerChart.setOption({
+      color: ["#315f98", "#168173", "#c34b16", "#9dbfe4"],
+      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: value => Number(value).toLocaleString() },
+      legend: { top: 2, left: "right" },
+      grid: { top: 42, right: 20, bottom: labels.length > 6 ? 96 : 64, left: 58, containLabel: true },
+      xAxis: { type: "category", data: labels, axisLabel: { interval: 0, rotate: labels.length > 4 ? 24 : 0, hideOverlap: true } },
+      yAxis: { type: "value", minInterval: this._planExplorerDataset === "progress" ? 10 : 1 },
+      series: dataset.series.map(([name, field]) => ({
+        name,
+        type: this._planExplorerChartType,
+        smooth: true,
+        barMaxWidth: 28,
+        data: rows.map(row => Number(row[field] || 0)),
+      })),
+    }, true);
+    this._planExplorerChart.resize();
+  }
+
+  openPlanExplorerConfig() {
+    this.closePlanExplorerConfig();
+    const modal = document.createElement("div");
+    modal.className = "zrn_planning_report_config";
+    modal.innerHTML = `
+      <div class="zrn_planning_report_config_backdrop"></div>
+      <div class="zrn_planning_report_config_dialog">
+        <div class="zrn_planning_report_config_head">
+          <strong>Configurar planes</strong>
+          <button type="button" class="btn zrn_planning_report_config_close" aria-label="Cerrar"><i class="fa fa-times"></i></button>
+        </div>
+        <div class="zrn_planning_report_config_body">
+          <label>Dataset</label>
+          <select class="form-select" data-field="dataset">
+            <option value="progress">Avance por plan</option>
+            <option value="units">Unidades por plan</option>
+            <option value="records">Volumen operativo</option>
+            <option value="manufacturing">Ordenes de fabricacion</option>
+            <option value="productivity">Productividad por plan</option>
+          </select>
+          <label>Tipo de grafica</label>
+          <select class="form-select" data-field="chartType">
+            <option value="bar">Barras</option>
+            <option value="line">Linea</option>
+          </select>
+          <label>Limite de registros</label>
+          <input class="form-control" type="number" min="1" max="100" data-field="limit"/>
+        </div>
+        <div class="zrn_planning_report_config_footer">
+          <button type="button" class="btn btn-primary" data-apply="1">Aplicar</button>
+        </div>
+      </div>`;
+    modal.querySelector('[data-field="dataset"]').value = this._planExplorerDataset;
+    modal.querySelector('[data-field="chartType"]').value = this._planExplorerChartType;
+    modal.querySelector('[data-field="limit"]').value = String(this._planExplorerLimit);
+    modal.querySelector(".zrn_planning_report_config_backdrop").addEventListener("click", () => this.closePlanExplorerConfig());
+    modal.querySelector(".zrn_planning_report_config_close").addEventListener("click", () => this.closePlanExplorerConfig());
+    modal.querySelector("[data-apply]").addEventListener("click", () => {
+      this._planExplorerDataset = modal.querySelector('[data-field="dataset"]').value || "progress";
+      this._planExplorerChartType = modal.querySelector('[data-field="chartType"]').value || "bar";
+      this._planExplorerLimit = Number(modal.querySelector('[data-field="limit"]').value || 20);
+      this._planExplorerView = "chart";
+      this.closePlanExplorerConfig();
+      this.renderProductionPlanExplorer();
+    });
+    document.body.appendChild(modal);
+    this._planExplorerConfig = modal;
+  }
+
+  closePlanExplorerConfig() {
+    this._planExplorerConfig?.remove();
+    this._planExplorerConfig = null;
+  }
+
+  openPlanExplorerExportMenu(button) {
+    this.closePlanExplorerExportMenu();
+    const rect = button.getBoundingClientRect();
+    const hasChart = this._planExplorerView === "chart" && this._planExplorerChart;
+    const menu = document.createElement("div");
+    menu.className = "zrn_planning_home_export_menu_wrap";
+    menu.innerHTML = `<div class="zrn_planning_home_export_backdrop"></div><div class="zrn_planning_home_export_menu" style="left:${Math.max(8, Math.min(rect.left, window.innerWidth - 188))}px;top:${Math.min(rect.bottom + 4, window.innerHeight - 180)}px"><strong>Exportar como</strong>${hasChart ? '<button type="button" data-format="png"><i class="fa fa-image"></i><span>Imagen PNG</span></button>' : ''}<button type="button" data-format="xls"><i class="fa fa-file-excel-o"></i><span>Excel (.xls)</span></button><button type="button" data-format="xml"><i class="fa fa-code"></i><span>XML</span></button><button type="button" data-format="csv"><i class="fa fa-file-text-o"></i><span>CSV</span></button><button type="button" data-format="json"><i class="fa fa-file-code-o"></i><span>JSON</span></button></div>`;
+    menu.querySelector(".zrn_planning_home_export_backdrop").addEventListener("click", () => this.closePlanExplorerExportMenu());
+    menu.querySelectorAll("[data-format]").forEach(item => item.addEventListener("click", () => this.exportPlanExplorer(item.dataset.format)));
+    document.body.appendChild(menu);
+    this._planExplorerExportMenu = menu;
+  }
+
+  closePlanExplorerExportMenu() {
+    this._planExplorerExportMenu?.remove();
+    this._planExplorerExportMenu = null;
+  }
+
+  exportPlanExplorer(format) {
+    this.closePlanExplorerExportMenu();
+    const filename = "zrn_planning_planes_fabricacion";
+    if (format === "png" && this._planExplorerChart) {
+      const link = document.createElement("a");
+      link.href = this._planExplorerChart.getDataURL({ type: "png", pixelRatio: 2, backgroundColor: "#ffffff" });
+      link.download = `${filename}.png`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      return;
+    }
+    const columns = this.getProductionPlanColumns();
+    const rows = [columns.map(([label]) => label), ...this.getSortedProductionPlanRows().map(row => columns.map(([, field]) => this.formatProductionPlanCell(row[field], field)))];
+    const content = format === "json"
+      ? JSON.stringify(rows.slice(1).map(row => Object.fromEntries(rows[0].map((head, index) => [head, row[index] || ""]))), null, 2)
+      : format === "csv"
+        ? rows.map(row => row.map(value => `"${String(value).replace(/"/g, '""')}"`).join(",")).join("\r\n")
+        : format === "xml"
+          ? `<?xml version="1.0"?><Rows>${rows.slice(1).map(row => `<Row>${rows[0].map((head, index) => `<${this.xmlTag(head)}>${this.escapeHtml(row[index] || "")}</${this.xmlTag(head)}>`).join("")}</Row>`).join("")}</Rows>`
+          : `<table border="1">${rows.map(row => `<tr>${row.map(cell => `<td>${this.escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</table>`;
+    const type = format === "json" ? "application/json;charset=utf-8" : format === "csv" ? "text/csv;charset=utf-8" : format === "xml" ? "application/xml;charset=utf-8" : "application/vnd.ms-excel";
+    const url = URL.createObjectURL(new Blob(["\ufeff", content], { type }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${filename}.${format === "xls" ? "xls" : format}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
   }
 
   renderSelectAllHeaderCheckbox() {

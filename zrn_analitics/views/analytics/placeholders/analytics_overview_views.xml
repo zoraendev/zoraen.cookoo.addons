@@ -11,13 +11,14 @@
                     <div class="zrn_analitics_home_cards">
                         <section class="zrn_analitics_home_card">
                             <div class="zrn_analitics_home_card_head">
-                                <span>Hubs</span>
-                                <span>Vista operativa</span>
+                                <span class="zrn_analitics_home_card_title">
+                                    <i class="fa fa-th-large" aria-hidden="true"/> Hubs
+                                </span>
                             </div>
                             <div class="zrn_analitics_home_card_body">
                                 <div class="zrn_analitics_home_card_intro">
-                                    <strong>Explora los hubs activos</strong>
-                                    <span>Comercial, Financiero, Operaciones, PDV / Cobertura y RRHH.</span>
+                                    <strong>Hubs analiticos</strong>
+                                    <span>Accede a las vistas de Comercial, Financiero, Operaciones, PDV / Cobertura y RRHH.</span>
                                 </div>
                                 <div class="zrn_analitics_home_card_list">
                                     <span>Comercial</span>
@@ -31,6 +32,7 @@
                                     <span class="zrn_analitics_home_chip">CSV</span>
                                     <span class="zrn_analitics_home_chip">XML</span>
                                     <span class="zrn_analitics_home_chip">Sheets</span>
+                                    <span class="zrn_analitics_home_chip">JSON</span>
                                 </div>
                                 <button
                                     name="action_open_hubs"
@@ -44,13 +46,14 @@
 
                         <section class="zrn_analitics_home_card">
                             <div class="zrn_analitics_home_card_head">
-                                <span>Procesamiento de datos</span>
-                                <span>Entrada y preparacion</span>
+                                <span class="zrn_analitics_home_card_title">
+                                    <i class="fa fa-database" aria-hidden="true"/> Retail Link Walmart
+                                </span>
                             </div>
                             <div class="zrn_analitics_home_card_body">
                                 <div class="zrn_analitics_home_card_intro">
-                                    <strong>Carga y depura fuentes</strong>
-                                    <span>Preparacion centralizada para archivos y conexiones operativas.</span>
+                                    <strong>Carga y valida fuentes</strong>
+                                    <span>Prepara archivos y consultas para comparar con los datos de Retail Link Walmart.</span>
                                 </div>
                                 <div class="zrn_analitics_home_card_list">
                                     <span>Importacion de archivos</span>
@@ -63,6 +66,7 @@
                                     <span class="zrn_analitics_home_chip">CSV</span>
                                     <span class="zrn_analitics_home_chip">XML</span>
                                     <span class="zrn_analitics_home_chip">Sheets</span>
+                                    <span class="zrn_analitics_home_chip">JSON</span>
                                 </div>
                                 <button
                                     name="action_open_processing"
