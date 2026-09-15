@@ -30,9 +30,9 @@
                                         <span>Revenue por mes</span>
                                         <span>Venta filtrada por PDV</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_revenue', 'chart')" aria-label="Ver grafica"><i class="fa fa-line-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_overview_revenue') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_revenue', 'chart')" aria-label="Ver grafica"><i class="fa fa-line-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-overview-revenue', filename: 'zrn_pdv_revenue_mes' })" aria-label="Exportar revenue por mes"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_revenue', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_overview_revenue') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_revenue', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <div t-if="getCommercialPanelView('pdv_overview_revenue') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
@@ -69,9 +69,9 @@
                                         <span>Cobertura por canal</span>
                                         <span>PDVs activos vs red total</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_coverage', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_overview_coverage') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_coverage', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-overview-coverage', filename: 'zrn_pdv_cobertura_canal' })" aria-label="Exportar cobertura por canal"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_coverage', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_overview_coverage') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_coverage', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <div t-if="getCommercialPanelView('pdv_overview_coverage') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
@@ -112,9 +112,9 @@
                                         <span>Top PDVs</span>
                                         <span>Revenue acumulado</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_top', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_overview_top') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_top', 'chart')" aria-label="Ver grafica"><i class="fa fa-bar-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-overview-top', filename: 'zrn_pdv_top_pdvs' })" aria-label="Exportar top PDVs"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_top', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_overview_top') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_overview_top', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <div t-if="getCommercialPanelView('pdv_overview_top') === 'chart'" class="zrn_analitics_pdv_chart_wrap">

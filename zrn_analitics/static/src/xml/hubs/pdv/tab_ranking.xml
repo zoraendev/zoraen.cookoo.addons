@@ -6,10 +6,10 @@
                                     <span>Ranking de PDVs</span>
                                     <span><t t-esc="formatCount(pdvPayload.ranking_rows.length)"/> PDVs filtrados</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_ranking', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_ranking') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_ranking', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('pdv_ranking')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-pdv_ranking', filename: 'zrn_pdv_ranking_pdvs' })" aria-label="Exportar ranking de PDVs"><i class="fa fa-download"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('pdv_ranking', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_ranking') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_ranking', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
                                 <t t-if="getCommercialPanelView('pdv_ranking') === 'chart'">

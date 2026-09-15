@@ -58,9 +58,9 @@
                         <div class="zrn_analitics_commercial_panel_head">
                             <span>Asociación Market Basket</span>
                             <div class="zrn_analitics_commercial_panel_actions">
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('insights_market_basket', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('insights_market_basket') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('insights_market_basket', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'insights-market-basket', filename: 'zrn_comercial_market_basket' })" aria-label="Exportar asociación"><i class="fa fa-download"/></button>
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('insights_market_basket', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('insights_market_basket') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('insights_market_basket', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                             </div>
                         </div>
                         <t t-if="getCommercialPanelView('insights_market_basket') === 'chart'">
@@ -156,9 +156,9 @@
                         <div class="zrn_analitics_commercial_panel_head">
                             <span>LTV Forecast</span>
                             <div class="zrn_analitics_commercial_panel_actions">
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('insights_ltv', 'chart')" aria-label="Ver gráfica"><i class="fa fa-line-chart"/></button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('insights_ltv') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('insights_ltv', 'chart')" aria-label="Ver gráfica"><i class="fa fa-line-chart"/></button>
                                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'insights-ltv', filename: 'zrn_comercial_ltv_forecast' })" aria-label="Exportar LTV"><i class="fa fa-download"/></button>
-                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('insights_ltv', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('insights_ltv') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('insights_ltv', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                             </div>
                         </div>
                         <div class="text-muted small my-2">Proyección lineal en base a los últimos 3 meses observados: <strong><t t-esc="commercialPayload.ltv_forecast.months_observed.join(', ')"/></strong></div>

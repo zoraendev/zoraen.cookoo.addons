@@ -6,9 +6,13 @@
                                     <div class="zrn_analitics_pdv_panel_head">
                                         <span>Cadenas adicionales</span>
                                         <span>Revenue por canal</span>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-otros-channels', filename: 'zrn_pdv_cadenas_adicionales' })" aria-label="Exportar cadenas adicionales"><i class="fa fa-download"/></button>
+                                        <div class="zrn_analitics_commercial_panel_actions">
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_otros_channels') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_otros_channels', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-otros-channels', filename: 'zrn_pdv_cadenas_adicionales' })" aria-label="Exportar cadenas adicionales"><i class="fa fa-download"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_otros_channels') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_otros_channels', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        </div>
                                     </div>
-                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                    <div t-if="getCommercialPanelView('pdv_otros_channels') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
                                         <t t-if="pdvPayload.otros.channels.length and hasEchartsLibrary">
                                             <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-otros-channels"/>
                                         </t>
@@ -18,6 +22,24 @@
                                         <t t-else="">
                                             <div class="zrn_analitics_pdv_chart_empty">Sin cadenas adicionales para mostrar.</div>
                                         </t>
+                                    </div>
+                                    <div t-if="getCommercialPanelView('pdv_otros_channels') === 'table'" class="zrn_analitics_pdv_table_wrap">
+                                        <table class="zrn_analitics_pdv_table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Canal</th>
+                                                    <th class="text-end">PDVs activos</th>
+                                                    <th class="text-end">Revenue</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr t-foreach="pdvPayload.otros.channels" t-as="row" t-key="'otros_table_' + row.channel">
+                                                    <td><strong><t t-esc="row.channel"/></strong></td>
+                                                    <td class="text-end"><t t-esc="formatCount(row.active || 0)"/></td>
+                                                    <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue || 0)"/></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </section>
 

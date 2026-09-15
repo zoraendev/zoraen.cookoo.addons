@@ -18,10 +18,10 @@
             <div class="zrn_analitics_commercial_panel_head">
               <span>Canales comerciales</span>
               <div class="zrn_analitics_commercial_panel_actions">
-                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('channel_main', 'chart')" aria-label="Ver gráfica por canal" title="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('channel_main') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('channel_main', 'chart')" aria-label="Ver gráfica por canal" title="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="toggleChannelChartConfig" aria-label="Configurar gráfica por canal" title="Configurar gráfica"><i class="fa fa-sliders"/></button>
                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'channel-main', filename: 'zrn_comercial_canales' })" aria-label="Exportar canales" title="Exportar"><i class="fa fa-download"/></button>
-                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('channel_main', 'table')" aria-label="Ver tabla por canal" title="Ver tabla"><i class="fa fa-table"/></button>
+                <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('channel_main') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('channel_main', 'table')" aria-label="Ver tabla por canal" title="Ver tabla"><i class="fa fa-table"/></button>
                 <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('cobertura')" aria-label="Ver cobertura"><i class="fa fa-arrow-right"/></button>
               </div>
             </div>

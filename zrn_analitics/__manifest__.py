@@ -82,7 +82,6 @@ Addon base para la capa analitica:
             'zrn_analitics/static/src/xml/hubs/pdv/tab_ranking.xml',
             'zrn_analitics/static/src/xml/hubs/pdv/tab_canales.xml',
             'zrn_analitics/static/src/xml/hubs/pdv/tab_otros.xml',
-            'zrn_analitics/static/src/xml/hubs/pdv/tab_alertas.xml',
             'zrn_analitics/static/src/xml/hubs/pdv/hub.xml',
             'zrn_analitics/static/src/xml/hubs/rrhh/tab_overview.xml',
             'zrn_analitics/static/src/xml/hubs/rrhh/tab_predictor.xml',

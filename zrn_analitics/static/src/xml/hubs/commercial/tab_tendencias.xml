@@ -17,9 +17,9 @@
                                 <div class="zrn_analitics_commercial_panel_head">
                                     <span>Productos en crecimiento</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_growers', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('trends_growers') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('trends_growers', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'trends-growers', filename: 'zrn_comercial_productos_crecimiento' })" aria-label="Exportar crecimiento"><i class="fa fa-download"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_growers', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('trends_growers') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('trends_growers', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
                                 <t t-if="getCommercialPanelView('trends_growers') === 'chart'">
@@ -61,9 +61,9 @@
                                 <div class="zrn_analitics_commercial_panel_head">
                                     <span>Productos en caída</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_decliners', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('trends_decliners') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('trends_decliners', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'trends-decliners', filename: 'zrn_comercial_productos_caida' })" aria-label="Exportar caída"><i class="fa fa-download"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('trends_decliners', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('trends_decliners') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('trends_decliners', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
                                 <t t-if="getCommercialPanelView('trends_decliners') === 'chart'">

@@ -7,9 +7,9 @@
                                         <span>Evolución financiera</span>
                                         <span>Revenue, costo y margen</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_overview') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-overview', filename: 'zrn_financiero_evolucion' })" aria-label="Exportar evolución financiera"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_overview') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <t t-if="getCommercialPanelView('financial_overview') === 'chart'">
@@ -44,9 +44,9 @@
                                         <span>Margen por marca</span>
                                         <span>Top del periodo</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brand_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_brand_overview') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_brand_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-brand-overview', filename: 'zrn_financiero_margen_marca' })" aria-label="Exportar margen por marca"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brand_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_brand_overview') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_brand_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <t t-if="getCommercialPanelView('financial_brand_overview') === 'chart'">
@@ -82,9 +82,9 @@
                                         <span>Margen % por canal</span>
                                         <span>Lectura rápida por segmento</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_channel_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_channel_overview') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_channel_overview', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'financial-channel-overview', filename: 'zrn_financiero_margen_canal' })" aria-label="Exportar margen por canal"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_channel_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_channel_overview') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_channel_overview', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <t t-if="getCommercialPanelView('financial_channel_overview') === 'chart'">

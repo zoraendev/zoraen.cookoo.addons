@@ -32,9 +32,9 @@
                                         <span>Expande para ver marcas, líneas y productos</span>
                                         <div class="zrn_analitics_commercial_panel_actions">
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_portfolio_drill', filename: 'zrn_financiero_drill_portafolio' })" aria-label="Exportar drill financiero"><i class="fa fa-download"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_portfolio_drill', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_portfolio_drill') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_portfolio_drill', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_portfolio_drill')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_portfolio_drill', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_portfolio_drill') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_portfolio_drill', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                         </div>
                                     </div>
                                     <t t-if="getCommercialPanelView('financial_portfolio_drill') === 'chart'">

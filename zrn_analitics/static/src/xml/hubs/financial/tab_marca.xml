@@ -27,9 +27,9 @@
                                     <span>Click en la fila para abrir detalle</span>
                                     <div class="zrn_analitics_commercial_panel_actions">
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-financial_brands', filename: 'zrn_financiero_comparativo_marcas' })" aria-label="Exportar comparativo por marca"><i class="fa fa-download"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brands', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_brands') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_brands', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('financial_brands')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('financial_brands', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('financial_brands') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('financial_brands', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
                                 <t t-if="getCommercialPanelView('financial_brands') === 'chart'">

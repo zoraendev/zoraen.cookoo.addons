@@ -32,9 +32,9 @@
                                             <option value="bar">Barras</option>
                                             <option value="line">Línea</option>
                                         </select>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_channel', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('coverage_channel') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('coverage_channel', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                         <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'coverage-channel', filename: 'zrn_comercial_cobertura_canales' })" aria-label="Exportar cobertura"><i class="fa fa-download"/></button>
-                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_channel', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('coverage_channel') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('coverage_channel', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                     </div>
                                 </div>
                                 <t t-if="getCommercialPanelView('coverage_channel') === 'table'">
@@ -189,10 +189,10 @@
                             <div class="zrn_analitics_commercial_panel_head">
                                 <span>Distribución por SKU</span>
                                 <div class="zrn_analitics_commercial_panel_actions">
-                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_sku', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('coverage_sku') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('coverage_sku', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                                     <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="toggleCoverageSkuChartConfig" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
                                     <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'coverage-sku', filename: 'zrn_comercial_distribucion_sku' })" aria-label="Exportar distribución"><i class="fa fa-download"/></button>
-                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('coverage_sku', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('coverage_sku') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('coverage_sku', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                                 </div>
                             </div>
                             <t t-if="getCommercialPanelView('coverage_sku') === 'table'">

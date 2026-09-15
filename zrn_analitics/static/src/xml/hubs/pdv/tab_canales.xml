@@ -27,9 +27,13 @@
                                 <div class="zrn_analitics_pdv_panel_head">
                                     <span>Sell-in vs Sell-out</span>
                                     <span><t t-esc="channelComparePayload.channel_labels.length ? channelComparePayload.channel_labels.join(', ') : 'Todos los canales'"/></span>
-                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-channel-monthly', filename: 'zrn_pdv_sellin_sellout_canales' })" aria-label="Exportar sell-in vs sell-out"><i class="fa fa-download"/></button>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_channel_monthly') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_channel_monthly', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'pdv-channel-monthly', filename: 'zrn_pdv_sellin_sellout_canales' })" aria-label="Exportar sell-in vs sell-out"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_channel_monthly') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_channel_monthly', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
-                                <div class="zrn_analitics_pdv_chart_wrap">
+                                <div t-if="getCommercialPanelView('pdv_channel_monthly') === 'chart'" class="zrn_analitics_pdv_chart_wrap">
                                     <t t-if="channelComparePayload.by_month.length and hasEchartsLibrary">
                                         <div class="zrn_analitics_pdv_echart" data-zrn-chart="pdv-channel-monthly"/>
                                     </t>
@@ -42,6 +46,24 @@
                                     <t t-else="">
                                         <div class="zrn_analitics_pdv_chart_empty">Sin data mensual para los canales filtrados.</div>
                                     </t>
+                                </div>
+                                <div t-if="getCommercialPanelView('pdv_channel_monthly') === 'table'" class="zrn_analitics_pdv_table_wrap">
+                                    <table class="zrn_analitics_pdv_table">
+                                        <thead>
+                                            <tr>
+                                                <th>Mes</th>
+                                                <th class="text-end">Sell-in</th>
+                                                <th class="text-end">Sell-out</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr t-foreach="channelComparePayload.by_month" t-as="row" t-key="row.label">
+                                                <td><strong><t t-esc="row.label"/></strong></td>
+                                                <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.sellin_q || 0)"/></td>
+                                                <td class="text-end"><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.sellout_q || 0)"/></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </section>
 

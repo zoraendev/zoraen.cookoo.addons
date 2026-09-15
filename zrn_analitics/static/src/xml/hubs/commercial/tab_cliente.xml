@@ -6,12 +6,12 @@
                     <div class="zrn_analitics_commercial_panel_head">
                         <span>Ranking completo de clientes / PDVs</span>
                         <div class="zrn_analitics_commercial_panel_actions">
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('client_main', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('client_main') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('client_main', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="toggleClientChartConfig" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'client-main', filename: 'zrn_comercial_clientes_pdv' })" aria-label="Exportar clientes">
                                 <i class="fa fa-download"/>
                             </button>
-                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialPanelView('client_main', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                            <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('client_main') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('client_main', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
                             <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.setCommercialTab('canal')" aria-label="Ver canales">
                                 <i class="fa fa-arrow-right"/>
                             </button>

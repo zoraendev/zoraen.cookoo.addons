@@ -63,7 +63,6 @@ const PDV_TABS = [
   { key: "ranking", label: "Ranking PDVs", icon: "fa-list-ol" },
   { key: "canales", label: "Canales PDV", icon: "fa-exchange" },
   { key: "otros", label: "Otras cadenas", icon: "fa-sitemap" },
-  { key: "alertas", label: "Alertas", icon: "fa-bell-o" },
 ];
 
 const RRHH_TABS = [
@@ -469,6 +468,9 @@ class ZrnAnalyticsHubAction extends Component {
         pdv_overview_revenue: "chart",
         pdv_overview_coverage: "chart",
         pdv_overview_top: "chart",
+        pdv_channel_monthly: "chart",
+        pdv_channel_detail: "table",
+        pdv_otros_channels: "chart",
       },
       analyticsChartConfigOpen: null,
       analyticsChartSettings: {
@@ -484,6 +486,7 @@ class ZrnAnalyticsHubAction extends Component {
         operations_abc: { metric: "revenue", type: "bar" },
         operations_trends: { metric: "trend_pct", type: "bar" },
         pdv_ranking: { metric: "rev", type: "bar" },
+        pdv_channel_detail: { metric: "rev", type: "bar" },
       },
       channelChartConfigOpen: false,
       channelChartMetric: "revenue",
@@ -1789,6 +1792,9 @@ class ZrnAnalyticsHubAction extends Component {
   }
 
   async setPdvTab(tabKey) {
+    if (!this.pdvTabs.some((tab) => tab.key === tabKey)) {
+      tabKey = this.pdvTabs[0]?.key || "overview";
+    }
     this.state.pdvTab = tabKey;
     this.closePdvSidebar();
     this.closePdvFilters();
@@ -5980,16 +5986,18 @@ class ZrnAnalyticsHubAction extends Component {
       animationDuration: 650,
       legend: {
         data: ["Activos", "Red total"],
+        top: 0,
+        right: 16,
         textStyle: { color: "#5f6b7a", fontSize: 11 },
       },
-      grid: { top: 30, right: 20, bottom: 30, left: 24, containLabel: true },
+      grid: { top: 46, right: 20, bottom: 42, left: 24, containLabel: true },
       tooltip: { trigger: "axis", axisPointer: { type: "shadow" } },
       xAxis: {
         type: "category",
         data: rows.map((row) => row.channel),
         axisTick: { show: false },
         axisLine: { lineStyle: { color: "#d6deea" } },
-        axisLabel: { color: "#5f6b7a", fontSize: 11 },
+        axisLabel: { color: "#5f6b7a", fontSize: 11, margin: 14 },
       },
       yAxis: {
         type: "value",
@@ -6074,7 +6082,7 @@ class ZrnAnalyticsHubAction extends Component {
     }
     chart.setOption({
       animationDuration: 600,
-      grid: { top: 35, right: 20, bottom: 25, left: 35, containLabel: true },
+      grid: { top: 46, right: 20, bottom: 42, left: 35, containLabel: true },
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
@@ -6083,13 +6091,15 @@ class ZrnAnalyticsHubAction extends Component {
       },
       legend: {
         data: ["Sell-in", "Sell-out"],
-        textStyle: { color: "#5f6b7a" },
+        top: 0,
+        right: 16,
+        textStyle: { color: "#5f6b7a", fontSize: 11 },
       },
       xAxis: {
         type: "category",
         data: rows.map((row) => row.label),
         axisLine: { lineStyle: { color: "#d6deea" } },
-        axisLabel: { color: "#5f6b7a" },
+        axisLabel: { color: "#5f6b7a", fontSize: 11, margin: 14 },
       },
       yAxis: {
         type: "value",
