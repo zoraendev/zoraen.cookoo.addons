@@ -1972,7 +1972,8 @@
   background-color: var(--zrn-analitics-table-hover) !important;
 }
 
-.zrn_analitics_commercial_hub {
+.zrn_analitics_commercial_hub,
+.zrn_analitics_rrhh_hub {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -4189,6 +4190,7 @@
 
 .zrn_analitics_rrhh_content {
   gap: 16px;
+  padding-bottom: 24px;
 }
 
 .zrn_analitics_rrhh_chart_wrap {
@@ -6902,7 +6904,8 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
     overflow: hidden;
   }
 
-  .zrn_analitics_commercial_hub {
+  .zrn_analitics_commercial_hub,
+  .zrn_analitics_rrhh_hub {
     flex: 1 1 auto;
     min-height: 0;
     height: 100%;
@@ -6914,6 +6917,11 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
     min-height: 0;
     height: 100%;
     overflow: hidden;
+  }
+
+  .zrn_analitics_rrhh_hub .zrn_analitics_commercial_shell {
+    flex: 1 1 auto;
+    height: auto;
   }
 
   .zrn_analitics_commercial_sidebar {
@@ -6944,6 +6952,10 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
     padding-right: 10px;
     scrollbar-color: var(--zrn-analitics-brand-600) var(--zrn-analitics-surface-soft);
     scrollbar-width: auto;
+  }
+
+  .zrn_analitics_rrhh_content {
+    padding-bottom: 28px;
   }
 
   .zrn_analitics_commercial_content::-webkit-scrollbar,
