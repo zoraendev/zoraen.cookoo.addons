@@ -71,9 +71,19 @@
                                 <div class="zrn_analitics_pdv_panel_head">
                                     <span>Detalle por PDV</span>
                                     <span><t t-esc="channelComparePayload.supported_channel_labels.length ? 'Click para drill-down' : 'Vista filtrada por canal'"/></span>
-                                    <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { filename: 'zrn_pdv_detalle_canales' })" aria-label="Exportar detalle por PDV"><i class="fa fa-download"/></button>
+                                    <div class="zrn_analitics_commercial_panel_actions">
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_channel_detail') === 'chart' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_channel_detail', 'chart')" aria-label="Ver gráfica"><i class="fa fa-bar-chart"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="() =&gt; this.toggleAnalyticsChartConfig('pdv_channel_detail')" aria-label="Configurar gráfica"><i class="fa fa-sliders"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-on-click="(ev) =&gt; this.exportCommercialVisibleContent(ev, { chartKey: 'analytics-panel-pdv_channel_detail', filename: 'zrn_pdv_detalle_canales' })" aria-label="Exportar detalle por PDV"><i class="fa fa-download"/></button>
+                                        <button type="button" class="btn zrn_analitics_commercial_icon_btn" t-att-class="getCommercialPanelView('pdv_channel_detail') === 'table' ? 'is-active' : ''" t-on-click="() =&gt; this.setCommercialPanelView('pdv_channel_detail', 'table')" aria-label="Ver tabla"><i class="fa fa-table"/></button>
+                                    </div>
                                 </div>
-                                <div class="zrn_analitics_pdv_table_wrap">
+                                <t t-if="getCommercialPanelView('pdv_channel_detail') === 'chart'">
+                                    <div class="zrn_analitics_pdv_chart_wrap">
+                                        <div class="zrn_analitics_pdv_echart" data-zrn-chart="analytics-panel-pdv_channel_detail"/>
+                                    </div>
+                                </t>
+                                <div t-if="getCommercialPanelView('pdv_channel_detail') === 'table'" class="zrn_analitics_pdv_table_wrap">
                                     <table class="zrn_analitics_pdv_table">
                                         <thead>
                                             <tr>

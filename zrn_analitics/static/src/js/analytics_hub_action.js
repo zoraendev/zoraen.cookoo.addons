@@ -2944,6 +2944,43 @@ class ZrnAnalyticsHubAction extends Component {
     this.openRecordModal("res.partner", row.partner_id);
   }
 
+  openPdvChannelSummaryModal(channelRow) {
+    if (!channelRow) {
+      return;
+    }
+    const channelName = channelRow.channel || channelRow.name || "";
+    const rows = (this.pdvPayload.otros?.rows || this.pdvPayload.channel_compare?.rows || [])
+      .filter((row) => row.channel === channelName);
+    const revenue = Number(channelRow.revenue ?? channelRow.rev ?? rows.reduce((sum, row) => sum + Number(row.rev || row.sellin_q || 0), 0));
+    const pdvCount = Number(channelRow.active ?? channelRow.pdv_count ?? rows.length);
+    const orderCount = rows.reduce((sum, row) => sum + Number(row.invoices || row.order_count || 0), 0);
+    this.openAnalyticsDetailModal({
+      title: channelName || "Canal",
+      subtitle: "Detalle por canal PDV",
+      currency_symbol: this.pdvPayload.summary.currency_symbol || "$",
+      summary_cards: [
+        { label: "PDVs", value: pdvCount },
+        { label: "Pedidos", value: orderCount },
+        { label: "Revenue", value: revenue, format: "money" },
+      ],
+      channel_rows: [{
+        name: channelName || "Canal",
+        pdv_count: pdvCount,
+        order_count: orderCount,
+        units: 0,
+        revenue,
+      }],
+      secondary_title: "PDVs",
+      secondary_rows: rows.map((row) => ({
+        id: row.partner_id,
+        name: row.name_short || row.client_full || row.name || "",
+        units: 0,
+        order_count: Number(row.invoices || row.order_count || 0),
+        revenue: Number(row.rev || row.sellin_q || 0),
+      })),
+    });
+  }
+
   openCustomerDetailById(partnerId) {
     if (!partnerId) {
       return;
@@ -3860,6 +3897,12 @@ class ZrnAnalyticsHubAction extends Component {
         { key: "avg_ticket", label: "Ticket", format: "money" },
         { key: "days_since_last", label: "Recencia", format: "count" },
       ],
+      pdv_channel_detail: [
+        { key: "rev", label: "Revenue", format: "money" },
+        { key: "sellin_q", label: "Sell-in", format: "money" },
+        { key: "sellout_q", label: "Sell-out", format: "money" },
+        { key: "invoices", label: "Pedidos", format: "count" },
+      ],
     };
     return metricSets[panelKey] || [{ key: "value", label: "Valor", format: "count" }];
   }
@@ -3892,6 +3935,7 @@ class ZrnAnalyticsHubAction extends Component {
       operations_abc: (this.sortedOperationsAbc || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
       operations_trends: (this.sortedOperationsTrends || []).slice(0, 10).map((row) => ({ ...row, label: row.name })),
       pdv_ranking: (this.sortedPdvRanking || []).slice(0, 12).map((row) => ({ ...row, label: row.name_short || row.client_full })),
+      pdv_channel_detail: (this.sortedPdvChannelRows || []).slice(0, 12).map((row) => ({ ...row, label: row.name_short || row.client_full })),
     };
     return rowSets[panelKey] || [];
   }

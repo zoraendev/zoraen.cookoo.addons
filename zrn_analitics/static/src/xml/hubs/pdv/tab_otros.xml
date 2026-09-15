@@ -51,11 +51,11 @@
                                     <div class="zrn_analitics_pdv_channel_list">
                                         <t t-if="pdvPayload.otros.channels.length">
                                             <t t-foreach="pdvPayload.otros.channels" t-as="row" t-key="'other_channel_' + row.channel">
-                                                <div class="zrn_analitics_pdv_channel_item">
+                                                <button type="button" class="btn zrn_analitics_pdv_channel_item" t-on-click="() =&gt; this.openPdvChannelSummaryModal(row)">
                                                     <strong><t t-esc="row.channel"/></strong>
                                                     <span><t t-esc="formatCount(row.active)"/> PDVs</span>
                                                     <span><t t-esc="pdvPayload.summary.currency_symbol"/> <t t-esc="formatMoney(row.revenue)"/></span>
-                                                </div>
+                                                </button>
                                             </t>
                                         </t>
                                         <t t-else="">

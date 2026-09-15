@@ -215,7 +215,7 @@
                                                             </thead>
                                                             <tbody>
                                                                 <t t-foreach="(state.analyticsDetailModal.secondary_rows || state.analyticsDetailModal.customer_rows || [])" t-as="row" t-key="row.name">
-                                                                    <tr class="zrn_analitics_commercial_table_row">
+                                                                    <tr t-att-class="row.id ? 'zrn_analitics_commercial_table_row zrn_analitics_commercial_table_row_clickable' : 'zrn_analitics_commercial_table_row'" t-on-click="() =&gt; row.id ? this.openRecordModal('res.partner', row.id) : null">
                                                                         <td><strong><t t-esc="row.name"/></strong></td>
                                                                         <td><t t-esc="formatCount(row.units)"/></td>
                                                                         <td><t t-esc="formatCount(row.order_count)"/></td>
