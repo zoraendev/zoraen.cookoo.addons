@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <templates xml:space="preserve"><t t-name="zrn_analitics.RelationalMultiSelect">
-        <div class="zrn_analitics_relational_filter o_field_many2manytags">
+        <div class="zrn_analitics_relational_filter o_field_many2manytags" t-on-click="guardAutocompleteLink">
             <div class="o_field_tags d-inline-flex flex-wrap gap-1 o_tags_input o_input">
                 <TagsList tags="tags"/>
                 <div class="o_field_many2many_selection d-inline-flex w-100">

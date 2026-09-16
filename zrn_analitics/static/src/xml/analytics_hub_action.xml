@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
     <t t-name="zrn_analitics.RelationalSingleSelect">
-        <div class="zrn_analitics_relational_single o_field_widget o_field_many2one" t-att-class="props.record ? 'is-selected' : 'is-empty'">
+        <div class="zrn_analitics_relational_single o_field_widget o_field_many2one" t-att-class="props.record ? 'is-selected' : 'is-empty'" t-on-click="guardAutocompleteLink">
             <div class="zrn_analitics_relational_single_control o_input">
                 <div class="zrn_analitics_relational_single_value" t-if="props.record">
                     <span class="zrn_analitics_relational_single_text"><t t-esc="props.record.display_name"/></span>

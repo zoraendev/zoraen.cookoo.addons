@@ -207,9 +207,20 @@ function normalizeFilterIds(values) {
   )];
 }
 
+function guardAutocompleteLink(ev) {
+  const link = ev.target.closest?.("a[href='#']");
+  if (link) {
+    ev.preventDefault();
+  }
+}
+
 class ZrnRelationalMultiSelect extends Component {
   setup() {
     this.orm = useService("orm");
+  }
+
+  guardAutocompleteLink(ev) {
+    guardAutocompleteLink(ev);
   }
 
   get activeActions() {
@@ -319,6 +330,10 @@ ZrnRelationalMultiSelect.defaultProps = {
 class ZrnRelationalSingleSelect extends Component {
   setup() {
     this.orm = useService("orm");
+  }
+
+  guardAutocompleteLink(ev) {
+    guardAutocompleteLink(ev);
   }
 
   get activeActions() {
