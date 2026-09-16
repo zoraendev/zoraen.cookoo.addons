@@ -26,22 +26,33 @@
   max-width: 1360px;
 }
 
+.o_form_view .zrn_analitics_form_shell:has(.zrn_processing_shell_mode),
+.o_form_view .zrn_analitics_form_shell:has(.zrn_processing_shell_mode) .o_form_renderer {
+  width: 100%;
+  max-width: none;
+}
+
 .o_form_view
   .zrn_analitics_form_shell
   .o_form_sheet:has(.zrn_processing_shell_mode) {
-  max-width: calc(100vw - 48px);
-  width: calc(100vw - 48px);
+  max-width: none;
+  width: 100%;
+  margin: 0;
   padding: 0;
   border: 0;
   background: transparent;
   box-shadow: none;
+  box-sizing: border-box;
 }
 
 .o_form_view
   .zrn_analitics_form_shell
   .o_form_sheet_bg:has(.zrn_processing_shell_mode) {
-  padding: 16px 24px 24px;
+  width: 100%;
+  max-width: none;
+  padding: 16px;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .zrn_analitics_shell {
@@ -821,6 +832,13 @@
   background: var(--zrn-analitics-surface-soft);
   color: var(--zrn-analitics-text-soft);
   font-size: 12px;
+}
+
+.zrn_processing_hint_strip_warning {
+  margin-bottom: 14px;
+  border-color: #d8d1aa;
+  background: #fff9e6;
+  color: #8b6b0e;
 }
 
 .zrn_processing_empty_state {
@@ -6848,6 +6866,16 @@ html.zrn_backend_dark .o_form_view .zrn_analitics_form_shell .o_form_sheet_bg,
 html.zrn_backend_dark .o_form_view .zrn_analitics_form_shell .o_form_sheet {
   background: var(--zrn-analitics-surface-muted);
   color: var(--zrn-analitics-text);
+}
+
+html.zrn_backend_dark .o_form_view .zrn_analitics_form_shell .o_form_sheet:has(.zrn_processing_shell_mode) {
+  background: transparent;
+}
+
+html.zrn_backend_dark .zrn_processing_hint_strip_warning {
+  border-color: #765f22;
+  background: #3a2d13;
+  color: #f5d985;
 }
 
 html.zrn_backend_dark .zrn_processing_modal_close,

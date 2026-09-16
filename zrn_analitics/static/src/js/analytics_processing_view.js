@@ -159,6 +159,7 @@ export class ZrnAnalyticsProcessingView {
         matchedRows: 0,
         unmatchedRows: 0,
         targetLabel: "",
+        fileFallback: false,
       },
       globalError: "",
     };
@@ -1304,6 +1305,7 @@ export class ZrnAnalyticsProcessingView {
     this.state.matchState.totalRows = 0;
     this.state.matchState.matchedRows = 0;
     this.state.matchState.unmatchedRows = 0;
+    this.state.matchState.fileFallback = false;
     this.disposeChart();
     this.disposeScenarioChart();
   }
@@ -1332,6 +1334,7 @@ export class ZrnAnalyticsProcessingView {
       this.state.matchState.totalRows = 0;
       this.state.matchState.matchedRows = 0;
       this.state.matchState.unmatchedRows = 0;
+      this.state.matchState.fileFallback = false;
       this.state.queryState.tableName = table.tableName;
       if (!this.state.queryState.sql.trim()) {
         this.state.queryState.sql = this.buildSampleQuery(table.tableName);
@@ -2227,6 +2230,7 @@ ${headers
     this.state.matchState.totalRows = 0;
     this.state.matchState.matchedRows = 0;
     this.state.matchState.unmatchedRows = 0;
+    this.state.matchState.fileFallback = false;
     this.render();
   }
 
@@ -2263,6 +2267,27 @@ ${headers
       return [];
     }
     return buildDatasetRecords(table, rawRows);
+  }
+
+  buildSellInOutDashboardRecord(row, odooRecord = null) {
+    const config = this.state.sellInOutConfig;
+    const sellIn = this.parseMetricValue(row[config.sellInColumn]);
+    const sellOut = this.parseMetricValue(row[config.sellOutColumn]);
+    const matchValue = row[config.matchColumn];
+    return {
+      ...row,
+      __match_value: matchValue,
+      __sell_in: sellIn,
+      __sell_out: sellOut,
+      __gap: sellIn - sellOut,
+      __quantity: this.parseMetricValue(row[config.quantityColumn]),
+      __date: config.dateColumn ? row[config.dateColumn] : "",
+      __group: config.groupColumn ? row[config.groupColumn] : "",
+      __odoo_id: odooRecord?.id || null,
+      __odoo_name: odooRecord?.display_name || odooRecord?.name || String(matchValue || "Fila del archivo"),
+      __odoo_ref: odooRecord?.default_code || odooRecord?.ref || String(matchValue || ""),
+      __file_only: !odooRecord,
+    };
   }
 
   async refreshSellInOutMatch() {
@@ -2315,37 +2340,27 @@ ${headers
       });
       const matchedRecords = [];
       let unmatchedRows = 0;
+      const fileRecords = [];
       rows.forEach((row) => {
         const matchValue = this.normalizeMatchValue(row[config.matchColumn]);
         const odooRecord = byMatchValue.get(matchValue);
         if (!odooRecord) {
           unmatchedRows += 1;
+          fileRecords.push(this.buildSellInOutDashboardRecord(row));
           return;
         }
-        const sellIn = this.parseMetricValue(row[config.sellInColumn]);
-        const sellOut = this.parseMetricValue(row[config.sellOutColumn]);
-        matchedRecords.push({
-          ...row,
-          __match_value: row[config.matchColumn],
-          __sell_in: sellIn,
-          __sell_out: sellOut,
-          __gap: sellIn - sellOut,
-          __quantity: this.parseMetricValue(row[config.quantityColumn]),
-          __date: config.dateColumn ? row[config.dateColumn] : "",
-          __group: config.groupColumn ? row[config.groupColumn] : "",
-          __odoo_id: odooRecord.id,
-          __odoo_name: odooRecord.display_name || odooRecord.name || "",
-          __odoo_ref: odooRecord.default_code || odooRecord.ref || "",
-        });
+        matchedRecords.push(this.buildSellInOutDashboardRecord(row, odooRecord));
       });
+      const fileFallback = !matchedRecords.length && Boolean(fileRecords.length);
       this.state.matchState = {
         loading: false,
         error: "",
-        records: matchedRecords,
+        records: fileFallback ? fileRecords : matchedRecords,
         totalRows: rows.length,
         matchedRows: matchedRecords.length,
         unmatchedRows,
         targetLabel: config.matchTarget === "customer" ? "clientes" : "productos",
+        fileFallback,
       };
       this.render();
     } catch (error) {
@@ -2453,6 +2468,7 @@ ${headers
   renderSellInOutDashboard() {
     const dashboard = this.getSellInOutDashboardData();
     const match = this.state.matchState;
+    const isFileFallback = Boolean(match.fileFallback);
     const maxBar = Math.max(...dashboard.groups.map((item) => Math.max(item.sellIn, item.sellOut)), 1);
     const barRows = dashboard.groups.length
       ? dashboard.groups
@@ -2472,7 +2488,7 @@ ${headers
       : `<div class="zrn_processing_result_empty">Ejecuta el match para ver comparativos.</div>`;
     const tableRows = dashboard.rows.slice(0, 80).map((row) => `
       <tr>
-        <td><strong>${escapeHtml(row.__odoo_name)}</strong><br/><span class="zrn_processing_helper">${escapeHtml(row.__odoo_ref || row.__match_value)}</span></td>
+        <td><strong>${escapeHtml(row.__odoo_name)}</strong><br/><span class="zrn_processing_helper">${escapeHtml(row.__file_only ? "Sin match en Odoo" : row.__odoo_ref || row.__match_value)}</span></td>
         <td>${escapeHtml(row.__date || "-")}</td>
         <td>${escapeHtml(row.__group || "-")}</td>
         <td class="text-end">${this.formatDashboardNumber(row.__sell_in)}</td>
@@ -2484,9 +2500,14 @@ ${headers
       <section class="zrn_processing_panel">
         <div class="zrn_processing_panel_head">
           <strong>Dashboard sell-in / sell-out</strong>
-          <span>${match.matchedRows || 0} filas matcheadas</span>
+          <span>${isFileFallback ? `${match.totalRows || 0} filas del archivo` : `${match.matchedRows || 0} filas matcheadas`}</span>
         </div>
         <div class="zrn_processing_panel_body">
+          ${
+            isFileFallback
+              ? `<div class="zrn_processing_hint_strip zrn_processing_hint_strip_warning">No se encontraron coincidencias en Odoo. El dashboard queda calculado con la informacion del archivo para que puedas revisar estructura, columnas y valores cargados.</div>`
+              : ""
+          }
           <div class="zrn_processing_totals_kpis">
             <div class="zrn_processing_total_kpi"><span>Sell-in</span><strong>${this.formatDashboardNumber(dashboard.totalSellIn)}</strong></div>
             <div class="zrn_processing_total_kpi"><span>Sell-out</span><strong>${this.formatDashboardNumber(dashboard.totalSellOut)}</strong></div>
@@ -2506,14 +2527,14 @@ ${headers
               <div class="zrn_processing_status_item"><small>Total archivo</small><strong>${match.totalRows || 0}</strong></div>
               <div class="zrn_processing_status_item"><small>Matcheadas</small><strong>${match.matchedRows || 0}</strong></div>
               <div class="zrn_processing_status_item"><small>Sin match</small><strong>${match.unmatchedRows || 0}</strong></div>
-              <div class="zrn_processing_status_item"><small>Destino</small><strong>${escapeHtml(match.targetLabel || "-")}</strong></div>
+              <div class="zrn_processing_status_item"><small>Vista</small><strong>${escapeHtml(isFileFallback ? "archivo" : match.targetLabel || "-")}</strong></div>
             </div>
           </div>
           <div class="zrn_processing_result_wrap zrn_processing_sellio_table_wrap">
             <table class="o_list_table table table-sm zrn_processing_result_table">
               <thead>
                 <tr>
-                  <th>Registro Odoo</th>
+                  <th>${isFileFallback ? "Registro del archivo" : "Registro Odoo"}</th>
                   <th>Periodo</th>
                   <th>Grupo</th>
                   <th class="text-end">Sell-in</th>
