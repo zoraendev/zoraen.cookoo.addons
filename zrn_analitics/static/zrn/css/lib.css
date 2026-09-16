@@ -1219,6 +1219,113 @@
   max-height: 360px;
 }
 
+.zrn_processing_match_grid {
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
+}
+
+.zrn_processing_sellio_dashboard_grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(220px, 0.8fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.zrn_processing_sellio_chart {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--zrn-analitics-line);
+  border-radius: 6px;
+  background: var(--zrn-analitics-surface);
+  overflow: auto;
+}
+
+.zrn_processing_sellio_legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  color: var(--zrn-analitics-text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.zrn_processing_sellio_legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.zrn_processing_sellio_legend i {
+  width: 12px;
+  height: 8px;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.zrn_processing_sellio_legend .is-sell-in,
+.zrn_processing_sellio_bar_track .is-sell-in {
+  background: #155e75;
+}
+
+.zrn_processing_sellio_legend .is-sell-out,
+.zrn_processing_sellio_bar_track .is-sell-out {
+  background: #b45309;
+}
+
+.zrn_processing_sellio_bar_row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(120px, 1.2fr) minmax(120px, 1.2fr) minmax(86px, auto);
+  gap: 8px;
+  align-items: center;
+  min-width: 620px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--zrn-analitics-line);
+}
+
+.zrn_processing_sellio_bar_row:last-child {
+  border-bottom: 0;
+}
+
+.zrn_processing_sellio_bar_row strong {
+  color: var(--zrn-analitics-text);
+  font-size: 12px;
+  word-break: break-word;
+}
+
+.zrn_processing_sellio_bar_row small {
+  color: var(--zrn-analitics-text-soft);
+  font-size: 12px;
+  text-align: right;
+}
+
+.zrn_processing_sellio_bar_track {
+  height: 9px;
+  border-radius: 3px;
+  background: var(--zrn-analitics-surface-soft);
+  overflow: hidden;
+}
+
+.zrn_processing_sellio_bar_track span {
+  display: block;
+  min-width: 3px;
+  height: 100%;
+  border-radius: 3px;
+}
+
+.zrn_processing_sellio_table_wrap {
+  max-height: 380px;
+  margin-top: 14px;
+  overflow: auto;
+}
+
+.zrn_processing_sellio_table_wrap .zrn_processing_helper {
+  color: var(--zrn-analitics-text-muted);
+  font-size: 11px;
+}
+
 @keyframes zrn-processing-spin {
   to {
     transform: rotate(360deg);
@@ -3577,6 +3684,8 @@
   .zrn_processing_overview_top,
   .zrn_processing_range_grid,
   .zrn_processing_totals_grid,
+  .zrn_processing_match_grid,
+  .zrn_processing_sellio_dashboard_grid,
   .zrn_processing_scenario_toolbar,
   .zrn_processing_query_workspace,
   .zrn_processing_builder_columns,
@@ -3591,6 +3700,10 @@
   .zrn_processing_query_hint {
     width: 100%;
     min-width: 0;
+  }
+
+  .zrn_processing_sellio_chart {
+    max-height: 320px;
   }
 
   .zrn_processing_scenario_toolbar,
@@ -6800,6 +6913,44 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
   border-color: var(--zrn-analitics-line);
 }
 
+html.zrn_backend_dark .zrn_processing_status_inline.is-ready {
+  border-color: #2f6844;
+  background: #173522;
+  color: #b8f1c9;
+}
+
+html.zrn_backend_dark .zrn_processing_status_inline.is-pending {
+  border-color: #765f22;
+  background: #3a2d13;
+  color: #f5d985;
+}
+
+html.zrn_backend_dark .zrn_processing_status_inline.is-danger {
+  border-color: #74343a;
+  background: #3d1f25;
+  color: #f2b5bd;
+}
+
+html.zrn_backend_dark .zrn_processing_sellio_chart,
+html.zrn_backend_dark .zrn_processing_sellio_table_wrap {
+  background: var(--zrn-analitics-surface);
+  border-color: var(--zrn-analitics-line);
+}
+
+html.zrn_backend_dark .zrn_processing_sellio_bar_track {
+  background: var(--zrn-analitics-surface-soft);
+}
+
+html.zrn_backend_dark .zrn_processing_sellio_legend .is-sell-in,
+html.zrn_backend_dark .zrn_processing_sellio_bar_track .is-sell-in {
+  background: #22a6b3;
+}
+
+html.zrn_backend_dark .zrn_processing_sellio_legend .is-sell-out,
+html.zrn_backend_dark .zrn_processing_sellio_bar_track .is-sell-out {
+  background: #f59e0b;
+}
+
 @media (max-width: 1200px) {
   .zrn_analitics_operations_hub {
     gap: 10px;
@@ -7262,7 +7413,11 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
   .zrn_analitics_operations_table_wrap,
   .zrn_analitics_operations_portfolio_table_wrap,
   .zrn_analitics_pdv_table_wrap,
-  .zrn_analitics_rrhh_table_wrap {
+  .zrn_analitics_rrhh_table_wrap,
+  .zrn_processing_columns_wrap,
+  .zrn_processing_result_wrap,
+  .zrn_processing_preview_wrap,
+  .zrn_processing_sellio_table_wrap {
     min-width: 0;
     max-width: 100%;
     max-height: min(58vh, 430px);
@@ -7285,6 +7440,10 @@ html.zrn_backend_dark .zrn_analitics_operations_coverage_note_row {
   .zrn_analitics_financial_channel_table_wrap table,
   .zrn_analitics_operations_table_wrap table,
   .zrn_analitics_operations_portfolio_table_wrap table,
+  .zrn_processing_columns_wrap table,
+  .zrn_processing_result_wrap table,
+  .zrn_processing_preview_wrap table,
+  .zrn_processing_sellio_table_wrap table,
   .zrn_analitics_pdv_table_wrap table,
   .zrn_analitics_rrhh_table_wrap table {
     width: max-content;

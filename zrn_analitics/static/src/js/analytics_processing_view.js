@@ -42,8 +42,13 @@ export class ZrnAnalyticsProcessingView {
     this.registeredTableName = "";
     this.lastRegisteredSignature = "";
     this.navigationHandlers = {};
+    this.orm = null;
     this.preserveStateOnUnmount = false;
     this.state = this.getInitialState();
+  }
+
+  setServices(services = {}) {
+    this.orm = services.orm || this.orm;
   }
 
   setNavigationHandlers(handlers) {
@@ -135,6 +140,25 @@ export class ZrnAnalyticsProcessingView {
         activeView: "table",
         chartType: "bar",
         textDelimiter: "|",
+      },
+      sellInOutConfig: {
+        matchColumn: "",
+        matchTarget: "product",
+        matchAttribute: "barcode",
+        sellInColumn: "",
+        sellOutColumn: "",
+        quantityColumn: "",
+        dateColumn: "",
+        groupColumn: "",
+      },
+      matchState: {
+        loading: false,
+        error: "",
+        records: [],
+        totalRows: 0,
+        matchedRows: 0,
+        unmatchedRows: 0,
+        targetLabel: "",
       },
       globalError: "",
     };
@@ -327,7 +351,7 @@ export class ZrnAnalyticsProcessingView {
       return true;
     }
     return window.confirm(
-      "El origen temporal y el trabajo de esta sesion se perderan al salir. Deseas continuar?",
+      "El origen temporal, el mapeo y el trabajo de esta sesion se perderan al salir. Deseas continuar?",
     );
   }
 
@@ -360,7 +384,7 @@ export class ZrnAnalyticsProcessingView {
     }
 
     const canLeave = window.confirm(
-      "El origen temporal se perdera si sales de Procesamiento. Deseas continuar?",
+      "El origen temporal y el mapeo se perderan si sales de Procesamiento. Deseas continuar?",
     );
     if (!canLeave) {
       event.preventDefault();
@@ -470,6 +494,15 @@ export class ZrnAnalyticsProcessingView {
     if (action === "reset-source" && event.type === "click") {
       event.preventDefault();
       this.resetAll();
+      return;
+    }
+    if (action === "sellio-config" && event.type === "change") {
+      this.updateSellInOutConfig(source.dataset.field || "", source.value);
+      return;
+    }
+    if (action === "sellio-match" && event.type === "click") {
+      event.preventDefault();
+      this.refreshSellInOutMatch();
       return;
     }
     if (action === "builder-column" && event.type === "change") {
@@ -1266,6 +1299,11 @@ export class ZrnAnalyticsProcessingView {
     this.state.scenarioState.rules = [];
     this.state.scenarioState.activeView = "table";
     this.state.scenarioState.chartType = "bar";
+    this.state.matchState.error = "";
+    this.state.matchState.records = [];
+    this.state.matchState.totalRows = 0;
+    this.state.matchState.matchedRows = 0;
+    this.state.matchState.unmatchedRows = 0;
     this.disposeChart();
     this.disposeScenarioChart();
   }
@@ -1289,6 +1327,11 @@ export class ZrnAnalyticsProcessingView {
       table.structureApplied = true;
       table.structureDirty = false;
       this.refreshDatasetStatus();
+      this.syncSellInOutDefaults(true);
+      this.state.matchState.records = [];
+      this.state.matchState.totalRows = 0;
+      this.state.matchState.matchedRows = 0;
+      this.state.matchState.unmatchedRows = 0;
       this.state.queryState.tableName = table.tableName;
       if (!this.state.queryState.sql.trim()) {
         this.state.queryState.sql = this.buildSampleQuery(table.tableName);
@@ -2080,7 +2123,7 @@ ${headers
   resetAll() {
     if (
       this.hasTransientData &&
-      !window.confirm("Se eliminara el origen temporal, la consulta y los resultados. Deseas continuar?")
+      !window.confirm("Se eliminara el origen temporal, el mapeo y los resultados. Deseas continuar?")
     ) {
       return;
     }
@@ -2095,6 +2138,397 @@ ${headers
     return this.root?.dataset?.zrnProcessingScreen || "workspace";
   }
 
+  get activeColumns() {
+    return (this.selectedTable?.columns || []).filter((column) => column.use);
+  }
+
+  getSellInOutColumnOptions(selectedValue = "", includeBlank = true) {
+    const options = includeBlank ? ['<option value="">Selecciona</option>'] : [];
+    this.activeColumns.forEach((column) => {
+      const alias = sanitizeIdentifier(column.alias, `column_${column.index + 1}`);
+      const label = `${column.originalLabel || alias} (${alias})`;
+      options.push(
+        `<option value="${escapeHtml(alias)}" ${selectedValue === alias ? "selected" : ""}>${escapeHtml(label)}</option>`,
+      );
+    });
+    return options.join("");
+  }
+
+  getMatchAttributeOptions(target = this.state.sellInOutConfig.matchTarget) {
+    const options =
+      target === "customer"
+        ? [
+            ["ref", "Referencia interna"],
+            ["vat", "NIT / identificacion fiscal"],
+            ["email", "Correo"],
+            ["name", "Nombre del cliente"],
+          ]
+        : [
+            ["barcode", "Codigo de barras"],
+            ["default_code", "Referencia interna"],
+            ["name", "Nombre del producto"],
+          ];
+    return options
+      .map(
+        ([value, label]) =>
+          `<option value="${value}" ${this.state.sellInOutConfig.matchAttribute === value ? "selected" : ""}>${escapeHtml(label)}</option>`,
+      )
+      .join("");
+  }
+
+  pickColumnByKeywords(keywords = [], used = new Set()) {
+    const columns = this.activeColumns;
+    const normalizedKeywords = keywords.map((keyword) => sanitizeIdentifier(keyword));
+    const found = columns.find((column) => {
+      const alias = sanitizeIdentifier(column.alias, `column_${column.index + 1}`);
+      const label = sanitizeIdentifier(column.originalLabel || "");
+      const combined = `${alias} ${label}`;
+      return !used.has(alias) && normalizedKeywords.some((keyword) => combined.includes(keyword));
+    });
+    return found ? sanitizeIdentifier(found.alias, `column_${found.index + 1}`) : "";
+  }
+
+  syncSellInOutDefaults(force = false) {
+    const config = this.state.sellInOutConfig;
+    const aliases = new Set(this.activeColumns.map((column) => sanitizeIdentifier(column.alias, `column_${column.index + 1}`)));
+    Object.keys(config).forEach((key) => {
+      if (key.endsWith("Column") && config[key] && !aliases.has(config[key])) {
+        config[key] = "";
+      }
+    });
+    const used = new Set();
+    const assign = (key, keywords) => {
+      if (!force && config[key] && aliases.has(config[key])) {
+        used.add(config[key]);
+        return;
+      }
+      const picked = this.pickColumnByKeywords(keywords, used);
+      config[key] = picked;
+      if (picked) used.add(picked);
+    };
+    assign("matchColumn", ["barcode", "codigo_barras", "cod_barras", "ean", "upc", "sku", "codigo", "item", "producto", "cliente", "customer"]);
+    assign("sellInColumn", ["sell_in", "sellin", "revenue", "ingreso", "facturado", "venta_neta", "importe", "monto"]);
+    assign("sellOutColumn", ["sell_out", "sellout", "pos", "retail", "venta", "vendido", "scan", "unidades"]);
+    assign("quantityColumn", ["cantidad", "quantity", "qty", "unidades", "units"]);
+    assign("dateColumn", ["fecha", "date", "mes", "month", "semana", "week"]);
+    assign("groupColumn", ["tienda", "store", "canal", "channel", "marca", "brand", "categoria", "category"]);
+  }
+
+  updateSellInOutConfig(field, value) {
+    if (!field || !(field in this.state.sellInOutConfig)) {
+      return;
+    }
+    this.state.sellInOutConfig[field] = value;
+    if (field === "matchTarget") {
+      this.state.sellInOutConfig.matchAttribute = value === "customer" ? "ref" : "barcode";
+    }
+    this.state.matchState.error = "";
+    this.state.matchState.records = [];
+    this.state.matchState.totalRows = 0;
+    this.state.matchState.matchedRows = 0;
+    this.state.matchState.unmatchedRows = 0;
+    this.render();
+  }
+
+  normalizeMatchValue(value) {
+    return String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
+  }
+
+  parseMetricValue(value) {
+    if (value === null || value === undefined || value === "") {
+      return 0;
+    }
+    if (typeof value === "number") {
+      return Number.isFinite(value) ? value : 0;
+    }
+    const normalized = String(value)
+      .replace(/[$Q€£]/g, "")
+      .replace(/\s/g, "")
+      .replace(/,/g, "");
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  formatDashboardNumber(value, decimals = 2) {
+    return Number(value || 0).toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  }
+
+  getCurrentDatasetRecords() {
+    const table = this.selectedTable;
+    const rawRows = this.selectedSheet?.rawRows || [];
+    if (!table || table.errors?.length) {
+      return [];
+    }
+    return buildDatasetRecords(table, rawRows);
+  }
+
+  async refreshSellInOutMatch() {
+    const config = this.state.sellInOutConfig;
+    const rows = this.getCurrentDatasetRecords();
+    if (!rows.length) {
+      this.state.matchState.error = "Aplica una estructura de tabla con filas de datos antes de hacer match.";
+      this.render();
+      return;
+    }
+    if (!config.matchColumn || !config.matchAttribute) {
+      this.state.matchState.error = "Selecciona la columna del archivo y el atributo de Odoo para el match.";
+      this.render();
+      return;
+    }
+    if (!this.orm) {
+      this.state.matchState.error = "No se pudo acceder al servicio de Odoo para consultar datos.";
+      this.render();
+      return;
+    }
+    const rawValues = Array.from(
+      new Set(rows.map((row) => String(row[config.matchColumn] ?? "").trim()).filter(Boolean)),
+    );
+    if (!rawValues.length) {
+      this.state.matchState.error = "La columna seleccionada para match no contiene valores utilizables.";
+      this.render();
+      return;
+    }
+    const model = config.matchTarget === "customer" ? "res.partner" : "product.product";
+    const fields =
+      config.matchTarget === "customer"
+        ? ["display_name", "ref", "vat", "email", "name"]
+        : ["display_name", "barcode", "default_code", "name"];
+    this.state.matchState.loading = true;
+    this.state.matchState.error = "";
+    this.render();
+    try {
+      const odooRows = await this.orm.searchRead(
+        model,
+        [[config.matchAttribute, "in", rawValues]],
+        fields,
+        { limit: Math.max(rawValues.length + 20, 80) },
+      );
+      const byMatchValue = new Map();
+      odooRows.forEach((record) => {
+        const key = this.normalizeMatchValue(record[config.matchAttribute]);
+        if (key && !byMatchValue.has(key)) {
+          byMatchValue.set(key, record);
+        }
+      });
+      const matchedRecords = [];
+      let unmatchedRows = 0;
+      rows.forEach((row) => {
+        const matchValue = this.normalizeMatchValue(row[config.matchColumn]);
+        const odooRecord = byMatchValue.get(matchValue);
+        if (!odooRecord) {
+          unmatchedRows += 1;
+          return;
+        }
+        const sellIn = this.parseMetricValue(row[config.sellInColumn]);
+        const sellOut = this.parseMetricValue(row[config.sellOutColumn]);
+        matchedRecords.push({
+          ...row,
+          __match_value: row[config.matchColumn],
+          __sell_in: sellIn,
+          __sell_out: sellOut,
+          __gap: sellIn - sellOut,
+          __quantity: this.parseMetricValue(row[config.quantityColumn]),
+          __date: config.dateColumn ? row[config.dateColumn] : "",
+          __group: config.groupColumn ? row[config.groupColumn] : "",
+          __odoo_id: odooRecord.id,
+          __odoo_name: odooRecord.display_name || odooRecord.name || "",
+          __odoo_ref: odooRecord.default_code || odooRecord.ref || "",
+        });
+      });
+      this.state.matchState = {
+        loading: false,
+        error: "",
+        records: matchedRecords,
+        totalRows: rows.length,
+        matchedRows: matchedRecords.length,
+        unmatchedRows,
+        targetLabel: config.matchTarget === "customer" ? "clientes" : "productos",
+      };
+      this.render();
+    } catch (error) {
+      this.state.matchState.loading = false;
+      this.state.matchState.error = error.message || "No se pudo realizar el match contra Odoo.";
+      this.render();
+    }
+  }
+
+  getSellInOutDashboardData() {
+    const rows = this.state.matchState.records || [];
+    const totalSellIn = rows.reduce((total, row) => total + Number(row.__sell_in || 0), 0);
+    const totalSellOut = rows.reduce((total, row) => total + Number(row.__sell_out || 0), 0);
+    const totalGap = totalSellIn - totalSellOut;
+    const byGroup = new Map();
+    rows.forEach((row) => {
+      const label = String(row.__group || row.__odoo_name || row.__match_value || "Sin grupo").trim();
+      if (!byGroup.has(label)) {
+        byGroup.set(label, { label, sellIn: 0, sellOut: 0, gap: 0, rows: 0 });
+      }
+      const item = byGroup.get(label);
+      item.sellIn += Number(row.__sell_in || 0);
+      item.sellOut += Number(row.__sell_out || 0);
+      item.gap = item.sellIn - item.sellOut;
+      item.rows += 1;
+    });
+    const groups = Array.from(byGroup.values())
+      .sort((left, right) => Math.abs(right.gap) - Math.abs(left.gap))
+      .slice(0, 8);
+    return { rows, totalSellIn, totalSellOut, totalGap, groups };
+  }
+
+  renderSellInOutMappingPanel(table) {
+    this.syncSellInOutDefaults();
+    const config = this.state.sellInOutConfig;
+    const targetOptions = [
+      ["product", "Productos"],
+      ["customer", "Clientes"],
+    ]
+      .map(
+        ([value, label]) =>
+          `<option value="${value}" ${config.matchTarget === value ? "selected" : ""}>${label}</option>`,
+      )
+      .join("");
+    const selected = (field) => this.getSellInOutColumnOptions(config[field]);
+    return `
+      <section class="zrn_processing_panel">
+        <div class="zrn_processing_panel_head">
+          <strong>Mapeo sell-in / sell-out</strong>
+          <span>${table ? `${table.dataRowsCount} filas disponibles` : "Sin tabla activa"}</span>
+        </div>
+        <div class="zrn_processing_panel_body">
+          <div class="zrn_processing_field_grid zrn_processing_match_grid">
+            <div class="zrn_processing_field">
+              <label>Columna para match</label>
+              <select class="form-select" data-action="sellio-config" data-field="matchColumn">${selected("matchColumn")}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Matchear contra</label>
+              <select class="form-select" data-action="sellio-config" data-field="matchTarget">${targetOptions}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Atributo de Odoo</label>
+              <select class="form-select" data-action="sellio-config" data-field="matchAttribute">${this.getMatchAttributeOptions()}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Sell-in</label>
+              <select class="form-select" data-action="sellio-config" data-field="sellInColumn">${selected("sellInColumn")}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Sell-out</label>
+              <select class="form-select" data-action="sellio-config" data-field="sellOutColumn">${selected("sellOutColumn")}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Unidades</label>
+              <select class="form-select" data-action="sellio-config" data-field="quantityColumn">${selected("quantityColumn")}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Fecha o periodo</label>
+              <select class="form-select" data-action="sellio-config" data-field="dateColumn">${selected("dateColumn")}</select>
+            </div>
+            <div class="zrn_processing_field">
+              <label>Grupo visual</label>
+              <select class="form-select" data-action="sellio-config" data-field="groupColumn">${selected("groupColumn")}</select>
+            </div>
+          </div>
+          <div class="zrn_processing_actions">
+            <button type="button" class="btn btn-primary" data-action="sellio-match" ${this.state.matchState.loading ? "disabled" : ""}>
+              ${this.state.matchState.loading ? "Matcheando..." : "Matchear con Odoo"}
+            </button>
+          </div>
+          ${
+            this.state.matchState.error
+              ? `<div class="zrn_processing_query_error">${escapeHtml(this.state.matchState.error)}</div>`
+              : ""
+          }
+          <div class="zrn_processing_hint_strip">
+            Solo las filas matcheadas contra Odoo entran al dashboard. Las no matcheadas quedan fuera para evitar mezclar Retail Link con registros sin referencia interna.
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  renderSellInOutDashboard() {
+    const dashboard = this.getSellInOutDashboardData();
+    const match = this.state.matchState;
+    const maxBar = Math.max(...dashboard.groups.map((item) => Math.max(item.sellIn, item.sellOut)), 1);
+    const barRows = dashboard.groups.length
+      ? dashboard.groups
+          .map((item) => {
+            const inWidth = Math.max(3, Math.round((item.sellIn / maxBar) * 100));
+            const outWidth = Math.max(3, Math.round((item.sellOut / maxBar) * 100));
+            return `
+              <div class="zrn_processing_sellio_bar_row">
+                <strong>${escapeHtml(item.label)}</strong>
+                <div class="zrn_processing_sellio_bar_track"><span class="is-sell-in" style="width:${inWidth}%"></span></div>
+                <div class="zrn_processing_sellio_bar_track"><span class="is-sell-out" style="width:${outWidth}%"></span></div>
+                <small>${this.formatDashboardNumber(item.gap)}</small>
+              </div>
+            `;
+          })
+          .join("")
+      : `<div class="zrn_processing_result_empty">Ejecuta el match para ver comparativos.</div>`;
+    const tableRows = dashboard.rows.slice(0, 80).map((row) => `
+      <tr>
+        <td><strong>${escapeHtml(row.__odoo_name)}</strong><br/><span class="zrn_processing_helper">${escapeHtml(row.__odoo_ref || row.__match_value)}</span></td>
+        <td>${escapeHtml(row.__date || "-")}</td>
+        <td>${escapeHtml(row.__group || "-")}</td>
+        <td class="text-end">${this.formatDashboardNumber(row.__sell_in)}</td>
+        <td class="text-end">${this.formatDashboardNumber(row.__sell_out)}</td>
+        <td class="text-end">${this.formatDashboardNumber(row.__gap)}</td>
+      </tr>
+    `).join("");
+    return `
+      <section class="zrn_processing_panel">
+        <div class="zrn_processing_panel_head">
+          <strong>Dashboard sell-in / sell-out</strong>
+          <span>${match.matchedRows || 0} filas matcheadas</span>
+        </div>
+        <div class="zrn_processing_panel_body">
+          <div class="zrn_processing_totals_kpis">
+            <div class="zrn_processing_total_kpi"><span>Sell-in</span><strong>${this.formatDashboardNumber(dashboard.totalSellIn)}</strong></div>
+            <div class="zrn_processing_total_kpi"><span>Sell-out</span><strong>${this.formatDashboardNumber(dashboard.totalSellOut)}</strong></div>
+            <div class="zrn_processing_total_kpi"><span>Diferencia</span><strong>${this.formatDashboardNumber(dashboard.totalGap)}</strong></div>
+            <div class="zrn_processing_total_kpi"><span>Match</span><strong>${match.totalRows ? `${Math.round((match.matchedRows / match.totalRows) * 100)}%` : "0%"}</strong></div>
+          </div>
+          <div class="zrn_processing_sellio_dashboard_grid">
+            <div class="zrn_processing_sellio_chart">
+              <div class="zrn_processing_sellio_legend">
+                <span><i class="is-sell-in"></i>Sell-in</span>
+                <span><i class="is-sell-out"></i>Sell-out</span>
+                <span>Diferencia</span>
+              </div>
+              ${barRows}
+            </div>
+            <div class="zrn_processing_status_grid">
+              <div class="zrn_processing_status_item"><small>Total archivo</small><strong>${match.totalRows || 0}</strong></div>
+              <div class="zrn_processing_status_item"><small>Matcheadas</small><strong>${match.matchedRows || 0}</strong></div>
+              <div class="zrn_processing_status_item"><small>Sin match</small><strong>${match.unmatchedRows || 0}</strong></div>
+              <div class="zrn_processing_status_item"><small>Destino</small><strong>${escapeHtml(match.targetLabel || "-")}</strong></div>
+            </div>
+          </div>
+          <div class="zrn_processing_result_wrap zrn_processing_sellio_table_wrap">
+            <table class="o_list_table table table-sm zrn_processing_result_table">
+              <thead>
+                <tr>
+                  <th>Registro Odoo</th>
+                  <th>Periodo</th>
+                  <th>Grupo</th>
+                  <th class="text-end">Sell-in</th>
+                  <th class="text-end">Sell-out</th>
+                  <th class="text-end">Diferencia</th>
+                </tr>
+              </thead>
+              <tbody>${tableRows || '<tr><td colspan="6">Sin datos matcheados.</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
   renderLanding() {
     const isLoadingGoogle = Boolean(this.state.sourceInput.loading);
     return `
@@ -2106,7 +2540,7 @@ ${headers
         }
         <section class="zrn_processing_panel">
           <div class="zrn_processing_panel_head">
-            <strong>Origen temporal</strong>
+            <strong>Fuente sell-in / sell-out</strong>
             <span>Archivo local o Google Sheets publico</span>
           </div>
           <div class="zrn_processing_panel_body">
@@ -2138,7 +2572,7 @@ ${headers
               ${
                 isLoadingGoogle
                   ? "Leyendo hojas publicas del Google Sheet..."
-                  : "El origen vive solo en esta sesion del navegador. Si sales o recargas la pagina, se pierde."
+                  : "Carga Retail Link o un archivo sell-out para matchearlo con productos o clientes de Odoo."
               }
             </div>
           </div>
@@ -2260,7 +2694,7 @@ ${headers
               </select>
             </div>
             <div class="zrn_processing_field">
-              <label>Tabla SQL</label>
+              <label>Clave del dataset</label>
               <input type="text" class="form-control" value="${escapeHtml(table?.tableName || "")}" disabled="disabled" />
             </div>
           </div>
@@ -2354,7 +2788,7 @@ ${headers
     return `
       <section class="zrn_processing_panel">
         <div class="zrn_processing_panel_head">
-          <strong>Dataset temporal</strong>
+          <strong>Estructura del archivo</strong>
           <span>${table ? `${table.dataRowsCount} filas detectadas` : "Sin estructura"}</span>
         </div>
         <div class="zrn_processing_panel_body">
@@ -2375,7 +2809,7 @@ ${headers
                     <input type="text" class="form-control" data-action="table-name" value="${escapeHtml(table.name)}" />
                   </div>
                   <div class="zrn_processing_field">
-                    <label>Tabla SQL</label>
+                    <label>Clave del dataset</label>
                     <input type="text" class="form-control" data-action="table-sql-name" value="${escapeHtml(table.tableName)}" />
                   </div>
                   <div class="zrn_processing_field">
@@ -2408,7 +2842,7 @@ ${headers
                       <tr>
                         <th>Usar</th>
                         <th>Origen</th>
-                        <th>Alias SQL</th>
+                        <th>Alias de columna</th>
                         <th>Tipo</th>
                       </tr>
                     </thead>
@@ -2543,7 +2977,7 @@ ${headers
                     <input type="text" class="form-control" data-action="table-name" value="${escapeHtml(table.name)}" />
                   </div>
                   <div class="zrn_processing_field">
-                    <label>Tabla SQL</label>
+                    <label>Clave del dataset</label>
                     <input type="text" class="form-control" data-action="table-sql-name" value="${escapeHtml(table.tableName)}" />
                   </div>
                   <div class="zrn_processing_field">
@@ -2599,7 +3033,7 @@ ${headers
                       <tr>
                         <th>Usar</th>
                         <th>Origen</th>
-                        <th>Alias SQL</th>
+                        <th>Alias de columna</th>
                         <th>Tipo</th>
                       </tr>
                     </thead>
@@ -2613,7 +3047,7 @@ ${headers
     return `
       <section class="zrn_processing_panel">
         <div class="zrn_processing_panel_head">
-          <strong>Dataset temporal</strong>
+          <strong>Estructura del archivo</strong>
           <span>${isSheetLoading ? "Cargando hoja..." : table ? `${table.dataRowsCount} filas detectadas` : "Sin estructura"}</span>
         </div>
         <div class="zrn_processing_panel_body">${bodyContent}</div>
@@ -3409,17 +3843,13 @@ ${headers
             : `
               ${this.renderOverviewPanel(sheet, table)}
               ${this.renderDatasetPanelEnhanced(sheet, table)}
-              ${this.renderQueryPanel(table)}
-              ${this.renderResultPanel()}
-              ${this.renderTotalsPanel()}
-              ${this.renderHelpPanel()}
+              ${this.renderSellInOutMappingPanel(table)}
+              ${this.renderSellInOutDashboard()}
             `
         }
       </div>
     `;
 
-    this.ensureChartRendered();
-    this.ensureScenarioChartRendered();
     this.restoreFocusedField(focusState);
   }
 }
