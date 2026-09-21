@@ -31,8 +31,13 @@ class ZrnPlanningFormController extends FormController {
     this._boundFilterClick = (event) => this.onPlanningFilterClick(event);
     this._boundReconciliationHeaderClick = (event) => this.onReconciliationHeaderClick(event);
     this._currentHomeResId = null;
+    this._themeChangedHandler = () => {
+      if (this.isPlanningHome) this.renderHomeDashboard();
+      if (this.isProductionPlanningFilter) this.renderPlanExplorerChart();
+    };
 
     onMounted(() => {
+      window.addEventListener("zrn-theme-changed", this._themeChangedHandler);
       if (this.isPlanningHome) {
         window.addEventListener("resize", this._homeChartResizeHandler);
         this.rootRef.el?.addEventListener("click", this._boundHomeClick);
@@ -63,6 +68,7 @@ class ZrnPlanningFormController extends FormController {
     });
 
     onWillUnmount(() => {
+      window.removeEventListener("zrn-theme-changed", this._themeChangedHandler);
       if (this.isPlanningHome) {
         window.removeEventListener("resize", this._homeChartResizeHandler);
         this.rootRef.el?.removeEventListener("click", this._boundHomeClick);
@@ -314,13 +320,42 @@ class ZrnPlanningFormController extends FormController {
     if (!this._planExplorerChart) this._planExplorerChart = window.echarts.init(mount);
     const dataset = this.getProductionPlanDataset();
     const labels = rows.map(row => row.name);
+    const isDark = document.documentElement.classList.contains("zrn_backend_dark") ||
+                   document.documentElement.classList.contains("dark") ||
+                   document.body?.classList.contains("o_dark");
     this._planExplorerChart.setOption({
-      color: ["#315f98", "#168173", "#c34b16", "#9dbfe4"],
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: value => Number(value).toLocaleString() },
-      legend: { top: 2, left: "right" },
+      color: isDark ? ["#72a2e8", "#55b9a5", "#f1d38c", "#bfabed"] : ["#315f98", "#168173", "#c34b16", "#9dbfe4"],
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        valueFormatter: value => Number(value).toLocaleString(),
+        backgroundColor: isDark ? "#162131" : "#ffffff",
+        borderColor: isDark ? "#31445d" : "#cfd9e6",
+        textStyle: { color: isDark ? "#e5edf8" : "#17324d" },
+      },
+      legend: {
+        top: 2,
+        left: "right",
+        textStyle: { color: isDark ? "#9fb0c6" : "#61758c" },
+      },
       grid: { top: 42, right: 20, bottom: labels.length > 6 ? 96 : 64, left: 58, containLabel: true },
-      xAxis: { type: "category", data: labels, axisLabel: { interval: 0, rotate: labels.length > 4 ? 24 : 0, hideOverlap: true } },
-      yAxis: { type: "value", minInterval: this._planExplorerDataset === "progress" ? 10 : 1 },
+      xAxis: {
+        type: "category",
+        data: labels,
+        axisLabel: {
+          interval: 0,
+          rotate: labels.length > 4 ? 24 : 0,
+          hideOverlap: true,
+          color: isDark ? "#9fb0c6" : "#61758c",
+        },
+        axisLine: { lineStyle: { color: isDark ? "#334155" : "#cfd9e6" } },
+      },
+      yAxis: {
+        type: "value",
+        minInterval: this._planExplorerDataset === "progress" ? 10 : 1,
+        axisLabel: { color: isDark ? "#9fb0c6" : "#61758c" },
+        splitLine: { lineStyle: { color: isDark ? "#22344a" : "#edf2f8" } },
+      },
       series: dataset.series.map(([name, field]) => ({
         name,
         type: this._planExplorerChartType,
@@ -604,13 +639,41 @@ class ZrnPlanningFormController extends FormController {
     const labels = rows.map(row => row.name);
     const generatedLabel = payload.order_label || "Ordenes";
     const completedLabel = "Finalizadas";
+    const isDark = document.documentElement.classList.contains("zrn_backend_dark") ||
+                   document.documentElement.classList.contains("dark") ||
+                   document.body?.classList.contains("o_dark");
     return {
-      color: ["#315f98", "#9dbfe4"],
-      tooltip: { trigger: "axis", axisPointer: { type: "shadow" }, valueFormatter: value => Number(value).toLocaleString() },
-      legend: { bottom: 4, left: "center" },
+      color: isDark ? ["#72a2e8", "#55b9a5"] : ["#315f98", "#9dbfe4"],
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        valueFormatter: value => Number(value).toLocaleString(),
+        backgroundColor: isDark ? "#162131" : "#ffffff",
+        borderColor: isDark ? "#31445d" : "#cfd9e6",
+        textStyle: { color: isDark ? "#e5edf8" : "#17324d" },
+      },
+      legend: {
+        bottom: 4,
+        left: "center",
+        textStyle: { color: isDark ? "#9fb0c6" : "#61758c" },
+      },
       grid: { top: 22, right: 20, bottom: labels.length > 4 ? 88 : 62, left: 52, containLabel: true },
-      xAxis: { type: "category", data: labels, axisLabel: { interval: 0, rotate: labels.length > 4 ? 24 : 0 } },
-      yAxis: { type: "value", minInterval: 1 },
+      xAxis: {
+        type: "category",
+        data: labels,
+        axisLabel: {
+          interval: 0,
+          rotate: labels.length > 4 ? 24 : 0,
+          color: isDark ? "#9fb0c6" : "#61758c",
+        },
+        axisLine: { lineStyle: { color: isDark ? "#334155" : "#cfd9e6" } },
+      },
+      yAxis: {
+        type: "value",
+        minInterval: 1,
+        axisLabel: { color: isDark ? "#9fb0c6" : "#61758c" },
+        splitLine: { lineStyle: { color: isDark ? "#22344a" : "#edf2f8" } },
+      },
       series: [
         { name: generatedLabel, type: "bar", barMaxWidth: 30, data: rows.map(row => Number(row.orders_generated || 0)) },
         { name: completedLabel, type: "bar", barMaxWidth: 30, data: rows.map(row => Number(row.orders_completed || 0)) },

@@ -29,6 +29,7 @@ Addon dedicado a la capa comercial operativa:
     'assets': {
         'web.assets_backend': [
             'zrn_commercial/static/lib/echarts/echarts.min.js',
+            'zrn_commercial/static/src/js/dark_mode_bridge.js',
             'zrn_commercial/static/src/js/commercial_home_dashboard.js',
             'zrn_commercial/static/src/scss/commercial_home_dashboard.scss',
             'zrn_commercial/static/src/js/commercial_hub_action.js',

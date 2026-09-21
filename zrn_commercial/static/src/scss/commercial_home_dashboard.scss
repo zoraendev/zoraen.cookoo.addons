@@ -501,3 +501,259 @@ button.zrn_commercial_btn_orders:hover {
     margin-left: 0;
   }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// (ZRN) Manejo Comercial – Dark mode overrides (alineado con ZRN Analitica)
+// ─────────────────────────────────────────────────────────────────────────────
+html.dark,
+html[data-theme="dark"],
+html[data-color-scheme="dark"],
+html.zrn_backend_dark,
+body.o_dark,
+body.dark,
+.o_web_client.o_dark,
+.o_dark {
+  .o_action_manager .zrn_commercial_home,
+  .o_form_view .zrn_commercial_home {
+    background: transparent;
+  }
+
+  // Tabla resumen de KPIs superiores
+  .o_action_manager .zrn_commercial_summary_table,
+  .o_form_view .zrn_commercial_summary_table {
+    border-color: #334155;
+    background: #162131;
+
+    th {
+      border-bottom: 1px solid #31445d;
+      background: #182334;
+      color: #8db6f2;
+    }
+
+    td {
+      background: #111827;
+      border-bottom: 0;
+    }
+  }
+
+  .o_action_manager .zrn_commercial_summary_link.btn,
+  .o_form_view .zrn_commercial_summary_link.btn {
+    color: #8db6f2;
+  }
+
+  .o_action_manager .zrn_commercial_summary_icon,
+  .o_form_view .zrn_commercial_summary_icon {
+    color: #72a2e8;
+  }
+
+  .o_action_manager .zrn_commercial_summary_value,
+  .o_form_view .zrn_commercial_summary_value,
+  .o_action_manager .zrn_commercial_summary_value .o_field_widget,
+  .o_form_view .zrn_commercial_summary_value .o_field_widget,
+  .o_action_manager .zrn_commercial_summary_value .o_field_widget span,
+  .o_form_view .zrn_commercial_summary_value .o_field_widget span {
+    color: #8db6f2;
+    text-decoration-color: #8db6f2;
+  }
+
+  // Paneles del dashboard
+  .o_action_manager .zrn_commercial_panel,
+  .o_form_view .zrn_commercial_panel {
+    border-color: #334155;
+    background: #111827;
+  }
+
+  .o_action_manager .zrn_commercial_panel_head,
+  .o_form_view .zrn_commercial_panel_head {
+    border-bottom: 1px solid #31445d;
+    background: #182334;
+
+    strong {
+      color: #8db6f2;
+    }
+
+    span {
+      color: #9fb0c6;
+    }
+  }
+
+  // Botones de acción (gráfica, config, export, tabla, navegación)
+  .o_action_manager .zrn_commercial_icon_btn.btn,
+  .o_form_view .zrn_commercial_icon_btn.btn {
+    border-color: #334155;
+    background: #162131;
+    color: #8db6f2;
+
+    &:hover,
+    &:focus {
+      border-color: #42566f;
+      background: #1e2c40;
+      color: #a7c8f8;
+    }
+
+    &.is-active {
+      border-color: #72a2e8;
+      background: #1f4e8c;
+      color: #ffffff;
+    }
+  }
+
+  .o_action_manager .zrn_commercial_nav_btn.btn,
+  .o_form_view .zrn_commercial_nav_btn.btn {
+    border-color: #72a2e8;
+    background: #1f4e8c;
+    color: #ffffff;
+
+    &:hover,
+    &:focus {
+      border-color: #8db6f2;
+      background: #2f65ad;
+      color: #ffffff;
+    }
+  }
+
+  // Gráfica y montajes de tabla
+  .o_action_manager .zrn_commercial_chart,
+  .o_form_view .zrn_commercial_chart,
+  .o_action_manager .zrn_commercial_table_mount,
+  .o_form_view .zrn_commercial_table_mount,
+  .o_action_manager .zrn_commercial_table_surface,
+  .o_form_view .zrn_commercial_table_surface {
+    background: #131d2c;
+  }
+
+  // Tablas de datos internas
+  .o_action_manager .zrn_commercial_table_surface,
+  .o_form_view .zrn_commercial_table_surface {
+    table {
+      color: #e5edf8;
+    }
+
+    th {
+      border-bottom: 1px solid #31445d;
+      background: #182334;
+      color: #8db6f2;
+    }
+
+    td {
+      border-bottom: 1px solid #334155;
+      color: #e5edf8;
+      background: #131d2c;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #111827;
+    }
+
+    tbody tr:hover td {
+      background: #22344a;
+    }
+  }
+
+  .o_action_manager .zrn_commercial_sort_header,
+  .o_form_view .zrn_commercial_sort_header {
+    i {
+      color: #9fb0c6;
+    }
+
+    &:hover,
+    &:focus {
+      color: #8db6f2;
+
+      i {
+        color: #8db6f2;
+      }
+    }
+  }
+
+  .o_action_manager .zrn_commercial_table_empty,
+  .o_form_view .zrn_commercial_table_empty,
+  .o_action_manager .zrn_commercial_empty,
+  .o_form_view .zrn_commercial_empty {
+    color: #9fb0c6;
+    background: #131d2c;
+  }
+
+  // Modal de configuración de gráfico
+  .o_action_manager .zrn_commercial_chart_config_backdrop,
+  .o_form_view .zrn_commercial_chart_config_backdrop {
+    background: rgba(2, 6, 23, 0.65);
+  }
+
+  .o_action_manager .zrn_commercial_chart_config_dialog,
+  .o_form_view .zrn_commercial_chart_config_dialog {
+    border-color: #334155;
+    background: #162131;
+    color: #e5edf8;
+    box-shadow: 0 10px 28px rgba(2, 6, 23, 0.45);
+  }
+
+  .o_action_manager .zrn_commercial_chart_config_head,
+  .o_form_view .zrn_commercial_chart_config_head,
+  .o_action_manager .zrn_commercial_chart_config_footer,
+  .o_form_view .zrn_commercial_chart_config_footer {
+    border-color: #31445d;
+    background: #182334;
+    color: #f8fbff;
+  }
+
+  .o_action_manager .zrn_commercial_chart_config_body,
+  .o_form_view .zrn_commercial_chart_config_body {
+    background: #162131;
+
+    label {
+      color: #8db6f2;
+    }
+
+    select,
+    input {
+      border: 1px solid #42566f;
+      border-radius: 4px;
+      background: #101a29;
+      color: #e5edf8;
+    }
+  }
+
+  // Menú flotante de exportación
+  .zrn_commercial_export_menu {
+    border-color: #334155;
+    background: #162131;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.4);
+  }
+
+  .zrn_commercial_export_menu_title {
+    border-bottom: 1px solid #31445d;
+    color: #9fb0c6;
+  }
+
+  .zrn_commercial_export_menu_item {
+    background: transparent;
+    color: #8db6f2;
+
+    &:hover,
+    &:focus {
+      background: #1e2c40;
+      color: #a7c8f8;
+    }
+  }
+
+  // Tarjetas KPI heredadas
+  .o_action_manager .zrn_commercial_kpi,
+  .o_form_view .zrn_commercial_kpi {
+    border-color: #334155;
+    background: #162131;
+
+    strong {
+      color: #f8fbff;
+    }
+
+    .zrn_commercial_text_link.btn {
+      color: #8db6f2;
+
+      &:hover {
+        color: #a7c8f8;
+      }
+    }
+  }
+}
+
