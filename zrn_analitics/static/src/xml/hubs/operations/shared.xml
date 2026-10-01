@@ -61,6 +61,17 @@
                                     <label>Rotacion</label>
                                     <SelectMenu choices="getSelectChoices(operationsPayload.filter_options.rotation_choices, 'Toda la rotacion')" value="state.operationsFilters.rotation_key" onSelect.bind="this.onOperationsRotationSelect"/>
                                 </div>
+                                <div class="zrn_analitics_operations_field zrn_analitics_commercial_field_inline zrn_analitics_commercial_billing_filter">
+                                    <label>Contabilidad</label>
+                                    <label class="zrn_analitics_commercial_check">
+                                        <input type="checkbox" class="form-check-input" t-att-checked="state.operationsFilters.accounting_basis" t-on-change="(ev) =&gt; this.updateOperationsFilter('accounting_basis', ev.target.checked)"/>
+                                        <span>Cuadrar con contabilidad</span>
+                                    </label>
+                                    <label class="zrn_analitics_commercial_check">
+                                        <input type="checkbox" class="form-check-input" t-att-checked="state.operationsFilters.include_special_invoices" t-on-change="(ev) =&gt; this.updateOperationsFilter('include_special_invoices', ev.target.checked)"/>
+                                        <span>Incluir facturas especiales</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">

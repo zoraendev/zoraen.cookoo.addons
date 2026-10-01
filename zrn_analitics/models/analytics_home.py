@@ -290,7 +290,23 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         product_ids,
         order_status='confirmed',
         invoiced_only=False,
+        accounting_basis=False,
+        include_special_invoices=False,
     ):
+        if accounting_basis:
+            metrics = self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                product_ids,
+                include_special_invoices,
+            )
+            line_ids = list(metrics.get('lines', {}).keys())
+            return self.env['sale.order.line'].browse(line_ids).sorted(
+                key=lambda line: (
+                    metrics['lines'].get(line.id, {}).get('date') or fields.Date.context_today(self),
+                    line.id,
+                )
+            )
         state_map = {
             'draft': ['draft', 'sent'],
             'confirmed': ['sale', 'done'],
@@ -314,6 +330,114 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 line.id,
             )
         )
+
+    @api.model
+    def _is_special_invoice_move(self, move):
+        marker_values = [
+            move.name,
+            move.ref,
+            move.journal_id.name,
+            move.journal_id.code,
+        ]
+        for field_name in (
+            'l10n_latam_document_type_id',
+            'l10n_gt_document_type_id',
+            'l10n_gt_edi_document_type_id',
+        ):
+            if field_name not in move._fields:
+                continue
+            document_type = getattr(move, field_name)
+            if not document_type:
+                continue
+            marker_values.extend([
+                getattr(document_type, 'name', False),
+                getattr(document_type, 'code', False),
+                getattr(document_type, 'internal_type', False),
+            ])
+        markers = ('especial', 'special', 'fespc')
+        return any(
+            any(marker in str(value).lower() for marker in markers)
+            for value in marker_values
+            if value
+        )
+
+    @api.model
+    def _get_accounting_sale_line_metrics(self, date_from, date_to, product_ids, include_special_invoices=False):
+        if not product_ids or 'account.move.line' not in self.env:
+            return {'lines': {}, 'monthly': defaultdict(float)}
+        domain = [
+            ('move_id.state', '=', 'posted'),
+            ('move_id.move_type', 'in', ['out_invoice', 'out_refund']),
+            ('company_id', '=', self.env.company.id),
+            ('display_type', 'not in', ['line_section', 'line_note']),
+            ('product_id', 'in', product_ids),
+            ('sale_line_ids', '!=', False),
+        ]
+        if date_from:
+            domain.append(('move_id.invoice_date', '>=', date_from))
+        if date_to:
+            domain.append(('move_id.invoice_date', '<=', date_to))
+
+        metrics = {'lines': {}, 'monthly': defaultdict(float)}
+        for invoice_line in self.env['account.move.line'].search(domain):
+            move = invoice_line.move_id
+            if not include_special_invoices and self._is_special_invoice_move(move):
+                continue
+            invoice_date = move.invoice_date or move.date
+            if not invoice_date:
+                continue
+            sign = -1.0 if move.move_type == 'out_refund' else 1.0
+            sale_lines = invoice_line.sale_line_ids.filtered(lambda line: line.product_id.id in product_ids)
+            if not sale_lines:
+                continue
+            split_count = len(sale_lines)
+            amount = sign * float(getattr(invoice_line, 'price_total', 0.0) or 0.0) / split_count
+            quantity = sign * float(getattr(invoice_line, 'quantity', 0.0) or 0.0) / split_count
+            month_key = invoice_date.replace(day=1)
+            metrics['monthly'][month_key] += amount
+            for sale_line in sale_lines:
+                line_metrics = metrics['lines'].setdefault(
+                    sale_line.id,
+                    {
+                        'amount': 0.0,
+                        'quantity': 0.0,
+                        'date': invoice_date,
+                        'monthly': defaultdict(float),
+                        'move_ids': set(),
+                    },
+                )
+                line_metrics['amount'] += amount
+                line_metrics['quantity'] += quantity
+                line_metrics['date'] = max(line_metrics['date'], invoice_date)
+                line_metrics['monthly'][month_key] += amount
+                line_metrics['move_ids'].add(move.id)
+        return metrics
+
+    @api.model
+    def _get_line_amount(self, line, accounting_metrics=None):
+        if accounting_metrics:
+            return float(accounting_metrics.get('lines', {}).get(line.id, {}).get('amount', 0.0))
+        return float(line.price_total or 0.0)
+
+    @api.model
+    def _get_line_quantity(self, line, accounting_metrics=None):
+        if accounting_metrics:
+            return float(accounting_metrics.get('lines', {}).get(line.id, {}).get('quantity', 0.0))
+        return float(line.product_uom_qty or 0.0)
+
+    @api.model
+    def _get_line_date(self, line, fallback_date=False, accounting_metrics=None):
+        if accounting_metrics:
+            return accounting_metrics.get('lines', {}).get(line.id, {}).get('date') or fallback_date
+        order = line.order_id
+        return fields.Datetime.to_datetime(order.date_order).date() if order and order.date_order else fallback_date
+
+    @api.model
+    def _get_line_month_amounts(self, line, accounting_metrics=None):
+        if accounting_metrics:
+            return accounting_metrics.get('lines', {}).get(line.id, {}).get('monthly', {})
+        order_date = self._get_line_date(line)
+        return {order_date.replace(day=1): self._get_line_amount(line)} if order_date else {}
 
     @api.model
     def _get_recent_month_labels(self, date_to, count=5):
@@ -675,6 +799,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             'order_type': order_type,
             'order_status': order_status,
             'invoiced_only': bool(filters.get('invoiced_only')) if order_type == 'sale' else False,
+            'accounting_basis': bool(filters.get('accounting_basis')) if order_type == 'sale' else False,
+            'include_special_invoices': bool(filters.get('include_special_invoices')) if order_type == 'sale' else False,
         }
 
     @api.model
@@ -750,6 +876,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             'order_type': normalized_filters.get('order_type') or 'sale',
             'order_status': normalized_filters.get('order_status') or 'confirmed',
             'invoiced_only': bool(normalized_filters.get('invoiced_only')),
+            'accounting_basis': bool(normalized_filters.get('accounting_basis')),
+            'include_special_invoices': bool(normalized_filters.get('include_special_invoices')),
         }
 
     @api.model
@@ -1251,13 +1379,24 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
         currency_symbol = self.env.company.currency_id.symbol or '$'
         brands, product_brand_map = self._get_commercial_brand_map()
         channel_setup = self._get_channel_setup_status()
-        order_lines = self.env['sale.order.line'].search([
-            ('order_id.state', 'in', ['sale', 'done']),
-            ('display_type', '=', False),
-            ('company_id', '=', self.env.company.id),
-            ('order_id.date_order', '>=', f'{date_from} 00:00:00'),
-            ('order_id.date_order', '<=', f'{date_to} 23:59:59'),
-        ]).sorted(key=lambda line: ((line.order_id.date_order or fields.Datetime.now()), line.id))
+        accounting_metrics = (
+            self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                list(product_brand_map.keys()),
+                normalized_filters.get('include_special_invoices'),
+            )
+            if normalized_filters.get('accounting_basis') else {}
+        )
+        order_lines = self._get_commercial_sale_order_lines(
+            date_from,
+            date_to,
+            list(product_brand_map.keys()),
+            normalized_filters.get('order_status') or 'confirmed',
+            normalized_filters.get('invoiced_only'),
+            normalized_filters.get('accounting_basis'),
+            normalized_filters.get('include_special_invoices'),
+        )
         filter_options = self._build_filter_options(order_lines, brands)
 
         if not brands or not product_brand_map:
@@ -1440,8 +1579,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             filtered_count += 1
             product_count_set.add(product.id)
             order_id_set.add(order.id)
-            amount = float(line.price_total or 0.0)
-            quantity = float(line.product_uom_qty or 0.0)
+            amount = self._get_line_amount(line, accounting_metrics)
+            quantity = self._get_line_quantity(line, accounting_metrics)
             standard_cost = float(product.standard_price or 0.0)
             has_cost = standard_cost > 0
             has_match = bool(brand_id and has_cost)
@@ -1449,7 +1588,7 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             cost_amount = (standard_cost * quantity) if has_match else 0.0
             margin_amount = matched_amount - cost_amount
             margin_pct = (margin_amount / matched_amount * 100.0) if matched_amount else 0.0
-            order_date = fields.Datetime.to_datetime(order.date_order).date() if order.date_order else False
+            order_date = self._get_line_date(line, accounting_metrics=accounting_metrics)
             if order_date:
                 month_key = order_date.replace(day=1)
                 if month_key in month_index:
@@ -2002,12 +2141,23 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             return payload
 
         partner_channel_map = self._get_partner_channel_details_map()
+        accounting_metrics = (
+            self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                list(product_brand_map.keys()),
+                normalized_filters.get('include_special_invoices'),
+            )
+            if normalized_filters.get('accounting_basis') else {}
+        )
         order_lines = self._get_commercial_sale_order_lines(
             date_from,
             date_to,
             list(product_brand_map.keys()),
             normalized_filters.get('order_status') or 'confirmed',
             normalized_filters.get('invoiced_only'),
+            normalized_filters.get('accounting_basis'),
+            normalized_filters.get('include_special_invoices'),
         )
         filter_options = self._build_filter_options(order_lines, brands, filters=normalized_filters)
         filtered_lines = order_lines.filtered(lambda line: self._line_matches_filters(line, product_brand_map, normalized_filters, partner_channel_map=partner_channel_map))
@@ -2196,18 +2346,15 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             if not brand_info:
                 continue
 
-            amount = float(line.price_total or 0.0)
-            quantity = float(line.product_uom_qty or 0.0)
+            amount = self._get_line_amount(line, accounting_metrics)
+            quantity = self._get_line_quantity(line, accounting_metrics)
             order_ids.add(order.id)
             channel_name = self._resolve_partner_channel(commercial_partner)
 
-            if order.date_order:
-                order_date = fields.Datetime.to_datetime(order.date_order).date()
-                order_month = order_date.replace(day=1)
+            order_date = self._get_line_date(line, accounting_metrics=accounting_metrics)
+            for order_month, month_amount in self._get_line_month_amounts(line, accounting_metrics).items():
                 if order_month in month_amounts:
-                    month_amounts[order_month] += amount
-            else:
-                order_date = False
+                    month_amounts[order_month] += month_amount
 
             brand_amounts[brand_info['brand_name']] += amount
             brand_product_ids[brand_info['brand_name']].add(product.id)
@@ -2296,8 +2443,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 customer_entry['total_units'] += quantity
                 cost_real = getattr(line, 'purchase_price', 0.0) or (product.standard_price or 0.0)
                 customer_entry['cost_amount'] += quantity * cost_real
-                if order.date_order:
-                    customer_entry['order_dates'].add(fields.Datetime.to_datetime(order.date_order).date())
+                if order_date:
+                    customer_entry['order_dates'].add(order_date)
                 if channel_name:
                     customer_entry['channels_rev'][channel_name] += amount
                 customer_entry['products_rev'][product.display_name] += amount
@@ -2970,9 +3117,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             entry = c['_raw_entry']
             monthly_revs = defaultdict(float)
             for line in filtered_lines:
-                if line.order_id.partner_id.id == c['id'] and line.order_id.date_order:
-                    m_key = fields.Datetime.to_datetime(line.order_id.date_order).date().strftime('%Y-%m')
-                    monthly_revs[m_key] += float(line.price_total or 0.0)
+                if line.order_id.partner_id.id == c['id']:
+                    for month_key, month_amount in self._get_line_month_amounts(line, accounting_metrics).items():
+                        monthly_revs[month_key.strftime('%Y-%m')] += month_amount
                     
             r_vals = [monthly_revs[m] for m in last_3_months]
             while len(r_vals) < 3:
@@ -3053,12 +3200,14 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             qty_last_month = 0.0
             qty_preceding = 0.0
             for line in filtered_lines:
-                if line.product_id.id == p_id and line.order_id.date_order:
-                    o_date = fields.Datetime.to_datetime(line.order_id.date_order).date()
+                if line.product_id.id == p_id:
+                    o_date = self._get_line_date(line, accounting_metrics=accounting_metrics)
+                    if not o_date:
+                        continue
                     if o_date >= last_month_start:
-                        qty_last_month += float(line.product_uom_qty or 0.0)
+                        qty_last_month += self._get_line_quantity(line, accounting_metrics)
                     else:
-                        qty_preceding += float(line.product_uom_qty or 0.0)
+                        qty_preceding += self._get_line_quantity(line, accounting_metrics)
                         
             pace_last = qty_last_month / last_month_days if last_month_days > 0 else 0.0
             pace_prev = qty_preceding / preceding_days if preceding_days > 0 else 0.0
@@ -3105,11 +3254,12 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 if not order or not partner or not product:
                     continue
                 
-                amount = float(line.price_total or 0.0)
-                quantity = float(line.product_uom_qty or 0.0)
-                month_key = fields.Datetime.to_datetime(order.date_order).date().strftime('%Y-%m')
+                amount = self._get_line_amount(line, accounting_metrics)
+                quantity = self._get_line_quantity(line, accounting_metrics)
+                order_date = self._get_line_date(line, date_to, accounting_metrics)
+                month_key = order_date.strftime('%Y-%m')
                 
-                seed = (product.id * 17 + partner.id * 31 + (order.date_order.month if order.date_order else 5) * 13) % 100
+                seed = (product.id * 17 + partner.id * 31 + (order_date.month if order_date else 5) * 13) % 100
                 factor = 0.82 + (seed % 13) * 0.01
                 sellout_u = round(quantity * factor, 0)
                 sellout_q = amount * (sellout_u / quantity) if quantity > 0 else 0.0
@@ -3418,6 +3568,8 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             list(product_brand_map.keys()),
             normalized_filters.get('order_status') or 'confirmed',
             normalized_filters.get('invoiced_only'),
+            normalized_filters.get('accounting_basis'),
+            normalized_filters.get('include_special_invoices'),
         )
         if not order_lines:
             return self._build_empty_operations_payload(
@@ -3444,6 +3596,15 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 base_filter_options,
                 'No hay datos operativos para los filtros seleccionados.',
             )
+        accounting_metrics = (
+            self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                list(product_brand_map.keys()),
+                normalized_filters.get('include_special_invoices'),
+            )
+            if normalized_filters.get('accounting_basis') else {}
+        )
 
         def _month_key_from_date(value):
             if not value:
@@ -3513,15 +3674,15 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             if not brand_info:
                 continue
 
-            order_date = fields.Datetime.to_datetime(order.date_order).date() if order.date_order else date_to
+            order_date = self._get_line_date(line, date_to, accounting_metrics)
             month_key = _month_key_from_date(order_date.replace(day=1))
             channel_name = self._resolve_partner_channel(commercial_partner)
             if not channel_name:
                 continue
 
             channels_seen.add(channel_name)
-            amount = float(line.price_total or 0.0)
-            quantity = float(line.product_uom_qty or 0.0)
+            amount = self._get_line_amount(line, accounting_metrics)
+            quantity = self._get_line_quantity(line, accounting_metrics)
             order_ids.add(order.id)
             partner_ids.add(commercial_partner.id)
 
@@ -3702,9 +3863,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             channel_name = self._resolve_partner_channel(commercial_partner)
             if not channel_name:
                 continue
-            order_date = fields.Datetime.to_datetime(order.date_order).date() if order.date_order else date_to
+            order_date = self._get_line_date(line, date_to, accounting_metrics)
             month_key = _month_key_from_date(order_date.replace(day=1))
-            selected_channel_month_totals[channel_name][month_key] += float(line.price_total or 0.0)
+            selected_channel_month_totals[channel_name][month_key] += self._get_line_amount(line, accounting_metrics)
 
         forecast_channel_rows = []
         if month_keys:
@@ -4375,6 +4536,17 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             list(product_brand_map.keys()),
             normalized_filters.get('order_status') or 'confirmed',
             normalized_filters.get('invoiced_only'),
+            normalized_filters.get('accounting_basis'),
+            normalized_filters.get('include_special_invoices'),
+        )
+        accounting_metrics = (
+            self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                list(product_brand_map.keys()),
+                normalized_filters.get('include_special_invoices'),
+            )
+            if normalized_filters.get('accounting_basis') else {}
         )
 
         base_channels = set()
@@ -4457,9 +4629,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
                 if search_term not in search_haystack:
                     continue
 
-            amount = float(line.price_total or 0.0)
-            quantity = float(line.product_uom_qty or 0.0)
-            order_date = fields.Datetime.to_datetime(order.date_order).date() if order.date_order else date_to
+            amount = self._get_line_amount(line, accounting_metrics)
+            quantity = self._get_line_quantity(line, accounting_metrics)
+            order_date = self._get_line_date(line, date_to, accounting_metrics)
 
             row = channel_rows.setdefault(
                 channel_name,
@@ -4710,6 +4882,17 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             list(product_brand_map.keys()),
             normalized_filters.get('order_status') or 'confirmed',
             normalized_filters.get('invoiced_only'),
+            normalized_filters.get('accounting_basis'),
+            normalized_filters.get('include_special_invoices'),
+        )
+        accounting_metrics = (
+            self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                list(product_brand_map.keys()),
+                normalized_filters.get('include_special_invoices'),
+            )
+            if normalized_filters.get('accounting_basis') else {}
         )
         filter_options = self._build_filter_options(order_lines, brands)
         filtered_lines = order_lines.filtered(lambda line: self._line_matches_filters(line, product_brand_map, normalized_filters, partner_channel_map=partner_channel_map))
@@ -4812,9 +4995,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             if not brand_info:
                 continue
 
-            amount = float(line.price_total or 0.0)
-            quantity = float(line.product_uom_qty or 0.0)
-            order_date = fields.Datetime.to_datetime(order.date_order).date() if order.date_order else date_to
+            amount = self._get_line_amount(line, accounting_metrics)
+            quantity = self._get_line_quantity(line, accounting_metrics)
+            order_date = self._get_line_date(line, date_to, accounting_metrics)
             channel_name = self._resolve_partner_channel(partner)
             total_revenue += amount
 
@@ -5148,6 +5331,17 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             list(product_brand_map.keys()),
             normalized_filters.get('order_status') or 'confirmed',
             normalized_filters.get('invoiced_only'),
+            normalized_filters.get('accounting_basis'),
+            normalized_filters.get('include_special_invoices'),
+        )
+        accounting_metrics = (
+            self._get_accounting_sale_line_metrics(
+                date_from,
+                date_to,
+                list(product_brand_map.keys()),
+                normalized_filters.get('include_special_invoices'),
+            )
+            if normalized_filters.get('accounting_basis') else {}
         )
         filter_options = self._build_filter_options(order_lines, brands)
 
@@ -5198,9 +5392,9 @@ class ZrnAnalyticsHome(ZrnAnalyticsNavigationMixin, models.Model):
             if not brand_info:
                 continue
 
-            order_date = fields.Datetime.to_datetime(order.date_order).date() if order.date_order else date_to
-            amount = float(line.price_total or 0.0)
-            quantity = float(line.product_uom_qty or 0.0)
+            order_date = self._get_line_date(line, date_to, accounting_metrics)
+            amount = self._get_line_amount(line, accounting_metrics)
+            quantity = self._get_line_quantity(line, accounting_metrics)
             channel_name = self._resolve_partner_channel(partner)
             subchain = self._infer_pdv_subchain(channel_name, partner.display_name)
             month_key = order_date.replace(day=1)

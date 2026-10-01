@@ -53,6 +53,17 @@
                                     <label>Canal</label>
                                     <ZrnRelationalMultiSelect records="getSelectedOptionRecords(pdvPayload.filter_options.channels, state.pdvFilters.channel_ids)" domain="getOptionDomain(pdvPayload.filter_options.channels)" resModel="'zrn_commercial.commercial.channel'" fieldString="'Canal'" placeholder="'Todos los canales'" onChange.bind="this.onPdvChannelsChange"/>
                                 </div>
+                                <div class="zrn_analitics_pdv_field zrn_analitics_commercial_field_inline zrn_analitics_commercial_billing_filter">
+                                    <label>Contabilidad</label>
+                                    <label class="zrn_analitics_commercial_check">
+                                        <input type="checkbox" class="form-check-input" t-att-checked="state.pdvFilters.accounting_basis" t-on-change="(ev) =&gt; this.updatePdvFilter('accounting_basis', ev.target.checked)"/>
+                                        <span>Cuadrar con contabilidad</span>
+                                    </label>
+                                    <label class="zrn_analitics_commercial_check">
+                                        <input type="checkbox" class="form-check-input" t-att-checked="state.pdvFilters.include_special_invoices" t-on-change="(ev) =&gt; this.updatePdvFilter('include_special_invoices', ev.target.checked)"/>
+                                        <span>Incluir facturas especiales</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">

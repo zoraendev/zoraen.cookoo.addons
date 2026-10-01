@@ -100,6 +100,8 @@ const DEFAULT_FILTERS = Object.freeze({
   order_type: "sale",
   order_status: "confirmed",
   invoiced_only: false,
+  accounting_basis: false,
+  include_special_invoices: false,
 });
 
 function cloneDefaultFilters() {
@@ -117,6 +119,8 @@ function cloneDefaultFilters() {
     order_type: "sale",
     order_status: "confirmed",
     invoiced_only: false,
+    accounting_basis: false,
+    include_special_invoices: false,
   };
 }
 
@@ -132,7 +136,7 @@ function normalizeCommercialFilterValue(key, value) {
   ].includes(key)) {
     return normalizeFilterIds(value);
   }
-  if (key === "invoiced_only") {
+  if (key === "invoiced_only" || key === "accounting_basis" || key === "include_special_invoices") {
     return Boolean(value);
   }
   return value ?? "";
@@ -147,6 +151,8 @@ const OPERATIONS_DEFAULT_FILTERS = Object.freeze({
   abc_class: "",
   rotation_key: "",
   search: "",
+  accounting_basis: false,
+  include_special_invoices: false,
 });
 
 function cloneOperationsDefaultFilters() {
@@ -157,6 +163,8 @@ function cloneOperationsDefaultFilters() {
     channel_ids: [],
     product_channel_ids: [],
     brand_ids: [],
+    accounting_basis: false,
+    include_special_invoices: false,
   };
 }
 
@@ -2205,6 +2213,8 @@ class ZrnAnalyticsHubAction extends Component {
       order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
       order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
       invoiced_only: Boolean(activeFilters.invoiced_only),
+      accounting_basis: Boolean(activeFilters.accounting_basis),
+      include_special_invoices: Boolean(activeFilters.include_special_invoices),
     };
     this.state.overviewFilters = { ...nextFilters };
     this.state.portfolioFilters = { ...nextFilters };
@@ -2227,6 +2237,8 @@ class ZrnAnalyticsHubAction extends Component {
       order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
       order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
       invoiced_only: Boolean(activeFilters.invoiced_only),
+      accounting_basis: Boolean(activeFilters.accounting_basis),
+      include_special_invoices: Boolean(activeFilters.include_special_invoices),
     };
   }
 
@@ -2246,6 +2258,8 @@ class ZrnAnalyticsHubAction extends Component {
       order_type: activeFilters.order_type || DEFAULT_FILTERS.order_type,
       order_status: activeFilters.order_status || DEFAULT_FILTERS.order_status,
       invoiced_only: Boolean(activeFilters.invoiced_only),
+      accounting_basis: Boolean(activeFilters.accounting_basis),
+      include_special_invoices: Boolean(activeFilters.include_special_invoices),
     };
   }
 
@@ -2258,6 +2272,8 @@ class ZrnAnalyticsHubAction extends Component {
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
       search: activeFilters.search || "",
+      accounting_basis: Boolean(activeFilters.accounting_basis),
+      include_special_invoices: Boolean(activeFilters.include_special_invoices),
     };
   }
 
@@ -2272,6 +2288,8 @@ class ZrnAnalyticsHubAction extends Component {
       abc_class: activeFilters.abc_class || "",
       rotation_key: activeFilters.rotation_key || "",
       search: activeFilters.search || "",
+      accounting_basis: Boolean(activeFilters.accounting_basis),
+      include_special_invoices: Boolean(activeFilters.include_special_invoices),
     };
   }
 
@@ -2284,6 +2302,8 @@ class ZrnAnalyticsHubAction extends Component {
       brand_ids: normalizeFilterIds(activeFilters.brand_ids),
       category_ids: normalizeFilterIds(activeFilters.category_ids),
       search: activeFilters.search || "",
+      accounting_basis: Boolean(activeFilters.accounting_basis),
+      include_special_invoices: Boolean(activeFilters.include_special_invoices),
     };
   }
 
@@ -2409,7 +2429,9 @@ class ZrnAnalyticsHubAction extends Component {
       [key]:
         key === "channel_ids" || key === "brand_ids" || key === "category_ids"
           ? normalizeFilterIds(value)
-          : value ?? "",
+          : key === "accounting_basis" || key === "include_special_invoices"
+            ? Boolean(value)
+            : value ?? "",
     };
   }
 
@@ -2419,7 +2441,9 @@ class ZrnAnalyticsHubAction extends Component {
       [key]:
         key === "channel_ids" || key === "product_channel_ids" || key === "brand_ids"
           ? normalizeFilterIds(value)
-          : value ?? "",
+          : key === "accounting_basis" || key === "include_special_invoices"
+            ? Boolean(value)
+            : value ?? "",
     };
   }
 
@@ -2429,7 +2453,9 @@ class ZrnAnalyticsHubAction extends Component {
       [key]:
         key === "channel_ids" || key === "brand_ids" || key === "category_ids"
           ? normalizeFilterIds(value)
-          : value ?? "",
+          : key === "accounting_basis" || key === "include_special_invoices"
+            ? Boolean(value)
+            : value ?? "",
     };
   }
 
@@ -2594,6 +2620,8 @@ class ZrnAnalyticsHubAction extends Component {
     this.updateCommercialFilter("order_status", "confirmed");
     if (ev.target.value === "purchase") {
       this.updateCommercialFilter("invoiced_only", false);
+      this.updateCommercialFilter("accounting_basis", false);
+      this.updateCommercialFilter("include_special_invoices", false);
     }
   }
 
