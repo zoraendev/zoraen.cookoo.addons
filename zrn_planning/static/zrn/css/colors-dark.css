@@ -480,3 +480,55 @@
     --z-color-scrollbar-thumb-hover: var(--scrollbar-thumb-hover);
   }
 }
+
+/* ── Odoo Backend Dark Theme Overrides ── */
+html.dark .o_main_navbar,
+html.zrn_backend_dark .o_main_navbar {
+  background: var(--z-color-neutral-1900) !important;
+  border-bottom: 1px solid var(--z-color-neutral-1700) !important;
+}
+
+html.dark .o_main_navbar .dropdown-menu,
+html.zrn_backend_dark .o_main_navbar .dropdown-menu {
+  background-color: var(--z-color-neutral-1800) !important;
+  border-color: var(--z-color-neutral-1600) !important;
+  color: var(--z-color-neutral-100) !important;
+}
+
+html.dark .o_main_navbar .dropdown-item,
+html.zrn_backend_dark .o_main_navbar .dropdown-item {
+  color: var(--z-color-neutral-200) !important;
+}
+
+html.dark .o_main_navbar .dropdown-item:hover,
+html.zrn_backend_dark .o_main_navbar .dropdown-item:hover,
+html.dark .o_main_navbar .dropdown-item:focus,
+html.zrn_backend_dark .o_main_navbar .dropdown-item:focus {
+  background-color: var(--z-color-neutral-1600) !important;
+  color: var(--z-color-neutral-50) !important;
+}
+
+html.dark .o_control_panel,
+html.zrn_backend_dark .o_control_panel {
+  background-color: var(--z-color-neutral-1900) !important;
+  border-bottom: 1px solid var(--z-color-neutral-1700) !important;
+  color: var(--z-color-neutral-100) !important;
+}
+
+html.dark .o_control_panel .breadcrumb,
+html.zrn_backend_dark .o_control_panel .breadcrumb,
+html.dark .o_control_panel .breadcrumb-item,
+html.zrn_backend_dark .o_control_panel .breadcrumb-item {
+  color: var(--z-color-neutral-300) !important;
+}
+
+html.dark .o_web_client,
+html.zrn_backend_dark .o_web_client,
+html.dark .o_action_manager,
+html.zrn_backend_dark .o_action_manager,
+html.dark .o_content,
+html.zrn_backend_dark .o_content {
+  background-color: var(--z-color-neutral-2000) !important;
+  color: var(--z-color-neutral-100) !important;
+}
+

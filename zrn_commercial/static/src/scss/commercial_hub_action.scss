@@ -95,3 +95,64 @@
     width: 100%;
   }
 }
+
+html.dark,
+html[data-theme="dark"],
+html[data-color-scheme="dark"],
+html.zrn_backend_dark,
+body.o_dark,
+body.dark,
+.o_web_client.o_dark,
+.o_dark {
+  .o_action_manager .zrn_hub_workspace {
+    background: #0f1724;
+  }
+
+  .o_action_manager .zrn_hub_header {
+    background: #162131;
+    border-bottom-color: #31445d;
+  }
+
+  .o_action_manager .zrn_hub_header_main h1 {
+    color: #f8fbff;
+  }
+
+  .o_action_manager .zrn_hub_kicker {
+    color: #8db6f2;
+  }
+
+  .o_action_manager .zrn_hub_switch.btn {
+    border-color: #334155;
+    background: #162131;
+    color: #8db6f2;
+
+    &:hover,
+    &:focus {
+      border-color: #42566f;
+      background: #1e2c40;
+      color: #a7c8f8;
+    }
+  }
+
+  .o_action_manager .zrn_hub_switch_active.btn,
+  .o_action_manager .zrn_hub_switch_active.btn:hover,
+  .o_action_manager .zrn_hub_switch_active.btn:focus {
+    border-color: #72a2e8;
+    background: #1f4e8c;
+    color: #ffffff;
+  }
+
+  .o_action_manager .zrn_hub_panel {
+    border-color: #334155;
+    background: #162131;
+  }
+
+  .o_action_manager .zrn_hub_panel_title {
+    color: #f8fbff;
+  }
+
+  .o_action_manager .zrn_hub_panel_text {
+    color: #9fb0c6;
+  }
+}
+

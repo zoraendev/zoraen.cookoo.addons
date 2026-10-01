@@ -157,6 +157,7 @@ const DATASETS = {
 };
 
 const COLORS = ["#315f98", "#4a78ad", "#6f5d9a", "#2f8f6f", "#c58b2b", "#9a5f6d"];
+const DARK_COLORS = ["#72a2e8", "#55b9a5", "#bfabed", "#f1d38c", "#a7c8f8", "#e34c62"];
 
 class ZrnCommercialHomeDashboardController extends FormController {
   setup() {
@@ -178,9 +179,11 @@ class ZrnCommercialHomeDashboardController extends FormController {
       exportMenu: null,
     });
     this.resizeCharts = () => this.charts.forEach((chart) => chart.resize());
+    this._themeChangedHandler = () => this.renderCharts();
 
     onMounted(() => {
       window.addEventListener("resize", this.resizeCharts);
+      window.addEventListener("zrn-theme-changed", this._themeChangedHandler);
       this.rootRef.el?.addEventListener("click", this._rootClickHandler);
       this.rootRef.el?.addEventListener("change", this._rootChangeHandler);
       this.loadDashboard();
@@ -188,6 +191,7 @@ class ZrnCommercialHomeDashboardController extends FormController {
     onPatched(() => this.loadDashboard());
     onWillUnmount(() => {
       window.removeEventListener("resize", this.resizeCharts);
+      window.removeEventListener("zrn-theme-changed", this._themeChangedHandler);
       this.rootRef.el?.removeEventListener("click", this._rootClickHandler);
       this.rootRef.el?.removeEventListener("change", this._rootChangeHandler);
       this.charts.forEach((chart) => chart.dispose());
@@ -538,6 +542,10 @@ class ZrnCommercialHomeDashboardController extends FormController {
     const currency = this.payload?.currency || "";
     const chartSeries = variant.chartSeries || [{ key: variant.chartMetric, label: variant.chartLabel || variant.label }];
     const primarySerie = chartSeries.find((serie) => serie.key === variant.chartMetric) || chartSeries[0];
+    const isDark = document.documentElement.classList.contains("zrn_backend_dark") ||
+                   document.documentElement.classList.contains("dark") ||
+                   document.body?.classList.contains("o_dark");
+    const activePalette = isDark ? DARK_COLORS : COLORS;
     const formatValue = (value, serie = primarySerie) => serie?.format === "money"
       ? `${currency} ${Number(value).toLocaleString()}`
       : serie?.format === "percent"
@@ -545,28 +553,62 @@ class ZrnCommercialHomeDashboardController extends FormController {
       : Number(value).toLocaleString();
     if (config.type === "pie") {
       return {
-        color: COLORS,
-        tooltip: { trigger: "item", formatter: (item) => `${item.name}<br/>${formatValue(item.value)}` },
-        legend: { bottom: 0, left: "center", type: "scroll" },
+        color: activePalette,
+        tooltip: {
+          trigger: "item",
+          formatter: (item) => `${item.name}<br/>${formatValue(item.value)}`,
+          backgroundColor: isDark ? "#162131" : "#ffffff",
+          borderColor: isDark ? "#31445d" : "#cfd9e6",
+          textStyle: { color: isDark ? "#e5edf8" : "#17324d" },
+        },
+        legend: {
+          bottom: 0,
+          left: "center",
+          type: "scroll",
+          textStyle: { color: isDark ? "#9fb0c6" : "#5f6b7a" },
+        },
         series: [{
           name: primarySerie.label,
           type: "pie",
           radius: ["42%", "70%"],
+          itemStyle: { borderColor: isDark ? "#111827" : "#ffffff", borderWidth: 2 },
           data: data.rows.map((row, index) => ({ name: data.labels[index], value: Number(row[primarySerie.key] || 0) })),
         }],
       };
     }
     return {
-      color: COLORS,
+      color: activePalette,
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
         valueFormatter: (value) => formatValue(value, primarySerie),
+        backgroundColor: isDark ? "#162131" : "#ffffff",
+        borderColor: isDark ? "#31445d" : "#cfd9e6",
+        textStyle: { color: isDark ? "#e5edf8" : "#17324d" },
       },
-      legend: { bottom: 4, left: "center", type: "scroll" },
+      legend: {
+        bottom: 4,
+        left: "center",
+        type: "scroll",
+        textStyle: { color: isDark ? "#9fb0c6" : "#5f6b7a" },
+      },
       grid: { top: 18, right: 24, bottom: 64, left: 54, containLabel: true },
-      xAxis: { type: "category", data: data.labels, axisLabel: { interval: 0, rotate: data.labels.length > 4 ? 24 : 0 } },
-      yAxis: { type: "value", minInterval: 1 },
+      xAxis: {
+        type: "category",
+        data: data.labels,
+        axisLabel: {
+          interval: 0,
+          rotate: data.labels.length > 4 ? 24 : 0,
+          color: isDark ? "#9fb0c6" : "#5f6b7a",
+        },
+        axisLine: { lineStyle: { color: isDark ? "#334155" : "#cfd9e6" } },
+      },
+      yAxis: {
+        type: "value",
+        minInterval: 1,
+        axisLabel: { color: isDark ? "#9fb0c6" : "#5f6b7a" },
+        splitLine: { lineStyle: { color: isDark ? "#22344a" : "#edf2f8" } },
+      },
       series: chartSeries.map((serie) => ({
         name: serie.label,
         type: config.type === "line" ? "line" : "bar",

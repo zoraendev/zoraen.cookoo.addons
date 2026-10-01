@@ -1322,117 +1322,468 @@
   background: #e9f0f7;
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// (ZRN) Planeacion – Dark mode overrides (alineado con ZRN Analitica)
+// ─────────────────────────────────────────────────────────────────────────────
+html.dark,
+html[data-theme="dark"],
+html[data-color-scheme="dark"],
+html.zrn_backend_dark,
+body.o_dark,
+body.dark,
 .o_web_client.o_dark,
-.o_web_client[data-theme="dark"],
 .o_dark {
+  .o_form_view.zrn_planning_home_form,
+  .zrn_planning_home_dashboard {
+    background: transparent;
+  }
+
+  // Paneles de producción y abastecimiento
+  .zrn_planning_home_panel {
+    border-color: #334155;
+    background: #111827;
+  }
+
+  .zrn_planning_home_panel_head {
+    border-bottom: 1px solid #31445d;
+    background: #182334;
+    color: #8db6f2;
+
+    strong {
+      color: #8db6f2;
+    }
+  }
+
+  // Tabla de métricas resumidas (Planes, OFs/OCs, Finalizadas, Avance)
+  .zrn_planning_home_metrics {
+    border-color: #334155;
+    background: #162131;
+  }
+
+  .zrn_planning_home_summary_table {
+    background: #162131;
+
+    th {
+      border-bottom: 1px solid #31445d;
+      background: #182334;
+      color: #8db6f2;
+    }
+
+    td {
+      background: #111827;
+      color: #8db6f2;
+      text-decoration-color: #8db6f2;
+      border-bottom: 0;
+    }
+  }
+
+  // Subcabecera visual ("Vista de planes")
+  .zrn_planning_home_visual_head {
+    border-bottom: 1px solid #31445d;
+    color: #8db6f2;
+  }
+
+  // Botones de acción del panel
+  .zrn_planning_home_icon_btn {
+    border-color: #334155;
+    background: #162131;
+    color: #8db6f2;
+
+    &:hover,
+    &:focus {
+      border-color: #42566f;
+      background: #1e2c40;
+      color: #a7c8f8;
+    }
+
+    &.is-active {
+      border-color: #72a2e8;
+      background: #1f4e8c;
+      color: #ffffff;
+    }
+  }
+
+  .zrn_planning_home_nav_btn {
+    border-color: #72a2e8;
+    background: #1f4e8c;
+    color: #ffffff;
+
+    &:hover,
+    &:focus {
+      border-color: #8db6f2;
+      background: #2f65ad;
+      color: #ffffff;
+    }
+  }
+
+  // Menú flotante de exportación
   .zrn_planning_home_export_menu,
   .zrn_planning_export_menu {
-    border-color: #3a4654;
-    background: #1d2530;
+    border-color: #334155;
+    background: #162131;
+    box-shadow: 0 8px 24px rgba(2, 6, 23, 0.4);
+
+    strong,
+    .zrn_planning_export_menu_title {
+      border-bottom: 1px solid #31445d;
+      color: #f8fbff;
+    }
+
+    button,
+    .zrn_planning_export_menu_item {
+      background: #162131;
+      color: #8db6f2;
+
+      &:hover,
+      &:focus {
+        background: #1e2c40;
+        color: #a7c8f8;
+      }
+    }
   }
 
-  .zrn_planning_home_export_menu strong,
-  .zrn_planning_export_menu_title {
-    border-color: #3a4654;
-    color: #d9e3ee;
+  // Superficies de tabla de planes y gráfica
+  .zrn_planning_home_table_mount,
+  .zrn_planning_home_chart_canvas,
+  .zrn_planning_home_table_surface {
+    background: #131d2c;
   }
 
-  .zrn_planning_home_export_menu button,
-  .zrn_planning_export_menu_item {
-    background: #1d2530;
-    color: #d9e3ee;
+  .zrn_planning_home_table_surface {
+    table {
+      color: #e5edf8;
+    }
+
+    th {
+      border-bottom: 1px solid #31445d;
+      background: #182334;
+      color: #8db6f2;
+    }
+
+    td {
+      border-bottom: 1px solid #334155;
+      background: #131d2c;
+      color: #e5edf8;
+
+      &:first-child {
+        color: #f8fbff;
+      }
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #111827;
+    }
+
+    tbody tr:hover td {
+      background: #22344a;
+    }
   }
 
-  .zrn_planning_home_export_menu button:hover,
-  .zrn_planning_home_export_menu button:focus,
-  .zrn_planning_export_menu_item:hover,
-  .zrn_planning_export_menu_item:focus {
-    background: #243244;
-    color: #ffffff;
-  }
-}
+  .zrn_planning_sort_header {
+    i {
+      color: #9fb0c6;
+    }
 
-.o_web_client.o_dark .o_form_view.zrn_planning_purchase_report_form,
-.o_web_client[data-theme="dark"] .o_form_view.zrn_planning_purchase_report_form,
-.o_dark .o_form_view.zrn_planning_purchase_report_form {
-  .zrn_planning_production_report_header_shell,
+    &:hover,
+    &:focus {
+      color: #8db6f2;
+
+      i {
+        color: #8db6f2;
+      }
+    }
+  }
+
+  .zrn_planning_home_empty_cell,
+  .zrn_planning_home_chart_empty {
+    color: #9fb0c6;
+    background: #131d2c;
+  }
+
+  // Modales de filtros y configuración
+  .zrn_planning_home_chart_config_backdrop,
+  .zrn_planning_filter_modal_backdrop {
+    background: rgba(2, 6, 23, 0.65);
+  }
+
+  .zrn_planning_home_chart_config_dialog,
+  .zrn_planning_filter_modal_dialog {
+    border-color: #334155;
+    background: #162131;
+    color: #e5edf8;
+    box-shadow: 0 10px 28px rgba(2, 6, 23, 0.45);
+  }
+
+  .zrn_planning_home_chart_config_head,
+  .zrn_planning_filter_modal_head,
+  .zrn_planning_home_chart_config_footer,
+  .zrn_planning_filter_modal_footer,
+  .zrn_planning_filter_modal_header {
+    border-color: #31445d;
+    background: #182334;
+
+    h3 {
+      color: #f8fbff;
+    }
+
+    span {
+      color: #9fb0c6;
+    }
+  }
+
+  .zrn_planning_home_chart_config_body,
+  .zrn_planning_filter_modal_body {
+    background: #162131;
+
+    label,
+    span {
+      color: #8db6f2;
+    }
+
+    select,
+    input {
+      border: 1px solid #42566f;
+      border-radius: 4px;
+      background: #101a29;
+      color: #e5edf8;
+    }
+  }
+
+  .zrn_planning_filter_modal_field > .o_field_widget {
+    border-bottom: 1px solid #42566f;
+    background: #101a29;
+    color: #e5edf8;
+
+    input,
+    select {
+      color: #e5edf8;
+    }
+
+    input::placeholder {
+      color: #9fb0c6;
+    }
+  }
+
+  .zrn_planning_filter_modal_close {
+    border-color: #334155;
+    background: #162131;
+    color: #9fb0c6;
+
+    &:hover,
+    &:focus {
+      border-color: #42566f;
+      color: #f8fbff;
+    }
+  }
+
+  // Barra de filtros y resúmenes en vistas de planeación
+  .zrn_planning_filter_bar {
+    border-color: #334155;
+    background: #182233;
+  }
+
+  .zrn_planning_filter_summary_inline {
+    color: #9fb0c6;
+  }
+
+  .zrn_planning_filter_footer_stats .zrn_planning_filter_summary_item {
+    border-color: #334155;
+    background: #162131;
+    color: #e5edf8;
+
+    i {
+      color: #72a2e8;
+    }
+
+    strong {
+      color: #8db6f2;
+    }
+  }
+
+  // Paneles de explorador de planes y reportes de producción/compras
+  .zrn_planning_filter_table_panel,
   .zrn_planning_production_report_table_panel,
-  .zrn_planning_report_metric_strip,
-  .zrn_planning_production_report_table_toolbar,
-  .zrn_planning_production_report_table_placeholder {
-    border-color: #3a4654;
-    background: #151b23;
+  .o_form_view.zrn_planning_production_report_form .zrn_planning_production_report_header_shell {
+    border-color: #334155;
+    background: #111827;
   }
 
-  .zrn_planning_production_report_header_range,
-  .zrn_planning_production_report_inline_stat,
-  .zrn_planning_report_metric_strip > div,
-  .zrn_planning_production_manufacture_table_wrap,
-  .zrn_planning_report_chart_canvas {
-    border-color: #3a4654;
-    background: #1d2530;
-    color: #d9e3ee;
+  .zrn_planning_filter_table_head_main {
+    border-bottom: 1px solid #31445d;
+    background: #182334;
+    color: #f8fbff;
   }
 
-  .zrn_planning_production_report_table_title,
-  .zrn_planning_production_report_header_range,
-  .zrn_planning_production_report_inline_stat,
-  .zrn_planning_report_metric_strip strong,
-  .zrn_planning_production_manufacture_table_wrap .o_list_table th,
-  .zrn_planning_production_manufacture_table_wrap .o_list_table td {
-    color: #d9e3ee;
+  .zrn_planning_plan_explorer_chart {
+    border-color: #334155;
+    background: #111827;
   }
 
-  .zrn_planning_report_metric_strip span,
-  .zrn_planning_production_report_header_range span,
-  .zrn_planning_production_report_inline_stat span {
-    color: #9fb1c4;
+  .zrn_planning_plan_explorer_scroll {
+    scrollbar-color: #42566f #131d2c;
+
+    &::-webkit-scrollbar-track {
+      background: #131d2c;
+      border-color: #334155;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-color: #131d2c;
+      background: #42566f;
+
+      &:hover {
+        background: #72a2e8;
+      }
+    }
   }
 
-  .zrn_planning_production_report_inline_stat i,
-  .zrn_planning_report_metric_strip i {
-    color: #78a7dc;
+  .zrn_planning_plan_explorer_grid {
+    th {
+      border-bottom: 1px solid #31445d;
+      background: #182334;
+      color: #8db6f2;
+    }
+
+    td {
+      border-bottom: 1px solid #334155;
+      background: #131d2c;
+      color: #e5edf8;
+    }
+
+    tbody tr:nth-child(even) td {
+      background: #111827;
+    }
+
+    tbody tr:hover td {
+      background: #22344a;
+    }
   }
 
-  .zrn_planning_production_report_action_btn,
-  .zrn_planning_report_icon_btn {
-    border-color: #46586b;
-    background: #202b38;
-    color: #d9e3ee;
+  .zrn_planning_plan_name_cell {
+    color: #f8fbff;
   }
 
-  .zrn_planning_production_report_action_btn:not(.zrn_planning_production_report_action_btn_inactive),
-  .zrn_planning_report_icon_btn.is-active {
-    border-color: #4f82bd;
-    background: #315f98;
-    color: #fff;
+  // Métricas y paneles en reportes de producción
+  .zrn_planning_production_report_metric {
+    border-color: #334155;
+    background: #162131;
+
+    span {
+      color: #8db6f2;
+    }
+
+    strong {
+      color: #f8fbff;
+    }
   }
 
-  .o_list_table thead th {
-    background: #243244;
-    color: #e4edf6;
+  .zrn_planning_production_report_chart_panel {
+    border-color: #334155;
+    background: #131d2c;
   }
 
-  .o_list_table tbody td {
-    background: #1d2530;
-    color: #d9e3ee;
+  .zrn_planning_filter_table_panel .zrn_planning_plans_list_container {
+    background: #131d2c;
   }
 
-  .o_list_table tbody tr:nth-child(even) td {
-    background: #202a36;
+  // Tablas estándar de Odoo en formularios de reporte
+  .o_form_view.zrn_planning_filter_form .o_list_table thead th,
+  .o_form_view.zrn_planning_production_report_form .o_list_table thead th {
+    background: #182334;
+    color: #8db6f2;
+    border-bottom: 1px solid #31445d;
   }
 
-  .o_list_table tfoot td {
-    background: #263549;
-    color: #e4edf6;
+  .o_form_view.zrn_planning_filter_form .o_list_table tbody td,
+  .o_form_view.zrn_planning_production_report_form .o_list_table tbody td {
+    background: #131d2c;
+    color: #e5edf8;
+    border-bottom: 1px solid #334155;
   }
 
-  .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-track {
-    background: #151b23;
-  }
+  // Reporte de compras/producción existente
+  .o_form_view.zrn_planning_purchase_report_form {
+    .zrn_planning_production_report_header_shell,
+    .zrn_planning_production_report_table_panel,
+    .zrn_planning_report_metric_strip,
+    .zrn_planning_production_report_table_toolbar,
+    .zrn_planning_production_report_table_placeholder {
+      border-color: #334155;
+      background: #111827;
+    }
 
-  .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-thumb {
-    background: #536d88;
+    .zrn_planning_production_report_header_range,
+    .zrn_planning_production_report_inline_stat,
+    .zrn_planning_report_metric_strip > div,
+    .zrn_planning_production_manufacture_table_wrap,
+    .zrn_planning_report_chart_canvas {
+      border-color: #334155;
+      background: #162131;
+      color: #e5edf8;
+    }
+
+    .zrn_planning_production_report_table_title,
+    .zrn_planning_production_report_header_range,
+    .zrn_planning_production_report_inline_stat,
+    .zrn_planning_report_metric_strip strong,
+    .zrn_planning_production_manufacture_table_wrap .o_list_table th,
+    .zrn_planning_production_manufacture_table_wrap .o_list_table td {
+      color: #f8fbff;
+    }
+
+    .zrn_planning_report_metric_strip span,
+    .zrn_planning_production_report_header_range span,
+    .zrn_planning_production_report_inline_stat span {
+      color: #9fb0c6;
+    }
+
+    .zrn_planning_production_report_inline_stat i,
+    .zrn_planning_report_metric_strip i {
+      color: #72a2e8;
+    }
+
+    .zrn_planning_production_report_action_btn,
+    .zrn_planning_report_icon_btn {
+      border-color: #334155;
+      background: #162131;
+      color: #8db6f2;
+    }
+
+    .zrn_planning_production_report_action_btn:not(.zrn_planning_production_report_action_btn_inactive),
+    .zrn_planning_report_icon_btn.is-active {
+      border-color: #72a2e8;
+      background: #1f4e8c;
+      color: #fff;
+    }
+
+    .o_list_table thead th {
+      background: #182334;
+      color: #8db6f2;
+      border-bottom: 1px solid #31445d;
+    }
+
+    .o_list_table tbody td {
+      background: #131d2c;
+      color: #e5edf8;
+      border-bottom: 1px solid #334155;
+    }
+
+    .o_list_table tbody tr:nth-child(even) td {
+      background: #111827;
+    }
+
+    .o_list_table tfoot td {
+      background: #182334;
+      color: #f8fbff;
+    }
+
+    .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-track {
+      background: #131d2c;
+    }
+
+    .zrn_planning_production_manufacture_table_wrap::-webkit-scrollbar-thumb {
+      background: #42566f;
+    }
   }
 }
 
